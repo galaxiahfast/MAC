@@ -1,0 +1,129 @@
+:root {
+    --bg-map: #ffffff;
+    --accent: #38bdf8;
+    --scroll-track: #0f172a;
+    --scroll-thumb: #334155;
+    --scroll-hover: #475569;
+    --danger: #f87171;
+    --ui-bg: rgba(15, 23, 42, 0.8);
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-map);
+    overscroll-behavior: none;
+}
+body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    line-height: 0;
+}
+
+/* ==========================================================================
+   DISEÑO DEL SCROLLBAR PERSONALIZADO (COLOR ESTÁTICO)
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--scroll-track);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 5px;
+    border: 2px solid var(--scroll-track);
+}
+::-webkit-scrollbar-thumb:hover, 
+::-webkit-scrollbar-thumb:active {
+    background: var(--scroll-thumb);
+}
+
+/* ==========================================================================
+   CONTENEDOR DEL MAPA, IMAGEN BASE Y CAPAS DE INTERACCIÓN
+   ========================================================================== */
+.map-container {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-map);
+    z-index: 1;
+}
+.plano-base {
+    width: 100%;
+    height: auto;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 2;
+}
+#devices-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   BARRA LATERAL DE HERRAMIENTAS Y ESTILOS DE BOTONES (UI - PRIORIDAD MÁXIMA)
+   ========================================================================== */
+.sidebar-tools {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 9999;
+    padding: 15px;
+    background: var(--ui-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+.tool-btn {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.tool-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+.tool-btn:hover {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    transform: scale(1.1);
+}
