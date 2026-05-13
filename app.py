@@ -5,55 +5,27 @@ import json
 import os
 import threading
 import time
-import shutil  # Para el sistema de respaldos
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
 # --- CONFIGURACIÓN Y CARGA DE DATOS ---
 JSON_FILE = 'devices.json'
-BACKUP_FILE = 'devices.json.bak'
 IP_RANGE = "192.168.2.0/24"
 last_scan_results = [] 
 
 def load_devices():
-    """Carga dispositivos con validación de integridad."""
     if os.path.exists(JSON_FILE):
         try:
-            # Si el archivo está vacío pero existe el backup, restaurar
-            if os.path.getsize(JSON_FILE) == 0 and os.path.exists(BACKUP_FILE):
-                print("Archivo principal vacío. Restaurando desde backup...")
-                shutil.copy(BACKUP_FILE, JSON_FILE)
-            
             with open(JSON_FILE, 'r', encoding='utf-8') as f:
-                content = f.read().strip()
-                if not content:
-                    return []
-                return json.loads(content)
+                return json.load(f)
         except Exception as e:
             print(f"Error cargando JSON: {e}")
-            # Intentar cargar desde el backup si el principal falló
-            if os.path.exists(BACKUP_FILE):
-                try:
-                    with open(BACKUP_FILE, 'r', encoding='utf-8') as f:
-                        return json.load(f)
-                except: return []
             return []
     return []
 
 def save_devices(devices):
-    """Guarda dispositivos creando un respaldo previo."""
     try:
-        # 1. Verificar si los datos actuales son válidos antes de guardar
-        if not isinstance(devices, list):
-            print("Error: Se intentó guardar datos corruptos (no es una lista).")
-            return False
-
-        # 2. Crear respaldo del archivo actual si tiene contenido
-        if os.path.exists(JSON_FILE) and os.path.getsize(JSON_FILE) > 0:
-            shutil.copy(JSON_FILE, BACKUP_FILE)
-        
-        # 3. Escribir nuevos datos
         with open(JSON_FILE, 'w', encoding='utf-8') as f:
             json.dump(devices, f, indent=4, ensure_ascii=False)
         return True
@@ -288,6 +260,7 @@ HTML_BODY = """
         .scroll-content::-webkit-scrollbar { width: 4px; }
         .scroll-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         
+        /* UNIFICACIÓN DE TAMAÑO DE FUENTE A 12PX */
         .edit-field { font-size: 12px; transition: all 0.2s; padding: 2px 4px; border-radius: 4px; border: 1px solid transparent; display: block; text-align: left; text-transform: uppercase; }
         .edit-field[contenteditable="true"] { background: rgba(56, 189, 248, 0.1); border: 1px dashed var(--accent); outline: none; }
         

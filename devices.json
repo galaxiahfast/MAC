@@ -1,1 +1,17 @@
-[]
+[
+    {
+        "name": "PC-PROGRAMADOR",
+        "mac": "08:bf:b8:8c:1b:36",
+        "usuario": "JULIAN EMILIANO ORTIZ RIVERO",
+        "area": "SISTEMAS",
+        "pos_x": "50%",
+        "pos_y": "50%",
+        "host": "DATAMID",
+        "device_id": "F73D0147",
+        "product_id": "N/A",
+        "aw_active": false,
+        "kaspersky_active": false,
+        "becario_active": false,
+        "hidden": false
+    }
+]
