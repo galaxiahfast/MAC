@@ -1,43 +1,55 @@
 :root {
-    --bg-map: #ffffff;
-    --accent: #38bdf8;
-    --scroll-track: #0f172a;
-    --scroll-thumb: #334155;
-    --scroll-hover: #475569;
-    --danger: #f87171;
-    --ui-bg: rgba(15, 23, 42, 0.8);
+    --bg-map: #fefefe;
+    --accent: #475569;
+    --scroll-track: #f1f5f9;
+    --scroll-thumb: #cbd5e1;
+    --ui-bg: rgba(255, 255, 255, 0.9);
+    --ui-border: rgba(71, 85, 105, 0.2);
 }
+
+[data-theme="dark"] {
+    --bg-map: #121212;
+    --accent: #38bdf8;
+    --scroll-track: #0a0a0a;
+    --scroll-thumb: #262626;
+    --ui-bg: rgba(18, 18, 18, 0.95);
+    --ui-border: rgba(56, 189, 248, 0.3);
+}
+
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     background-color: var(--bg-map);
     overscroll-behavior: none;
+    transition: background-color 0.4s ease;
 }
+
 body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow-y: auto;
     overflow-x: hidden;
     line-height: 0;
 }
 
 /* ==========================================================================
-   DISEÑO DEL SCROLLBAR PERSONALIZADO (COLOR ESTÁTICO)
+   DISEÑO DEL SCROLLBAR PERSONALIZADO
    ========================================================================== */
 ::-webkit-scrollbar {
     width: 10px;
 }
+
 ::-webkit-scrollbar-track {
     background: var(--scroll-track);
 }
+
 ::-webkit-scrollbar-thumb {
     background: var(--scroll-thumb);
     border-radius: 5px;
     border: 2px solid var(--scroll-track);
-}
-::-webkit-scrollbar-thumb:hover, 
-::-webkit-scrollbar-thumb:active {
-    background: var(--scroll-thumb);
 }
 
 /* ==========================================================================
@@ -46,13 +58,12 @@ body {
 .map-container {
     position: relative;
     width: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
+    max-width: 2294px;
+    margin: auto;
     background-color: var(--bg-map);
     z-index: 1;
 }
+
 .plano-base {
     width: 100%;
     height: auto;
@@ -60,7 +71,14 @@ body {
     image-rendering: -webkit-optimize-contrast;
     user-select: none;
     -webkit-user-drag: none;
+    transition: filter 0.4s ease;
+    filter: none; 
 }
+
+[data-theme="dark"] .plano-base {
+    filter: invert(0.93) hue-rotate(180deg) brightness(0.8);
+}
+
 .grid-overlay {
     position: absolute;
     top: 0;
@@ -74,6 +92,7 @@ body {
     pointer-events: none;
     z-index: 2;
 }
+
 #devices-layer {
     position: absolute;
     top: 0;
@@ -85,11 +104,11 @@ body {
 }
 
 /* ==========================================================================
-   BARRA LATERAL DE HERRAMIENTAS Y ESTILOS DE BOTONES (UI - PRIORIDAD MÁXIMA)
+   BARRA LATERAL DE HERRAMIENTAS Y ESTILOS DE BOTONES (UI)
    ========================================================================== */
 .sidebar-tools {
     position: fixed;
-    right: 20px;
+    right: 25px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
@@ -99,10 +118,12 @@ body {
     padding: 15px;
     background: var(--ui-bg);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(56, 189, 248, 0.2);
+    border: 1px solid var(--ui-border);
     border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
 }
+
 .tool-btn {
     width: 45px;
     height: 45px;
@@ -116,14 +137,21 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .tool-btn svg {
     width: 24px;
     height: 24px;
     stroke-width: 2;
 }
+
 .tool-btn:hover {
     background: rgba(56, 189, 248, 0.1);
     border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
     transform: scale(1.1);
+}
+
+.theme-separator {
+    height: 1px;
+    background: var(--ui-border);
+    margin: 5px 0;
 }

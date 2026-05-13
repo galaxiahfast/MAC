@@ -6,20 +6,28 @@
     <title>Monitor de Red - DATAMID</title>
 
     <!-- ==========================================================================
-       METADATOS Y RECURSOS EXTERNOS (ESTILOS Y FUENTES)
-       ========================================================================== -->
+        METADATOS Y RECURSOS EXTERNOS (ESTILOS Y FUENTES)
+        ========================================================================== -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+<body data-theme="light">
 
     <!-- ==========================================================================
-       INTERFAZ DE USUARIO (BARRA LATERAL Y HERRAMIENTAS)
-       ========================================================================== -->
+        BARRA LATERAL DE HERRAMIENTAS (UI)
+        ========================================================================== -->
     <div class="sidebar-tools">
+        <button class="tool-btn" id="theme-toggle" title="CAMBIAR MODO">
+            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+
+        <div class="theme-separator"></div>
+
         <button class="tool-btn" title="AGREGAR DISPOSITIVO">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         </button>
-        <button class="tool-btn danger" title="ELIMINAR DISPOSITIVO">
+        <button class="tool-btn" title="ELIMINAR DISPOSITIVO">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </button>
         <button class="tool-btn" title="EDITAR DISPOSITIVO">
@@ -29,7 +37,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
         </button>
         <button class="tool-btn" title="OCULTAR DISPOSITIVO">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="12" x2="23" y2="23"></line></svg>
         </button>
         <button class="tool-btn" title="AÑADIR/ELIMINAR APARTADOS">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -37,12 +45,17 @@
     </div>
 
     <!-- ==========================================================================
-       VISUALIZACIÓN PRINCIPAL (MAPA, REJILLA Y DISPOSITIVOS)
-       ========================================================================== -->
+        VISUALIZACIÓN PRINCIPAL (MAPA, REJILLA Y DISPOSITIVOS)
+        ========================================================================== -->
     <div class="map-container" id="map">
         <img src="{{ url_for('static', filename='img/plano.png') }}" class="plano-base">
         <div class="grid-overlay"></div>
         <div id="devices-layer"></div>
     </div>
+
+    <!-- ==========================================================================
+        LÓGICA DE INTERACCIÓN (SCRIPTS)
+        ========================================================================== -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
