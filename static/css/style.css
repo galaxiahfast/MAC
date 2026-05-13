@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&display=swap');
+
+:root {
+    --accent: #38bdf8;
+    --bg-dark: rgba(15, 23, 42, 0.98);
+    --border: #334155;
+}
+
+body {
+    background: #0f172a;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow: hidden;
+}
+
+.map-container {
+    position: relative;
+    width: fit-content;
+    margin: 50px auto;
+    border: 1px solid var(--border);
+    background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+.plano-img {
+    display: block;
+    max-width: 100%;
+    opacity: 0.6;
+}
+
+.marker-wrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    cursor: grab;
+    padding: 15px; /* Área de activación del hover */
+}
+
+.marker-wrapper:active { cursor: grabbing; }
+
+.punto {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid white;
+    transition: transform 0.2s;
+}
+
+.info-box {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 260px;
+    background: var(--bg-dark);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+/* El PUENTE: Ahora es pequeño y centrado para no estorbar en las esquinas */
+.marker-wrapper:hover .info-box {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.info-box::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 25px;
+    background: transparent;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.label { font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 8px; }
+.data { font-family: 'JetBrains Mono'; font-size: 12px; margin-bottom: 5px; }
+.scroll-content { max-height: 200px; overflow-y: auto; }
