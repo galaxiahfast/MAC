@@ -155,3 +155,82 @@ body {
     background: var(--ui-border);
     margin: 5px 0;
 }
+
+/* ==========================================================================
+   ESTILOS DEL FORMULARIO DE GESTIÓN (REFINAMIENTO DE VISIBILIDAD)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100% - 100px); 
+    height: 100vh;
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+    background-color: transparent;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--ui-bg);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    border: 1px solid var(--ui-border);
+    color: var(--accent);
+    transition: all 0.4s ease;
+    pointer-events: auto;
+}
+
+.modal-content h3 {
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-form input {
+    padding: 10px;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--accent);
+    transition: border-color 0.3s;
+}
+
+.modal-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.btn-main {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background-color: #007bff;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-main:hover {
+    background-color: #0069d9;
+    transform: translateY(-1px);
+}
+
+.confirm-mode {
+    background-color: #28a745 !important;
+}
