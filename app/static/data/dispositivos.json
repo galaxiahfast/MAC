@@ -5,8 +5,8 @@
             "ID",
             "DIRECCIÓN MAC ADRESS",
             "ASFF",
-            "ASD",
-            "DF"
+            "DF",
+            "AS"
         ]
     },
     "dispositivos": [
@@ -19,8 +19,8 @@
                 "ID": "123342",
                 "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
                 "ASFF": "adsds",
-                "ASD": "asd",
-                "DF": "df"
+                "DF": "df",
+                "AS": "AS"
             }
         },
         {
@@ -32,8 +32,8 @@
                 "ID": "123342",
                 "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
                 "ASFF": "adsds",
-                "ASD": "asd",
-                "DF": "df"
+                "DF": "df",
+                "AS": "AS"
             }
         }
     ]

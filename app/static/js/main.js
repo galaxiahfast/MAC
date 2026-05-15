@@ -5,6 +5,11 @@ let datosApartadosGlobal = [];
 let isWaitingForApartadoConfirmation = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    const icon = document.getElementById('theme-icon');
+    if (icon) updateThemeIconVisual(icon, savedTheme === 'dark');
+
     initThemeControl();
     initApartadosManager();
     initGlobalToolEvents();
@@ -37,7 +42,9 @@ function initThemeControl() {
         e.stopPropagation(); 
         const isDark = body.getAttribute('data-theme') === 'dark';
         const newTheme = isDark ? 'light' : 'dark';
+        
         body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
         updateThemeIconVisual(icon, isDark);
     });
 }
@@ -113,8 +120,8 @@ async function API_EliminarApartadoEnJSON(nombre) {
 
         if (respuesta.ok) {
             UI_MostrarNotificacion(data.message || "Parámetro eliminado", "success");
-            UI_CerrarTodosLosModales();
-            setTimeout(() => location.reload(), 800);
+            datosApartadosGlobal = datosApartadosGlobal.filter(item => item !== nombre);
+            UI_RenderizarListaEliminacion(datosApartadosGlobal);
         } else {
             UI_MostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
         }
@@ -161,8 +168,8 @@ async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
 
         if (respuesta.ok) {
             UI_MostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "success");
+            datosApartadosGlobal.push(nombre);
             UI_CerrarTodosLosModales();
-            setTimeout(() => location.reload(), 800);
         } else {
             UI_MostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
             UI_HabilitarBotonTrasError();
