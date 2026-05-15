@@ -1,0 +1,5 @@
+# Respaldos JSON
+app/static/data/backups/
+
+# Opcional: ignorar solo los JSON de respaldo
+# app/static/data/backups/*.json

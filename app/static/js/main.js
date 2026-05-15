@@ -117,7 +117,8 @@ async function UI_RenderizarListaEliminacion() {
 function UI_ConfirmarEliminacion(nombre, boton) {
     if (!boton.classList.contains('confirming')) {
         boton.classList.add('confirming');
-        boton.innerHTML = '<span style="font-size:9px; letter-spacing:0.05em;">CONFIRMAR</span>';
+        // Envolvemos en span con clase específica para el CSS
+        boton.innerHTML = '<span class="confirm-text">Confirmar</span>';
         
         setTimeout(() => {
             if (boton) {
@@ -180,7 +181,7 @@ function UI_ResetearModalApartados() {
     
     if (!inputNombre || !inputValor || !actionButton) return;
 
-    actionButton.textContent = "Añadir";
+    actionButton.innerHTML = "Añadir";
     actionButton.classList.remove('confirm-mode');
     inputNombre.disabled = false;
     inputValor.disabled = false;
@@ -205,7 +206,7 @@ function UI_ManejarCicloConfirmacionApartado() {
     }
 
     if (!isWaitingForApartadoConfirmation) {
-        actionButton.textContent = "Confirmar";
+        actionButton.innerHTML = '<span class="confirm-text">Confirmar</span>';
         actionButton.classList.add('confirm-mode');
         inputNombre.disabled = true;
         inputValor.disabled = true;

@@ -360,15 +360,15 @@ body {
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    margin-top: 15px;
+    margin-top: 20px; 
     box-sizing: border-box;
-    max-height: 250px; 
+    max-height: 230px; 
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 10px 12px 10px 2px;
+    padding: 2px 25px 2px 2px; 
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
-    scroll-padding-block: 10px;
+    border: none;
 }
 
 #lista-apartados-existentes::-webkit-scrollbar {
@@ -377,7 +377,7 @@ body {
 
 #lista-apartados-existentes::-webkit-scrollbar-track {
     background: var(--scroll-track);
-    margin: 10px 0;
+    margin: 5px 5px 5px 0; 
     border-radius: 5px;
 }
 
@@ -400,6 +400,7 @@ body {
     flex-shrink: 0;
     min-height: 60px;
     scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .delete-item-row span {
@@ -437,31 +438,41 @@ body {
     transform: scale(1.05);
 }
 
-/* ESTADO CONFIRMAR (MODO CLARO) - CORRECCIÓN DE COLOR */
+.btn-delete-small.confirming,
+.btn-main.confirm-mode {
+    background-color: #ef4444 !important; 
+    color: #ffffff !important; 
+    font-family: 'Inter', sans-serif !important;
+    text-transform: uppercase !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    border-radius: 50px !important;
+    border: none !important;
+    cursor: pointer;
+    animation: pulse-red 1.5s infinite;
+}
+
 .btn-delete-small.confirming {
     width: auto !important;
     min-width: 95px !important;
     height: 34px !important;
     padding: 0 16px !important;
-    background-color: #ef4444 !important; /* Rojo vibrante */
-    color: #ffffff !important; /* BLANCO PURO FORZADO */
-    
-    font-family: 'Inter', sans-serif !important;
+}
+
+.btn-main.confirm-mode {
+    width: 100% !important;
+    padding: 18px !important;
+}
+
+.confirm-text {
+    color: #ffffff !important;
     font-size: 9px !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: block !important;
     line-height: 1 !important;
-    
-    border-radius: 50px !important;
-    border: none !important; /* Quitamos el borde negro de la imagen */
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
-    cursor: pointer;
-    animation: pulse-red 1.5s infinite;
 }
 
 @keyframes pulse-red {
@@ -470,7 +481,6 @@ body {
     100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-/* AJUSTES MODO OSCURO */
 [data-theme="dark"] .delete-item-row {
     background-color: rgba(255, 255, 255, 0.02);
     border-color: rgba(255, 255, 255, 0.06);
@@ -485,9 +495,20 @@ body {
     color: #64748b;
 }
 
-[data-theme="dark"] .btn-delete-small.confirming {
+[data-theme="dark"] .btn-delete-small.confirming,
+[data-theme="dark"] .btn-main.confirm-mode {
     background-color: transparent !important;
     border: 1.5px solid #38bdf8 !important; 
     color: #38bdf8 !important; 
-    animation: pulse-dark 1.5s infinite;
+    animation: pulse-dark 1.5s infinite !important;
+}
+
+[data-theme="dark"] .confirm-text {
+    color: #38bdf8 !important;
+}
+
+@keyframes pulse-dark {
+    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.3); }
+    70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }

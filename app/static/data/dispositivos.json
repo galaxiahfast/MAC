@@ -2,10 +2,9 @@
     "configuracion": {
         "apartados": [
             "MAC Address",
-            "PRUEBA",
             "ID",
-            "X",
-            "QWE"
+            "HOLA",
+            "AS"
         ]
     },
     "dispositivos": [
@@ -15,10 +14,9 @@
             "y": 120,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5E",
-                "PRUEBA": "123456789",
                 "ID": "123342",
-                "X": "qw",
-                "QWE": "we"
+                "HOLA": "PRUEBA",
+                "AS": "as"
             }
         },
         {
@@ -27,10 +25,9 @@
             "y": 300,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5F",
-                "PRUEBA": "123456789",
                 "ID": "123342",
-                "X": "qw",
-                "QWE": "we"
+                "HOLA": "PRUEBA",
+                "AS": "as"
             }
         }
     ]
