@@ -2,6 +2,7 @@
     "configuracion": {
         "apartados": [
             "MAC Address",
+            "Estado",
             "PRUEBA",
             "ID",
             "X",
@@ -15,6 +16,7 @@
             "y": 120,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5E",
+                "Estado": "Activo",
                 "PRUEBA": "123456789",
                 "ID": "123342",
                 "X": "qw",
@@ -27,6 +29,7 @@
             "y": 300,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5F",
+                "Estado": "Inactivo",
                 "PRUEBA": "123456789",
                 "ID": "123342",
                 "X": "qw",

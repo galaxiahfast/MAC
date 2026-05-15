@@ -1,7 +1,9 @@
 {
     "configuracion": {
         "apartados": [
+            "Usuario",
             "MAC Address",
+            "Estado",
             "PRUEBA",
             "ID",
             "X",
@@ -14,7 +16,9 @@
             "x": 250,
             "y": 120,
             "detalles": {
+                "Usuario": "Admin",
                 "MAC Address": "00:1A:2B:3C:4D:5E",
+                "Estado": "Activo",
                 "PRUEBA": "123456789",
                 "ID": "123342",
                 "X": "qw",
@@ -26,7 +30,9 @@
             "x": 400,
             "y": 300,
             "detalles": {
+                "Usuario": "Vendedor1",
                 "MAC Address": "00:1A:2B:3C:4D:5F",
+                "Estado": "Inactivo",
                 "PRUEBA": "123456789",
                 "ID": "123342",
                 "X": "qw",
