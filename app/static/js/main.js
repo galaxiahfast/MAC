@@ -1,12 +1,27 @@
 /* ==========================================================================
    INICIALIZACIÓN Y CONFIGURACIÓN GLOBAL
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', () => {
+let datosApartadosGlobal = [];
+let isWaitingForApartadoConfirmation = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
     initThemeControl();
     initApartadosManager();
     initGlobalToolEvents();
     initEliminarApartadosManager();
+    
+    await API_PrecargarDatosApartados();
 });
+
+async function API_PrecargarDatosApartados() {
+    try {
+        const response = await fetch('/static/data/dispositivos.json');
+        const data = await response.json();
+        datosApartadosGlobal = data.configuracion.apartados;
+    } catch (error) {
+        UI_MostrarNotificacion("No se pudieron precargar los parámetros", "error");
+    }
+}
 
 /* ==========================================================================
    CONTROL DE TEMA (DARK / LIGHT MODE)
@@ -22,7 +37,6 @@ function initThemeControl() {
         e.stopPropagation(); 
         const isDark = body.getAttribute('data-theme') === 'dark';
         const newTheme = isDark ? 'light' : 'dark';
-        
         body.setAttribute('data-theme', newTheme);
         updateThemeIconVisual(icon, isDark);
     });
@@ -31,8 +45,6 @@ function initThemeControl() {
 /* ==========================================================================
    GESTIÓN DE APARTADOS: CONTROL DE VISIBILIDAD E INTERRUPTOR
    ========================================================================== */
-let isWaitingForApartadoConfirmation = false;
-
 function initApartadosManager() {
     const btnOpenConfig = document.getElementById('btn-config');
     const modalElement = document.getElementById('modal-config');
@@ -40,20 +52,17 @@ function initApartadosManager() {
     if (btnOpenConfig && modalElement) {
         btnOpenConfig.onclick = (e) => {
             e.stopPropagation();
-            
             const isVisible = modalElement.style.display === 'flex';
             const isAgregarVisible = document.getElementById('contenedor-agregar').style.display === 'block';
 
-            if (!isVisible || !isAgregarVisible) {
-                UI_CerrarTodosLosModales();
-                
-                document.getElementById('contenedor-agregar').style.display = 'block';
-                document.getElementById('contenedor-eliminar').style.display = 'none';
-                
-                modalElement.style.display = 'flex';
-            } else {
+            if (isVisible && isAgregarVisible) {
                 modalElement.style.display = 'none';
                 UI_ResetearModalApartados();
+            } else {
+                UI_CerrarTodosLosModales();
+                document.getElementById('contenedor-agregar').style.display = 'block';
+                document.getElementById('contenedor-eliminar').style.display = 'none';
+                modalElement.style.display = 'flex';
             }
         };
 
@@ -74,60 +83,22 @@ function initEliminarApartadosManager() {
     const modalElement = document.getElementById('modal-config');
     
     if (btnDeleteTool) {
-        btnDeleteTool.onclick = async (e) => {
+        btnDeleteTool.onclick = (e) => {
             e.stopPropagation();
-            UI_CerrarTodosLosModales();
-            
-            document.getElementById('contenedor-agregar').style.display = 'none';
-            document.getElementById('contenedor-eliminar').style.display = 'block';
-            
-            modalElement.style.display = 'flex';
-            await UI_RenderizarListaEliminacion();
-        };
-    }
-}
+            const isVisible = modalElement.style.display === 'flex';
+            const isEliminarVisible = document.getElementById('contenedor-eliminar').style.display === 'block';
 
-async function UI_RenderizarListaEliminacion() {
-    const listaContenedor = document.getElementById('lista-apartados-existentes');
-    if (!listaContenedor) return;
-
-    listaContenedor.innerHTML = "";
-
-    try {
-        const response = await fetch('/static/data/dispositivos.json');
-        const data = await response.json();
-        const apartados = data.configuracion.apartados;
-
-        apartados.forEach(nombre => {
-            const item = document.createElement('div');
-            item.className = 'delete-item-row'; 
-            item.innerHTML = `
-                <span class="caps-text" style="font-size:11px;">${nombre}</span>
-                <button class="btn-delete-small" onclick="UI_ConfirmarEliminacion('${nombre}', this)">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
-            `;
-            listaContenedor.appendChild(item);
-        });
-    } catch (error) {
-        console.error("Error al cargar apartados:", error);
-    }
-}
-
-function UI_ConfirmarEliminacion(nombre, boton) {
-    if (!boton.classList.contains('confirming')) {
-        boton.classList.add('confirming');
-        // Envolvemos en span con clase específica para el CSS
-        boton.innerHTML = '<span class="confirm-text">Confirmar</span>';
-        
-        setTimeout(() => {
-            if (boton) {
-                boton.classList.remove('confirming');
-                boton.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+            if (isVisible && isEliminarVisible) {
+                modalElement.style.display = 'none';
+                UI_ResetearModalApartados();
+            } else {
+                UI_CerrarTodosLosModales();
+                document.getElementById('contenedor-agregar').style.display = 'none';
+                document.getElementById('contenedor-eliminar').style.display = 'block';
+                UI_RenderizarListaEliminacion(datosApartadosGlobal);
+                modalElement.style.display = 'flex';
             }
-        }, 3000);
-    } else {
-        API_EliminarApartadoEnJSON(nombre);
+        };
     }
 }
 
@@ -138,39 +109,101 @@ async function API_EliminarApartadoEnJSON(nombre) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nombre_apartado: nombre })
         });
+        const data = await respuesta.json();
 
         if (respuesta.ok) {
-            location.reload();
+            UI_MostrarNotificacion(data.message || "Parámetro eliminado", "success");
+            UI_CerrarTodosLosModales();
+            setTimeout(() => location.reload(), 800);
+        } else {
+            UI_MostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
         }
     } catch (error) {
-        console.error("Error en la eliminación:", error);
+        UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
     }
 }
 
 /* ==========================================================================
-   MANEJO DE EVENTOS GLOBALES (CIERRE POR OTROS BOTONES)
+   PROCESO DE GUARDADO Y VALIDACIÓN DE FORMULARIO
    ========================================================================== */
-function initGlobalToolEvents() {
-    const allButtons = document.querySelectorAll('.tool-btn');
-    
-    allButtons.forEach(btn => {
-        if (btn.id === 'theme-toggle' || btn.id === 'btn-config' || btn.id === 'btn-delete-params') return;
+function UI_ManejarCicloConfirmacionApartado() {
+    const inputNombre = document.getElementById('nombre-apartado');
+    const inputValor = document.getElementById('valor-default-apartado');
+    const actionButton = document.getElementById('btn-accion-apartado');
 
-        btn.addEventListener('click', () => {
-            UI_CerrarTodosLosModales();
+    const nombre = inputNombre.value.trim().toUpperCase();
+    const valor = inputValor.value.trim();
+
+    if (!nombre || !valor) {
+        UI_MostrarNotificacion("Faltan datos en el formulario para enviar", "warning");
+        return;
+    }
+
+    if (!isWaitingForApartadoConfirmation) {
+        actionButton.innerHTML = '<span class="confirm-text">Confirmar</span>';
+        actionButton.classList.add('confirm-mode');
+        inputNombre.disabled = true;
+        inputValor.disabled = true;
+        isWaitingForApartadoConfirmation = true;
+    } else {
+        API_GuardarNuevoApartadoEnJSON(nombre, valor);
+    }
+}
+
+async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
+    try {
+        const respuesta = await fetch('/api/config/apartados', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre_apartado: nombre, valor_predeterminado: valor })
         });
-    });
+        const data = await respuesta.json();
+
+        if (respuesta.ok) {
+            UI_MostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "success");
+            UI_CerrarTodosLosModales();
+            setTimeout(() => location.reload(), 800);
+        } else {
+            UI_MostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
+            UI_HabilitarBotonTrasError();
+        }
+    } catch (error) {
+        UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
+        UI_HabilitarBotonTrasError();
+    }
 }
 
 /* ==========================================================================
-   LIMPIEZA Y RESETEO DE INTERFAZ
+   SISTEMA DE NOTIFICACIONES (FRONT-END LOGIC)
+   ========================================================================== */
+function UI_MostrarNotificacion(mensaje, tipo = "warning") {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${tipo}`;
+    toast.innerHTML = mensaje;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
+/* ==========================================================================
+   FUNCIONES DE UTILIDAD Y RESETEO
    ========================================================================== */
 function UI_CerrarTodosLosModales() {
     const modalConfig = document.getElementById('modal-config');
     if (modalConfig) {
         modalConfig.style.display = 'none';
         UI_ResetearModalApartados();
-        document.getElementById('lista-apartados-existentes').innerHTML = "";
     }
 }
 
@@ -190,51 +223,54 @@ function UI_ResetearModalApartados() {
     isWaitingForApartadoConfirmation = false;
 }
 
-function UI_ManejarCicloConfirmacionApartado() {
-    const inputNombre = document.getElementById('nombre-apartado');
-    const inputValor = document.getElementById('valor-default-apartado');
+function UI_HabilitarBotonTrasError() {
     const actionButton = document.getElementById('btn-accion-apartado');
+    if (!actionButton) return;
+    actionButton.classList.remove('confirm-mode');
+    actionButton.innerHTML = "Añadir";
+    document.getElementById('nombre-apartado').disabled = false;
+    document.getElementById('valor-default-apartado').disabled = false;
+    isWaitingForApartadoConfirmation = false;
+}
 
-    if (!inputNombre || !inputValor || !actionButton) return;
+function UI_RenderizarListaEliminacion(apartados) {
+    const listaContenedor = document.getElementById('lista-apartados-existentes');
+    if (!listaContenedor) return;
+    listaContenedor.innerHTML = "";
+    apartados.forEach(nombre => {
+        const item = document.createElement('div');
+        item.className = 'delete-item-row'; 
+        item.innerHTML = `
+            <span class="caps-text" style="font-size:11px;">${nombre}</span>
+            <button class="btn-delete-small" onclick="UI_ConfirmarEliminacion('${nombre}', this)">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        `;
+        listaContenedor.appendChild(item);
+    });
+}
 
-    const nombre = inputNombre.value.trim().toUpperCase();
-    const valor = inputValor.value.trim();
-
-    if (!nombre || !valor) {
-        alert("Por favor, llena ambos campos");
-        return;
-    }
-
-    if (!isWaitingForApartadoConfirmation) {
-        actionButton.innerHTML = '<span class="confirm-text">Confirmar</span>';
-        actionButton.classList.add('confirm-mode');
-        inputNombre.disabled = true;
-        inputValor.disabled = true;
-        isWaitingForApartadoConfirmation = true;
+function UI_ConfirmarEliminacion(nombre, boton) {
+    if (!boton.classList.contains('confirming')) {
+        boton.classList.add('confirming');
+        boton.innerHTML = '<span class="confirm-text">Confirmar</span>';
+        setTimeout(() => {
+            if (boton && boton.classList.contains('confirming')) {
+                boton.classList.remove('confirming');
+                boton.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+            }
+        }, 3000);
     } else {
-        API_GuardarNuevoApartadoEnJSON(nombre, valor);
-        UI_ResetearModalApartados();
-        document.getElementById('modal-config').style.display = 'none';
+        API_EliminarApartadoEnJSON(nombre);
     }
 }
 
-async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
-    try {
-        const respuesta = await fetch('/api/config/apartados', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                nombre_apartado: nombre, 
-                valor_predeterminado: valor 
-            })
-        });
-
-        if (respuesta.ok) {
-            location.reload();
-        }
-    } catch (error) {
-        console.error("Error al conectar con el servidor:", error);
-    }
+function initGlobalToolEvents() {
+    const allButtons = document.querySelectorAll('.tool-btn');
+    allButtons.forEach(btn => {
+        if (btn.id === 'theme-toggle' || btn.id === 'btn-config' || btn.id === 'btn-delete-params') return;
+        btn.addEventListener('click', () => UI_CerrarTodosLosModales());
+    });
 }
 
 function updateThemeIconVisual(iconElement, wasDark) {

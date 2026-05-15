@@ -3,8 +3,10 @@
         "apartados": [
             "MAC Address",
             "ID",
-            "HOLA",
-            "AS"
+            "DIRECCIÓN MAC ADRESS",
+            "ASFF",
+            "ASD",
+            "DF"
         ]
     },
     "dispositivos": [
@@ -15,8 +17,10 @@
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5E",
                 "ID": "123342",
-                "HOLA": "PRUEBA",
-                "AS": "as"
+                "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
+                "ASFF": "adsds",
+                "ASD": "asd",
+                "DF": "df"
             }
         },
         {
@@ -26,8 +30,10 @@
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5F",
                 "ID": "123342",
-                "HOLA": "PRUEBA",
-                "AS": "as"
+                "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
+                "ASFF": "adsds",
+                "ASD": "asd",
+                "DF": "df"
             }
         }
     ]
