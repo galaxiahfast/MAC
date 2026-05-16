@@ -2,6 +2,7 @@
    INICIALIZACIÓN Y CONFIGURACIÓN GLOBAL
    ========================================================================== */
 let datosApartadosGlobal = [];
+let datosEliminacionCache = null;  // 🆕 Caché para eliminar
 let isWaitingForApartadoConfirmation = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -15,16 +16,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     initGlobalToolEvents();
     initEliminarApartadosManager();
     
+    // 🚀 Precargar datos de eliminación en segundo plano (sin bloquear)
+    setTimeout(() => {
+        PrecargarDatosEliminacion();
+    }, 100);
+    
     await API_PrecargarDatosApartados();
 });
 
+// 🆕 Función para precargar datos de eliminación en background
+async function PrecargarDatosEliminacion() {
+    if (datosEliminacionCache) return datosEliminacionCache;
+    
+    try {
+        const response = await fetch('/api/config/apartados/listar');
+        const data = await response.json();
+        if (data.status === 'success') {
+            datosEliminacionCache = data.apartados;
+            console.log("🗑️ Datos de eliminación precargados:", datosEliminacionCache);
+        }
+        return datosEliminacionCache;
+    } catch (error) {
+        console.error("Error precargando datos de eliminación:", error);
+        return [];
+    }
+}
+
 async function API_PrecargarDatosApartados() {
     try {
-        const response = await fetch('/static/data/dispositivos.json');
+        const response = await fetch('/api/config/apartados/listar');
         const data = await response.json();
-        datosApartadosGlobal = data.configuracion.apartados;
+        if (data.status === 'success') {
+            datosApartadosGlobal = data.apartados;
+            // 🔄 Actualizar también el caché de eliminación
+            datosEliminacionCache = [...data.apartados];
+            console.log("📦 Datos cargados desde API:", datosApartadosGlobal);
+        } else {
+            throw new Error(data.message);
+        }
+        return datosApartadosGlobal;
     } catch (error) {
+        console.error("Error precargando datos:", error);
         UI_MostrarNotificacion("No se pudieron precargar los parámetros", "error");
+        return [];
     }
 }
 
@@ -83,14 +117,14 @@ function initApartadosManager() {
 }
 
 /* ==========================================================================
-   LÓGICA DE ELIMINACIÓN: LISTADO Y CONFIRMACIÓN
+   LÓGICA DE ELIMINACIÓN: LISTADO Y CONFIRMACIÓN (OPTIMIZADA - SIN CORTE)
    ========================================================================== */
 function initEliminarApartadosManager() {
     const btnDeleteTool = document.getElementById('btn-delete-params');
     const modalElement = document.getElementById('modal-config');
     
     if (btnDeleteTool) {
-        btnDeleteTool.onclick = (e) => {
+        btnDeleteTool.onclick = async (e) => {
             e.stopPropagation();
             const isVisible = modalElement.style.display === 'flex';
             const isEliminarVisible = document.getElementById('contenedor-eliminar').style.display === 'block';
@@ -102,7 +136,17 @@ function initEliminarApartadosManager() {
                 UI_CerrarTodosLosModales();
                 document.getElementById('contenedor-agregar').style.display = 'none';
                 document.getElementById('contenedor-eliminar').style.display = 'block';
-                UI_RenderizarListaEliminacion(datosApartadosGlobal);
+                
+                // ⚡ USAR CACHÉ INSTANTÁNEO (sin esperar)
+                if (datosEliminacionCache) {
+                    UI_RenderizarListaEliminacion(datosEliminacionCache);
+                } else {
+                    // Primera vez: mostrar loading y cargar
+                    UI_RenderizarListaEliminacion([], true); // Modo loading
+                    await PrecargarDatosEliminacion();
+                    UI_RenderizarListaEliminacion(datosEliminacionCache);
+                }
+                
                 modalElement.style.display = 'flex';
             }
         };
@@ -120,12 +164,14 @@ async function API_EliminarApartadoEnJSON(nombre) {
 
         if (respuesta.ok) {
             UI_MostrarNotificacion(data.message || "Parámetro eliminado", "success");
-            datosApartadosGlobal = datosApartadosGlobal.filter(item => item !== nombre);
+            // ✅ RECARGAR DATOS DESPUÉS DE ELIMINAR
+            await API_PrecargarDatosApartados();
             UI_RenderizarListaEliminacion(datosApartadosGlobal);
         } else {
             UI_MostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
         }
     } catch (error) {
+        console.error("Error en eliminación:", error);
         UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
     }
 }
@@ -168,13 +214,14 @@ async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
 
         if (respuesta.ok) {
             UI_MostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "success");
-            datosApartadosGlobal.push(nombre);
-            UI_CerrarTodosLosModales();
+            await API_PrecargarDatosApartados();
+            UI_ResetearModalApartados();  
         } else {
             UI_MostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
             UI_HabilitarBotonTrasError();
         }
     } catch (error) {
+        console.error("Error al guardar:", error);
         UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
         UI_HabilitarBotonTrasError();
     }
@@ -228,6 +275,8 @@ function UI_ResetearModalApartados() {
     inputNombre.value = "";
     inputValor.value = "";
     isWaitingForApartadoConfirmation = false;
+    
+    inputNombre.focus();
 }
 
 function UI_HabilitarBotonTrasError() {
@@ -240,16 +289,38 @@ function UI_HabilitarBotonTrasError() {
     isWaitingForApartadoConfirmation = false;
 }
 
-function UI_RenderizarListaEliminacion(apartados) {
+// 🛡️ Función para escapar caracteres especiales
+function escapeHtml(texto) {
+    if (!texto) return '';
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
+function UI_RenderizarListaEliminacion(apartados, isLoading = false) {
     const listaContenedor = document.getElementById('lista-apartados-existentes');
     if (!listaContenedor) return;
+    
+    if (isLoading) {
+        listaContenedor.innerHTML = '<div class="delete-item-row"><span>Cargando...</span></div>';
+        return;
+    }
+    
+    if (!apartados || apartados.length === 0) {
+        listaContenedor.innerHTML = '<div class="delete-item-row"><span>No hay parámetros para eliminar</span></div>';
+        return;
+    }
+    
     listaContenedor.innerHTML = "";
     apartados.forEach(nombre => {
         const item = document.createElement('div');
-        item.className = 'delete-item-row'; 
+        item.className = 'delete-item-row';
+        
+        const nombreEscapado = nombre.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        
         item.innerHTML = `
-            <span class="caps-text" style="font-size:11px;">${nombre}</span>
-            <button class="btn-delete-small" onclick="UI_ConfirmarEliminacion('${nombre}', this)">
+            <span class="caps-text" style="font-size:11px;">${escapeHtml(nombre)}</span>
+            <button class="btn-delete-small" onclick="UI_ConfirmarEliminacion('${nombreEscapado}', this)">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
         `;

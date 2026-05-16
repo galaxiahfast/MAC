@@ -13,12 +13,11 @@
     <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
     <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}" as="image" media="(max-width: 600px) and (min-resolution: 2dppx)">
     <link rel="preload" href="{{ url_for('static', filename='img/plano-low.webp') }}" as="image" media="(min-width: 601px) and (max-width: 1200px)">
-
-    <link rel="preload" href="{{ url_for('static', filename='data/dispositivos.json') }}" as="fetch" crossorigin>
 </head>
 <body data-theme="light">
 
-    <div class="sidebar-tools">
+    <!-- Barra lateral con rol complementario (accesibilidad) -->
+    <div class="sidebar-tools" role="complementary" aria-label="Barra de herramientas">
         <button class="tool-btn" id="theme-toggle" aria-label="Cambiar tema de color">
             <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -58,26 +57,29 @@
         </button>
     </div>
 
-    <div class="map-container" id="map">
-        <img 
-            src="{{ url_for('static', filename='img/plano-mobile.webp') }}"
-            srcset="{{ url_for('static', filename='img/plano-mobile.webp') }} 412w,
-                    {{ url_for('static', filename='img/plano-mobile-2x.webp') }} 824w,
-                    {{ url_for('static', filename='img/plano-low.webp') }} 750w,
-                    {{ url_for('static', filename='img/plano-medium.webp') }} 1200w,
-                    {{ url_for('static', filename='img/plano-high.webp') }} 2294w"
-            sizes="(max-width: 600px) 100vw,
-                (max-width: 1200px) 800px,
-                2294px"
-            width="2294"
-            height="2722"
-            fetchpriority="high"
-            class="plano-base" 
-            alt="Plano técnico de distribución de dispositivos"
-        >
-        <div class="grid-overlay"></div>
-        <div id="devices-layer"></div>
-    </div>
+    <!-- Contenido principal (landmark) -->
+    <main id="contenido-principal">
+        <div class="map-container" id="map">
+            <img 
+                src="{{ url_for('static', filename='img/plano-mobile.webp') }}"
+                srcset="{{ url_for('static', filename='img/plano-mobile.webp') }} 412w,
+                        {{ url_for('static', filename='img/plano-mobile-2x.webp') }} 824w,
+                        {{ url_for('static', filename='img/plano-low.webp') }} 750w,
+                        {{ url_for('static', filename='img/plano-medium.webp') }} 1200w,
+                        {{ url_for('static', filename='img/plano-high.webp') }} 2294w"
+                sizes="(max-width: 600px) 100vw,
+                    (max-width: 1200px) 800px,
+                    2294px"
+                width="2294"
+                height="2722"
+                fetchpriority="high"
+                class="plano-base" 
+                alt="Plano técnico de distribución de dispositivos"
+            >
+            <div class="grid-overlay"></div>
+            <div id="devices-layer"></div>
+        </div>
+    </main>
 
     <div id="modal-config" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -133,6 +135,6 @@
         </div>
     </div>
     
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </body>
 </html>

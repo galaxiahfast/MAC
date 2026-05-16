@@ -30,13 +30,16 @@ def ejecutar_respaldo():
 
 """
 ==========================================================================
-OPERACIONES DE ESCRITURA Y MODIFICACIÓN DE JSON
+OPERACIONES DE ESCRITURA Y MODIFICACIÓN DE JSON (AGREGAR)
 ==========================================================================
 """
 def agregar_apartado_a_json(nombre_nuevo, valor_defecto):
     ejecutar_respaldo()
     ruta_json = 'app/static/data/dispositivos.json'
+    # Normalizar: mayúsculas, sin tildes, espacios a _
     nombre_normalizado = nombre_nuevo.strip().upper()
+    nombre_normalizado = nombre_normalizado.replace(" ", "_")
+    nombre_normalizado = nombre_normalizado.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U")
     
     with open(ruta_json, 'r+', encoding='utf-8') as f:
         data = json.load(f)
@@ -59,16 +62,22 @@ OPERACIONES DE ELIMINACIÓN EN JSON
 def eliminar_apartado_de_json(nombre_a_borrar):
     ejecutar_respaldo()
     ruta_json = 'app/static/data/dispositivos.json'
+    # Normalizar igual que al agregar
+    nombre_normalizado = nombre_a_borrar.strip().upper()
+    nombre_normalizado = nombre_normalizado.replace(" ", "_")
+    nombre_normalizado = nombre_normalizado.replace("Á", "A").replace("É", "E").replace("Í", "I").replace("Ó", "O").replace("Ú", "U")
     
     with open(ruta_json, 'r+', encoding='utf-8') as f:
         data = json.load(f)
         
-        if nombre_a_borrar in data['configuracion']['apartados']:
-            data['configuracion']['apartados'].remove(nombre_a_borrar)
+        if nombre_normalizado not in data['configuracion']['apartados']:
+            raise ValueError(f"El apartado '{nombre_a_borrar}' no existe")
+        
+        data['configuracion']['apartados'].remove(nombre_normalizado)
         
         for dispositivo in data['dispositivos']:
-            if nombre_a_borrar in dispositivo['detalles']:
-                del dispositivo['detalles'][nombre_a_borrar]
+            if nombre_normalizado in dispositivo['detalles']:
+                del dispositivo['detalles'][nombre_normalizado]
         
         f.seek(0)
         json.dump(data, f, indent=4, ensure_ascii=False)
