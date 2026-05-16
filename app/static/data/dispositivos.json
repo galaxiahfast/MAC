@@ -2,11 +2,14 @@
     "configuracion": {
         "apartados": [
             "MAC Address",
-            "ID",
             "DIRECCIÓN MAC ADRESS",
-            "ASFF",
-            "DF",
-            "AS"
+            "ASD",
+            "123",
+            "DFS",
+            "DSF",
+            "456",
+            "7",
+            "234"
         ]
     },
     "dispositivos": [
@@ -16,11 +19,14 @@
             "y": 120,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5E",
-                "ID": "123342",
                 "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
-                "ASFF": "adsds",
-                "DF": "df",
-                "AS": "AS"
+                "ASD": "asd",
+                "123": "123",
+                "DFS": "sdf",
+                "DSF": "sfd",
+                "456": "456",
+                "7": "7",
+                "234": "234"
             }
         },
         {
@@ -29,11 +35,14 @@
             "y": 300,
             "detalles": {
                 "MAC Address": "00:1A:2B:3C:4D:5F",
-                "ID": "123342",
                 "DIRECCIÓN MAC ADRESS": "23424.234234.234234.234",
-                "ASFF": "adsds",
-                "DF": "df",
-                "AS": "AS"
+                "ASD": "asd",
+                "123": "123",
+                "DFS": "sdf",
+                "DSF": "sfd",
+                "456": "456",
+                "7": "7",
+                "234": "234"
             }
         }
     ]
