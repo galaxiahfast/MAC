@@ -330,14 +330,6 @@ function UI_HabilitarBotonTrasError() {
     isWaitingForApartadoConfirmation = false;
 }
 
-// 🛡️ Función para escapar caracteres especiales
-function escapeHtml(texto) {
-    if (!texto) return '';
-    const div = document.createElement('div');
-    div.textContent = texto;
-    return div.innerHTML;
-}
-
 // Función para ajustar el padding derecho del contenedor según si hay scroll
 function ajustarPaddingContenedorEliminacion() {
     const listaContenedor = document.getElementById('lista-apartados-existentes');
@@ -414,7 +406,7 @@ function UI_RenderizarListaEliminacion(apartados, isLoading = false) {
         const nombreEscapado = nombre.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         item.innerHTML = `
-            <span class="caps-text" style="font-size:11px;">${escapeHtml(nombre)}</span>
+            <span class="caps-text" style="font-size:11px;">${manejoCaracteresEspeciales(nombre)}</span>
             <button class="btn-delete-small" onclick="UI_ConfirmarEliminacion('${nombreEscapado}', this)">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
@@ -591,9 +583,13 @@ function UI_RenderizarFormularioAgregarPunto(isLoading = false) {
     apartadosActivosFormulario.forEach(apartado => {
         const grupo = document.createElement('div');
         grupo.className = 'input-group';
+        
+        // ID seguro para el input
+        const idSeguro = limpiarParaId(apartado);
+        
         grupo.innerHTML = `
-            <span class="input-label caps-text">${escapeHtml(apartado)}</span>
-            <input type="text" id="campo_${escapeHtml(apartado)}" class="modern-input" placeholder="EJ: VALOR" style="text-transform: uppercase;">
+            <span class="input-label caps-text">${manejoCaracteresEspeciales(apartado)}</span>
+            <input type="text" id="campo_${idSeguro}" class="modern-input" placeholder="EJ: VALOR" style="text-transform: uppercase;">
         `;
         contenedorCampos.appendChild(grupo);
     });
@@ -909,8 +905,8 @@ function UI_AgregarPuntoAlMapa(dispositivo, conEfecto = true) {
     ` : '';
     
     const detallesHTML = Object.entries(dispositivo.detalles).map(([key, value]) => `
-        <div class="label">${escapeHtml(key)}</div>
-        <div class="data no-edit">${escapeHtml(value)}</div>
+        <div class="label">${manejoCaracteresEspeciales(key)}</div>
+        <div class="data no-edit">${manejoCaracteresEspeciales(value)}</div>
     `).join('');
     
     markerWrapper.innerHTML = `
@@ -920,7 +916,7 @@ function UI_AgregarPuntoAlMapa(dispositivo, conEfecto = true) {
         <div class="info-box" data-mac="${dispositivo.id}">
             <div class="status-row">
                 <div style="display:flex; align-items:center; gap:6px;">
-                    <span class="label-header">${escapeHtml(dispositivo.id)}</span>
+                    <span class="label-header">${manejoCaracteresEspeciales(dispositivo.id)}</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
                     <span class="online-status" style="color: ${puntoColor};">● ${conEfecto ? 'NUEVO' : 'ACTIVO'}</span>
