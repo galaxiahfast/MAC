@@ -3,7 +3,12 @@
         "apartados": [
             "MAC_ADDRESS",
             "DIRECCION_MAC_ADDRESS",
-            "ADS"
+            "SDF",
+            "GHFH",
+            "567567",
+            "ASA",
+            "DFG",
+            "DGFG"
         ]
     },
     "dispositivos": [
@@ -14,7 +19,12 @@
             "detalles": {
                 "MAC_ADDRESS": "00:1A:2B:3C:4D:5E",
                 "DIRECCION_MAC_ADDRESS": "23424.234234.234234.234",
-                "ADS": "ads"
+                "SDF": "sfd",
+                "GHFH": "fgfh",
+                "567567": "567575",
+                "ASA": "sas",
+                "DFG": "dfg",
+                "DGFG": "dfgd"
             }
         },
         {
@@ -24,7 +34,12 @@
             "detalles": {
                 "MAC_ADDRESS": "00:1A:2B:3C:4D:5F",
                 "DIRECCION_MAC_ADDRESS": "23424.234234.234234.234",
-                "ADS": "ads"
+                "SDF": "sfd",
+                "GHFH": "fgfh",
+                "567567": "567575",
+                "ASA": "sas",
+                "DFG": "dfg",
+                "DGFG": "dfgd"
             }
         }
     ]

@@ -297,17 +297,52 @@ function escapeHtml(texto) {
     return div.innerHTML;
 }
 
+// 🎯 Función para ajustar la altura del contenedor a 3 elementos exactos + padding
+function ajustarAlturaListaEliminacion() {
+    const listaContenedor = document.getElementById('lista-apartados-existentes');
+    if (!listaContenedor) return;
+    
+    // Esperar un momento a que los elementos estén renderizados
+    setTimeout(() => {
+        const items = listaContenedor.querySelectorAll('.delete-item-row');
+        
+        if (items.length === 0) {
+            // Si no hay elementos, altura mínima para mostrar el mensaje
+            listaContenedor.style.maxHeight = '';
+            listaContenedor.style.height = 'auto';
+            return;
+        }
+        
+        // Obtener altura del primer elemento (incluye padding y border)
+        const alturaItem = items[0].offsetHeight;
+        const gap = 12; // Mismo valor que el gap en CSS
+        const paddingVertical = 4; // 2px arriba + 2px abajo = 4px total
+        
+        // Calcular cuántos elementos mostrar (mínimo 3, máximo los que haya)
+        const elementosAMostrar = Math.min(3, items.length);
+        
+        // Altura total = (elementosAMostrar * alturaItem) + ((elementosAMostrar - 1) * gap) + paddingVertical
+        const alturaTotal = (elementosAMostrar * alturaItem) + ((elementosAMostrar - 1) * gap) + paddingVertical;
+        
+        // Aplicar la altura exacta
+        listaContenedor.style.maxHeight = alturaTotal + 'px';
+        listaContenedor.style.height = alturaTotal + 'px';
+    }, 10);
+}
+
 function UI_RenderizarListaEliminacion(apartados, isLoading = false) {
     const listaContenedor = document.getElementById('lista-apartados-existentes');
     if (!listaContenedor) return;
     
     if (isLoading) {
         listaContenedor.innerHTML = '<div class="delete-item-row"><span>Cargando...</span></div>';
+        ajustarAlturaListaEliminacion();
         return;
     }
     
     if (!apartados || apartados.length === 0) {
         listaContenedor.innerHTML = '<div class="delete-item-row"><span>No hay parámetros para eliminar</span></div>';
+        ajustarAlturaListaEliminacion();
         return;
     }
     
@@ -326,7 +361,18 @@ function UI_RenderizarListaEliminacion(apartados, isLoading = false) {
         `;
         listaContenedor.appendChild(item);
     });
+    
+    // Ajustar altura después de agregar todos los elementos
+    ajustarAlturaListaEliminacion();
 }
+
+// Si la ventana cambia de tamaño mientras el modal está abierto, reajustar
+window.addEventListener('resize', () => {
+    const modalEliminar = document.getElementById('contenedor-eliminar');
+    if (modalEliminar && modalEliminar.style.display === 'block') {
+        ajustarAlturaListaEliminacion();
+    }
+});
 
 function UI_ConfirmarEliminacion(nombre, boton) {
     if (!boton.classList.contains('confirming')) {

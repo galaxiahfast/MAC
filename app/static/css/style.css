@@ -366,13 +366,17 @@ body {
     width: 100%;
     margin-top: 20px; 
     box-sizing: border-box;
-    max-height: 230px; 
+    /* La altura se fijará dinámicamente con JS, pero mantenemos un fallback */
+    max-height: 220px;  /* Altura base: 3 elementos de 60px + 2 gaps de 12px = 180+36=216 */
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 2px 25px 2px 2px; 
+    padding: 2px 25px 2px 2px;  /* SIN padding vertical (eso causaba espacios extra) */
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     border: none;
+    /* Añadir estas propiedades para mejor scroll snap */
+    scroll-padding: 0;
+    scroll-margin: 0;
 }
 
 #lista-apartados-existentes::-webkit-scrollbar {
@@ -402,23 +406,27 @@ body {
     box-sizing: border-box;
     transition: all 0.3s ease;
     flex-shrink: 0;
-    min-height: 60px;
+    min-height: 60px;  /* Altura fija de cada elemento */
+    height: 60px;      /* Forzar altura fija para que el cálculo sea exacto */
     scroll-snap-align: start;
     scroll-snap-stop: always;
 }
 
+/* Si el texto es muy largo, permitir que se ajuste manteniendo la altura */
 .delete-item-row span {
     font-size: 11px;
     color: #050714;
     font-weight: 500;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    line-height: 1;
+    line-height: 1.2;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 200px;  /* Limitar ancho del texto */
 }
 
+/* El resto de tu código se mantiene igual */
 .btn-delete-small {
     width: 36px;
     height: 36px;
