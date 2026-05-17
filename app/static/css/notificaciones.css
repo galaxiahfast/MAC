@@ -203,40 +203,37 @@
    @galaxiahfast ANIMACIONES
    ========================================================================== */
 
-/* @galaxiahfast Animación de entrada */
+/* @galaxiahfast Animación de entrada - CON REBOTE RÁPIDO */
 @keyframes entradaNotificacion {
-
     0% {
         opacity: 0;
-        transform: translateX(-120%) scale(0.9);
+        transform: translateX(-150%) scale(0.9);
     }
-
-    60% {
-        transform: translateX(5%) scale(1.01);
+    70% {
+        transform: translateX(3%) scale(1.02);
     }
-
+    85% {
+        transform: translateX(-1%) scale(0.99);
+    }
     100% {
         opacity: 1;
         transform: translateX(0) scale(1);
     }
 }
 
-/* @galaxiahfast Animación de salida */
+/* @galaxiahfast Animación de salida - CON REBOTE RÁPIDO AL INICIO */
 @keyframes salidaNotificacion {
-
     0% {
         transform: translateX(0) scale(1);
-        opacity: 1;
     }
-
+    15% {
+        transform: translateX(-4%) scale(0.98);
+    }
     30% {
-        transform: translateX(-10%) scale(0.95);
-        opacity: 0.8;
+        transform: translateX(3%) scale(1.01);
     }
-
     100% {
-        transform: translateX(-120%) scale(0.9);
-        opacity: 0;
+        transform: translateX(-150%) scale(0.92);
     }
 }
 
