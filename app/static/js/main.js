@@ -63,7 +63,7 @@ async function API_PrecargarDatosApartados() {
         return datosApartadosGlobal;
     } catch (error) {
         console.error("Error precargando datos:", error);
-        UI_MostrarNotificacion("No se pudieron precargar los parámetros", "error");
+        mostrarNotificacion("No se pudieron precargar los parámetros", "error");
         return [];
     }
 }
@@ -212,7 +212,7 @@ async function API_EliminarApartadoEnJSON(nombre) {
         const data = await respuesta.json();
 
         if (respuesta.ok) {
-            UI_MostrarNotificacion(data.message || "Parámetro eliminado", "success");
+            mostrarNotificacion(data.message || "Parámetro eliminado", "exito");
             await API_PrecargarDatosApartados();
             
             // 🔄 Actualizar también el caché de agregar punto
@@ -220,11 +220,11 @@ async function API_EliminarApartadoEnJSON(nombre) {
             
             UI_RenderizarListaEliminacion(datosApartadosGlobal);
         } else {
-            UI_MostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
+            mostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
         }
     } catch (error) {
         console.error("Error en eliminación:", error);
-        UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
+        mostrarNotificacion("No se pudo conectar con la base de datos", "error");
     }
 }
 
@@ -240,7 +240,7 @@ function UI_ManejarCicloConfirmacionApartado() {
     const valor = inputValor.value.trim();
 
     if (!nombre || !valor) {
-        UI_MostrarNotificacion("Faltan datos en el formulario para enviar", "warning");
+        mostrarNotificacion("Faltan datos en el formulario para enviar", "advertencia");
         return;
     }
 
@@ -265,7 +265,7 @@ async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
         const data = await respuesta.json();
 
         if (respuesta.ok) {
-            UI_MostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "success");
+            mostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "exito");
             await API_PrecargarDatosApartados();
             
             // 🔄 Actualizar también el caché de agregar punto
@@ -273,37 +273,14 @@ async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
             
             UI_ResetearModalApartados();  
         } else {
-            UI_MostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
+            mostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
             UI_HabilitarBotonTrasError();
         }
     } catch (error) {
         console.error("Error al guardar:", error);
-        UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
+        mostrarNotificacion("No se pudo conectar con la base de datos", "error");
         UI_HabilitarBotonTrasError();
     }
-}
-
-/* ==========================================================================
-   SISTEMA DE NOTIFICACIONES (FRONT-END LOGIC)
-   ========================================================================== */
-function UI_MostrarNotificacion(mensaje, tipo = "warning") {
-    let container = document.getElementById('toast-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
-
-    const toast = document.createElement('div');
-    toast.className = `toast ${tipo}`;
-    toast.innerHTML = mensaje;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.classList.add('fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 4000);
 }
 
 /* ==========================================================================
@@ -541,7 +518,7 @@ async function ObtenerApartadosActivos(forzarRefresh = false) {
         return [];
     } catch (error) {
         console.error("Error obteniendo apartados:", error);
-        UI_MostrarNotificacion("No se pudieron cargar los campos del formulario", "error");
+        mostrarNotificacion("No se pudieron cargar los campos del formulario", "error");
         return [];
     }
 }
@@ -655,7 +632,7 @@ function UI_ManejarCicloConfirmacionDispositivo() {
     });
     
     if (!todosCamposLlenos) {
-        UI_MostrarNotificacion("Complete todos los campos del formulario", "warning");
+        mostrarNotificacion("Complete todos los campos del formulario", "advertencia");
         return;
     }
     
@@ -683,19 +660,19 @@ async function API_AgregarNuevoDispositivo(detalles) {
         const data = await respuesta.json();
         
         if (respuesta.ok) {
-            UI_MostrarNotificacion(data.message || "Dispositivo agregado correctamente", "success");
+            mostrarNotificacion(data.message || "Dispositivo agregado correctamente", "exito");
             UI_CerrarModalAgregarPunto();
             
             if (data.dispositivo) {
                 UI_AgregarPuntoAlMapa(data.dispositivo, true);
             }
         } else {
-            UI_MostrarNotificacion(data.message || "No se pudo agregar el dispositivo", "error");
+            mostrarNotificacion(data.message || "No se pudo agregar el dispositivo", "error");
             UI_HabilitarBotonDispositivoTrasError();
         }
     } catch (error) {
         console.error("Error al agregar dispositivo:", error);
-        UI_MostrarNotificacion("No se pudo conectar con la base de datos", "error");
+        mostrarNotificacion("No se pudo conectar con la base de datos", "error");
         UI_HabilitarBotonDispositivoTrasError();
     }
 }

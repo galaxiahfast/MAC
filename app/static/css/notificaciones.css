@@ -1,0 +1,243 @@
+
+
+
+/* ==========================================================================
+   @galaxiahfast SISTEMA DE NOTIFICACIONES
+   ========================================================================== */
+
+/* @galaxiahfast Contenedor principal */
+#contenedor-notificaciones {
+    position: fixed;
+    top: 25px;
+    left: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    z-index: 10001;
+    pointer-events: none;
+    max-width: 360px;
+}
+
+/* @galaxiahfast Estructura principal de notificaciones */
+.notificacion {
+    width: 340px;
+    min-height: 80px;
+    background: var(--notificacion-bg);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    border: 1px solid var(--ui-border);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    pointer-events: auto;
+    overflow: hidden;
+
+    user-select: none;
+    -webkit-user-select: none;
+
+    transition:
+        transform 2s ease-out,
+        opacity 2s ease-out,
+        margin 2s ease-out;
+
+    animation:
+        entradaNotificacion 0.35s
+        cubic-bezier(0.175, 0.885, 0.32, 1.275)
+        forwards;
+}
+
+/* @galaxiahfast Cabecera de la notificación */
+.notificacion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background-color: var(--notificacion-header-bg);
+    border-bottom: 1px solid var(--notificacion-header-border);
+}
+
+/* @galaxiahfast Grupo izquierdo del encabezado */
+.notificacion-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* @galaxiahfast Icono de notificación */
+.notificacion-icono {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notificacion-icono svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* @galaxiahfast Tipo de notificación */
+.notificacion-tipo {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* @galaxiahfast Hora de la notificación */
+.notificacion-hora {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+/* @galaxiahfast Contenido principal */
+.notificacion-cuerpo {
+    padding: 12px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 2;
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-word;
+    text-transform: uppercase;
+    color: var(--notificacion-texto);
+}
+
+/* @galaxiahfast Estado de desvanecimiento */
+.notificacion.desvanecer {
+
+    /* @galaxiahfast Evitar interacción durante salida */
+    pointer-events: none;
+
+    animation:
+        salidaNotificacion 0.4s
+        cubic-bezier(0.6, -0.28, 0.735, 0.045)
+        forwards;
+}
+
+/* ==========================================================================
+   @galaxiahfast VARIABLES DE TEMA
+   ========================================================================== */
+
+/* @galaxiahfast Variables de modo claro */
+:root {
+    --notificacion-bg: #fafafa;
+    --notificacion-header-bg: #f1f5f9;
+    --notificacion-header-border: #e2e8f0;
+    --notificacion-texto: #0f172a;
+    --notificacion-hora-color: #0f172a;
+}
+
+/* @galaxiahfast Variables de modo oscuro */
+[data-theme="dark"] {
+    --notificacion-bg: #0a0f1a;
+    --notificacion-header-bg: #050505;
+    --notificacion-header-border: rgba(56, 189, 248, 0.3);
+    --notificacion-texto: #f1f5f9;
+    --notificacion-hora-color: #94a3b8;
+}
+
+/* ==========================================================================
+   @galaxiahfast ESTILOS DE TEMA
+   ========================================================================== */
+
+/* @galaxiahfast Contenedor en modo oscuro */
+[data-theme="dark"] .notificacion {
+    background: var(--notificacion-bg);
+    border: 1px solid var(--ui-border);
+}
+
+/* @galaxiahfast Encabezado en modo oscuro */
+[data-theme="dark"] .notificacion-header {
+    background-color: var(--notificacion-header-bg);
+    border-bottom: 1px solid var(--notificacion-header-border);
+}
+
+/* @galaxiahfast Texto principal en modo oscuro */
+[data-theme="dark"] .notificacion-cuerpo {
+    color: var(--notificacion-texto);
+}
+
+/* @galaxiahfast Hora en modo oscuro */
+[data-theme="dark"] .notificacion-hora {
+    color: var(--notificacion-hora-color);
+}
+
+/* ==========================================================================
+   @galaxiahfast ESTILOS POR TIPO
+   ========================================================================== */
+
+/* @galaxiahfast Notificación de éxito */
+.notificacion.exito .notificacion-tipo {
+    color: #10b981;
+}
+
+.notificacion.exito .notificacion-icono svg {
+    stroke: #10b981;
+}
+
+/* @galaxiahfast Notificación de error */
+.notificacion.error .notificacion-tipo {
+    color: #ef4444;
+}
+
+.notificacion.error .notificacion-icono svg {
+    stroke: #ef4444;
+}
+
+/* @galaxiahfast Notificación de advertencia */
+.notificacion.advertencia .notificacion-tipo {
+    color: #f59e0b;
+}
+
+.notificacion.advertencia .notificacion-icono svg {
+    stroke: #f59e0b;
+}
+
+/* ==========================================================================
+   @galaxiahfast ANIMACIONES
+   ========================================================================== */
+
+/* @galaxiahfast Animación de entrada */
+@keyframes entradaNotificacion {
+
+    0% {
+        opacity: 0;
+        transform: translateX(-120%) scale(0.9);
+    }
+
+    60% {
+        transform: translateX(5%) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* @galaxiahfast Animación de salida */
+@keyframes salidaNotificacion {
+
+    0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+
+    30% {
+        transform: translateX(-10%) scale(0.95);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateX(-120%) scale(0.9);
+        opacity: 0;
+    }
+}
+
+

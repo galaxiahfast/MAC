@@ -6,17 +6,24 @@
     <meta name="description" content="Configuración técnica y administración de parámetros globales para la organización de dispositivos.">
     <title>Monitor de Red - DATAMID</title>
 
+    <!-- Estilos principales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" media="print" onload="this.media='all'">
+    
+    <!-- Estilos de notificaciones -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
+    
+    <!-- Fuentes y precargas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
+    <!-- Precarga de imágenes responsive -->
     <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
     <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}" as="image" media="(max-width: 600px) and (min-resolution: 2dppx)">
     <link rel="preload" href="{{ url_for('static', filename='img/plano-medium.webp') }}" as="image" media="(min-width: 1201px)">
 </head>
 <body data-theme="light">
 
-    <!-- Barra lateral con rol complementario (accesibilidad) -->
+    <!-- Barra lateral -->
     <div class="sidebar-tools" role="complementary" aria-label="Barra de herramientas">
         <button class="tool-btn" id="theme-toggle" aria-label="Cambiar tema de color">
             <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -57,7 +64,7 @@
         </button>
     </div>
 
-    <!-- Contenido principal (landmark) -->
+    <!-- Contenido principal -->
     <main id="contenido-principal">
         <div class="map-container" id="map">
             <img 
@@ -81,6 +88,7 @@
         </div>
     </main>
 
+    <!-- Modal: Configuración de parámetros -->
     <div id="modal-config" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div id="contenedor-agregar">
@@ -135,16 +143,18 @@
         </div>
     </div>
     
-        <!-- Modal para Agregar Nuevo Punto (Dispositivo) -->
+    <!-- Modal: Agregar nuevo punto (dispositivo) -->
     <div id="modal-agregar-punto" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div id="contenedor-agregar-punto">
                 <!-- El contenido se generará dinámicamente con JavaScript -->
-                <!-- pero la estructura base está aquí -->
             </div>
         </div>
     </div>
 
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </body>
 </html>
