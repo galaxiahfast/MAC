@@ -6,10 +6,13 @@
     <meta name="description" content="Configuración técnica y administración de parámetros globales para la organización de dispositivos.">
     <title>Monitor de Red - DATAMID</title>
 
+    <!-- Variables globales PRIMERO -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/temas.css') }}">
+
     <!-- Estilos principales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" media="print" onload="this.media='all'">
-    
-    <!-- Estilos de notificaciones -->
+
+    <!-- Notificaciones (ahora usa variables.css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
     
     <!-- Fuentes y precargas -->
@@ -21,7 +24,7 @@
     <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}" as="image" media="(max-width: 600px) and (min-resolution: 2dppx)">
     <link rel="preload" href="{{ url_for('static', filename='img/plano-medium.webp') }}" as="image" media="(min-width: 1201px)">
 </head>
-<body data-theme="light">
+<body data-theme="claro">
 
     <!-- Barra lateral -->
     <div class="sidebar-tools" role="complementary" aria-label="Barra de herramientas">
@@ -156,6 +159,7 @@
      <script src="{{ url_for('static', filename='js/manejoCaracteresEspeciales.js') }}"></script>
     <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
     <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/temas.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </body>
 </html>

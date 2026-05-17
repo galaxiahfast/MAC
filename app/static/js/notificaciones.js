@@ -222,12 +222,12 @@ function mostrarNotificacion(mensaje, tipo = "advertencia") {
 
     notificacion.className = `notificacion ${tipo}`;
 
-    const mensajeUpper = mensaje.toUpperCase();
+    const mensajeMayusculas = mensaje.toUpperCase();
 
     notificacion.innerHTML = `
-        <div class="notificacion-header">
+        <div class="notificacion-encabezado">
 
-            <div class="notificacion-header-left">
+            <div class="notificacion-encabezado-izquierdo">
 
                 <div class="notificacion-icono">
                     ${ICONOS[tipo]}
@@ -246,7 +246,7 @@ function mostrarNotificacion(mensaje, tipo = "advertencia") {
         </div>
 
         <div class="notificacion-cuerpo">
-            ${mensajeUpper}
+            ${mensajeMayusculas}
         </div>
     `;
 
@@ -255,7 +255,7 @@ function mostrarNotificacion(mensaje, tipo = "advertencia") {
 
     colaNotificaciones.push({
         elemento: notificacion,
-        mensaje: mensajeUpper,
+        mensaje: mensajeMayusculas,
         tipo
     });
 

@@ -1,0 +1,44 @@
+
+
+
+/* ==========================================================================
+   @galaxiahfast VARIABLES GLOBALES
+   ========================================================================== */
+
+/* @galaxiahfast Variables de modo claro */
+:root {
+    --fondo-mapa: #fefefe;
+    --color-acento: #050714;
+    --fondo-scroll: #f1f5f9;
+    --color-scroll: #cbd5e1;
+    --fondo-ventana: rgba(255, 255, 255, 0.9);
+    --borde-ventana: rgba(71, 85, 105, 0.2);
+
+    /* @galaxiahfast Variables de notificaciones */
+    --fondo-notificacion: #fafafa;
+    --fondo-cabecera-notificacion: #f1f5f9;
+    --borde-cabecera-notificacion: #e2e8f0;
+    --texto-notificacion: #0f172a;
+    --color-hora-notificacion: #0f172a;
+    --borde-notificacion: #e2e8f0;
+}
+
+/* @galaxiahfast Variables de modo oscuro */
+[data-theme="dark"] {
+    --fondo-mapa: #121212;
+    --color-acento: #38bdf8;
+    --fondo-scroll: #0a0a0a;
+    --color-scroll: #262626;
+    --fondo-ventana: rgba(18, 18, 18, 0.95);
+    --borde-ventana: rgba(56, 189, 248, 0.3);
+
+    /* @galaxiahfast Variables de notificaciones */
+    --fondo-notificacion: #0a0f1a;
+    --fondo-cabecera-notificacion: #050505;
+    --borde-cabecera-notificacion: rgba(56, 189, 248, 0.3);
+    --texto-notificacion: #f1f5f9;
+    --color-hora-notificacion: #94a3b8;
+    --borde-notificacion: rgba(56, 189, 248, 0.3);
+}
+
+

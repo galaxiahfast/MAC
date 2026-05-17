@@ -23,10 +23,10 @@
 .notificacion {
     width: 340px;
     min-height: 80px;
-    background: var(--notificacion-bg);
+    background: var(--fondo-notificacion);
     backdrop-filter: blur(15px);
     border-radius: 12px;
-    border: 1px solid var(--notificacion-border);
+    border: 1px solid var(--borde-notificacion);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
     pointer-events: auto;
     overflow: hidden;
@@ -45,18 +45,18 @@
         forwards;
 }
 
-/* @galaxiahfast Cabecera de la notificación */
-.notificacion-header {
+/* @galaxiahfast Encabezado de la notificación */
+.notificacion-encabezado {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 10px 16px;
-    background-color: var(--notificacion-header-bg);
-    border-bottom: 1px solid var(--notificacion-header-border);
+    background-color: var(--fondo-cabecera-notificacion);
+    border-bottom: 1px solid var(--borde-cabecera-notificacion);
 }
 
 /* @galaxiahfast Grupo izquierdo del encabezado */
-.notificacion-header-left {
+.notificacion-encabezado-izquierdo {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -91,6 +91,7 @@
     font-size: 11px;
     font-weight: 400;
     text-transform: uppercase;
+    color: var(--color-hora-notificacion);
 }
 
 /* @galaxiahfast Contenido principal */
@@ -105,7 +106,7 @@
     white-space: normal;
     word-break: break-word;
     text-transform: uppercase;
-    color: var(--notificacion-texto);
+    color: var(--texto-notificacion);
 }
 
 /* @galaxiahfast Estado de desvanecimiento */
@@ -118,56 +119,6 @@
         salidaNotificacion 0.4s
         cubic-bezier(0.6, -0.28, 0.735, 0.045)
         forwards;
-}
-
-/* ==========================================================================
-   @galaxiahfast VARIABLES DE TEMA
-   ========================================================================== */
-
-/* @galaxiahfast Variables de modo claro */
-:root {
-    --notificacion-bg: #fafafa;
-    --notificacion-header-bg: #f1f5f9;
-    --notificacion-header-border: #e2e8f0;
-    --notificacion-texto: #0f172a;
-    --notificacion-hora-color: #0f172a;
-    --notificacion-border: #e2e8f0;
-}
-
-/* @galaxiahfast Variables de modo oscuro */
-[data-theme="dark"] {
-    --notificacion-bg: #0a0f1a;
-    --notificacion-header-bg: #050505;
-    --notificacion-header-border: rgba(56, 189, 248, 0.3);
-    --notificacion-texto: #f1f5f9;
-    --notificacion-hora-color: #94a3b8;
-    --notificacion-border: rgba(56, 189, 248, 0.3);
-}
-
-/* ==========================================================================
-   @galaxiahfast ESTILOS DE TEMA
-   ========================================================================== */
-
-/* @galaxiahfast Contenedor en modo oscuro */
-[data-theme="dark"] .notificacion {
-    background: var(--notificacion-bg);
-    border: 1px solid var(--notificacion-border);
-}
-
-/* @galaxiahfast Encabezado en modo oscuro */
-[data-theme="dark"] .notificacion-header {
-    background-color: var(--notificacion-header-bg);
-    border-bottom: 1px solid var(--notificacion-header-border);
-}
-
-/* @galaxiahfast Texto principal en modo oscuro */
-[data-theme="dark"] .notificacion-cuerpo {
-    color: var(--notificacion-texto);
-}
-
-/* @galaxiahfast Hora en modo oscuro */
-[data-theme="dark"] .notificacion-hora {
-    color: var(--notificacion-hora-color);
 }
 
 /* ==========================================================================
@@ -205,33 +156,41 @@
    @galaxiahfast ANIMACIONES
    ========================================================================== */
 
-/* @galaxiahfast Animación de entrada - CON REBOTE RÁPIDO */
+/* @galaxiahfast Animación de entrada */
 @keyframes entradaNotificacion {
+
     0% {
         transform: translateX(-150%) scale(0.9);
     }
+
     70% {
         transform: translateX(3%) scale(1.02);
     }
+
     85% {
         transform: translateX(-1%) scale(0.99);
     }
+
     100% {
         transform: translateX(0) scale(1);
     }
 }
 
-/* @galaxiahfast Animación de salida - CON REBOTE RÁPIDO AL INICIO */
+/* @galaxiahfast Animación de salida */
 @keyframes salidaNotificacion {
+
     0% {
         transform: translateX(0) scale(1);
     }
+
     15% {
         transform: translateX(-4%) scale(0.98);
     }
+
     30% {
         transform: translateX(3%) scale(1.01);
     }
+
     100% {
         transform: translateX(-150%) scale(0.92);
     }

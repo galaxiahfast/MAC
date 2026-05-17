@@ -22,12 +22,12 @@ function manejoCaracteresEspeciales(texto) {
     }
 
     /* @galaxiahfast Crear contenedor temporal */
-    const div = document.createElement('div');
+    const contenedorTemporal = document.createElement('div');
 
     /* @galaxiahfast Convertir texto seguro */
-    div.textContent = texto;
+    contenedorTemporal.textContent = texto;
 
-    return div.innerHTML;
+    return contenedorTemporal.innerHTML;
 }
 
 /**
