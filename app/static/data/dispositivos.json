@@ -1,45 +1,84 @@
 {
     "configuracion": {
         "apartados": [
-            "MAC_ADDRESS",
             "DIRECCION_MAC_ADDRESS",
+            "DGF",
             "SDF",
-            "GHFH",
-            "567567",
-            "ASA",
-            "DFG",
-            "DGFG"
+            "ZXCZXC",
+            "JULIAN"
         ]
     },
     "dispositivos": [
         {
             "id": "pc_01",
-            "x": 250,
-            "y": 120,
+            "x": "10%",
+            "y": "20%",
             "detalles": {
-                "MAC_ADDRESS": "00:1A:2B:3C:4D:5E",
-                "DIRECCION_MAC_ADDRESS": "23424.234234.234234.234",
-                "SDF": "sfd",
-                "GHFH": "fgfh",
-                "567567": "567575",
-                "ASA": "sas",
-                "DFG": "dfg",
-                "DGFG": "dfgd"
+                "DIRECCION_MAC_ADDRESS": "VALOR1",
+                "DGF": "dfg",
+                "SDF": "sdf",
+                "ZXCZXC": "zc",
+                "JULIAN": "julian"
             }
         },
         {
             "id": "pc_02",
-            "x": 400,
-            "y": 300,
+            "x": "30%",
+            "y": "40%",
             "detalles": {
-                "MAC_ADDRESS": "00:1A:2B:3C:4D:5F",
-                "DIRECCION_MAC_ADDRESS": "23424.234234.234234.234",
-                "SDF": "sfd",
-                "GHFH": "fgfh",
-                "567567": "567575",
-                "ASA": "sas",
-                "DFG": "dfg",
-                "DGFG": "dfgd"
+                "DIRECCION_MAC_ADDRESS": "VALOR2",
+                "DGF": "dfg",
+                "SDF": "sdf",
+                "ZXCZXC": "zc",
+                "JULIAN": "julian"
+            }
+        },
+        {
+            "id": "pc_03",
+            "x": "60%",
+            "y": "70%",
+            "detalles": {
+                "DIRECCION_MAC_ADDRESS": "VALOR3",
+                "DGF": "dfg",
+                "SDF": "sdf",
+                "ZXCZXC": "zc",
+                "JULIAN": "julian"
+            }
+        },
+        {
+            "id": "pc_04",
+            "x": "50%",
+            "y": "50%",
+            "detalles": {
+                "DIRECCION_MAC_ADDRESS": "SDAF",
+                "DGF": "SDF",
+                "SDF": "SAF",
+                "ZXCZXC": "ASF",
+                "JULIAN": "SF"
+            }
+        },
+        {
+            "id": "pc_05",
+            "x": "50%",
+            "y": "50%",
+            "detalles": {
+                "DIRECCION_MAC_ADDRESS": "SDF",
+                "DGF": "SFD",
+                "SDF": "SDAF",
+                "ZXCZXC": "ASF",
+                "JULIAN": "FSD"
+            }
+        },
+        {
+            "id": "pc_06",
+            "x": "50%",
+            "y": "50%",
+            "detalles": {
+                "DIRECCION_MAC_ADDRESS": "XVC",
+                "DGF": "SDF",
+                "SDF": "SDF",
+                "ZXCZXC": "SDF",
+                "JULIAN": "SDF"
             }
         }
     ]

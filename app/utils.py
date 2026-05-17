@@ -28,6 +28,68 @@ def ejecutar_respaldo():
         if len(backups) > 10:
             os.remove(backups[0])
 
+def obtener_siguiente_id_dispositivo():
+    """Obtiene el siguiente ID disponible para un nuevo dispositivo (pc_XX)"""
+    ruta_json = 'app/static/data/dispositivos.json'
+    with open(ruta_json, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    max_num = 0
+    for dispositivo in data.get('dispositivos', []):
+        id_actual = dispositivo.get('id', '')
+        if id_actual.startswith('pc_'):
+            try:
+                num = int(id_actual.split('_')[1])
+                if num > max_num:
+                    max_num = num
+            except (ValueError, IndexError):
+                pass
+    
+    siguiente = max_num + 1
+    return f"pc_{siguiente:02d}"
+
+
+def agregar_dispositivo_a_json(x, y, detalles):
+    """Agrega un nuevo dispositivo/punto al JSON"""
+    ejecutar_respaldo()
+    ruta_json = 'app/static/data/dispositivos.json'
+    
+    with open(ruta_json, 'r+', encoding='utf-8') as f:
+        data = json.load(f)
+        
+        # Obtener apartados válidos
+        apartados_validos = data.get('configuracion', {}).get('apartados', [])
+        
+        # Validar que todos los detalles correspondan a apartados existentes
+        for clave in detalles.keys():
+            if clave not in apartados_validos:
+                raise ValueError(f"El apartado '{clave}' no está configurado. Agrégalo primero en la configuración.")
+        
+        # Generar nuevo ID
+        nuevo_id = obtener_siguiente_id_dispositivo()
+        
+        # Crear nuevo dispositivo (coordenadas recibidas, que serán "50%", "50%")
+        nuevo_dispositivo = {
+            "id": nuevo_id,
+            "x": x,
+            "y": y,
+            "detalles": detalles
+        }
+        
+        # Asegurar que la lista de dispositivos existe
+        if 'dispositivos' not in data:
+            data['dispositivos'] = []
+        
+        # Agregar a la lista
+        data['dispositivos'].append(nuevo_dispositivo)
+        
+        # Guardar cambios
+        f.seek(0)
+        json.dump(data, f, indent=4, ensure_ascii=False)
+        f.truncate()
+    
+    return nuevo_dispositivo
+
 """
 ==========================================================================
 OPERACIONES DE ESCRITURA Y MODIFICACIÓN DE JSON (AGREGAR)

@@ -366,26 +366,22 @@ body {
     width: 100%;
     margin-top: 20px; 
     box-sizing: border-box;
-    /* La altura se fijará dinámicamente con JS, pero mantenemos un fallback */
-    max-height: 220px;  /* Altura base: 3 elementos de 60px + 2 gaps de 12px = 180+36=216 */
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 2px 25px 2px 2px;  /* SIN padding vertical (eso causaba espacios extra) */
-    scroll-snap-type: y mandatory;
+    padding: 8px 0 8px 20px;  /* padding derecho lo controla JS */
     scroll-behavior: smooth;
     border: none;
-    /* Añadir estas propiedades para mejor scroll snap */
-    scroll-padding: 0;
-    scroll-margin: 0;
+    transition: opacity 0.15s ease-in-out;  /* Para el fade */
 }
 
+/* Scrollbar */
 #lista-apartados-existentes::-webkit-scrollbar {
     width: 10px;
 }
 
 #lista-apartados-existentes::-webkit-scrollbar-track {
     background: var(--scroll-track);
-    margin: 5px 5px 5px 0; 
+    margin: 5px 0;
     border-radius: 5px;
 }
 
@@ -406,13 +402,13 @@ body {
     box-sizing: border-box;
     transition: all 0.3s ease;
     flex-shrink: 0;
-    min-height: 60px;  /* Altura fija de cada elemento */
-    height: 60px;      /* Forzar altura fija para que el cálculo sea exacto */
+    min-height: 60px;
+    height: 60px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    width: 100%;
 }
 
-/* Si el texto es muy largo, permitir que se ajuste manteniendo la altura */
 .delete-item-row span {
     font-size: 11px;
     color: #050714;
@@ -423,10 +419,9 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;  /* Limitar ancho del texto */
+    max-width: 200px;
 }
 
-/* El resto de tu código se mantiene igual */
 .btn-delete-small {
     width: 36px;
     height: 36px;
@@ -525,6 +520,21 @@ body {
     100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ==========================================================================
    SISTEMA DE NOTIFICACIONES (TOASTS) - ARRIBA IZQUIERDA
    ========================================================================== */
@@ -620,4 +630,482 @@ body {
 [data-theme="dark"] .toast.error {
     border-color: #ef4444;
     color: #ef4444 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================================
+   MODAL: AGREGAR NUEVO PUNTO (DISPOSITIVO)
+   ========================================================================== */
+
+/* Contenedor principal */
+#contenedor-agregar-punto {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content-fade {
+    opacity: 0;
+}
+
+.modal-content-visible {
+    opacity: 1;
+}
+
+/* Icono - MISMO que en configuración */
+#contenedor-agregar-punto .modal-icon-container {
+    width: 70px;
+    height: 70px;
+    background: #ebf1f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#contenedor-agregar-punto .modal-icon-inner {
+    width: 48px;
+    height: 48px;
+    background-color: #050714;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+#contenedor-agregar-punto .modal-icon-inner svg {
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+    display: block;
+}
+
+/* Título - MISMO que en configuración */
+#contenedor-agregar-punto h3 {
+    margin: 0 0 25px 0;
+    padding: 0;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #050714;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    width: 100%;
+    text-align: center;
+    line-height: 1.2;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+#contenedor-agregar-punto h3::before { content: ""; margin-bottom: -0.25em; }
+#contenedor-agregar-punto h3::after { content: ""; margin-top: -0.25em; }
+
+/* Descripción - MISMO que en configuración */
+#contenedor-agregar-punto .modal-description {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 16px 0;
+    padding: 0;
+    font-size: 11px;
+    color: #64748b;
+    text-align: center;
+    font-weight: 400;
+    line-height: 2;
+    box-sizing: border-box;
+}
+
+#contenedor-agregar-punto .modal-description::before { content: ""; margin-bottom: -0.5em; }
+#contenedor-agregar-punto .modal-description::after { content: ""; margin-top: -0.5em; }
+
+/* CONTENEDOR DE CAMPOS */
+#formulario-dispositivo-dinamico {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;  /* Espacio entre cada grupo (de un input al siguiente título) */
+    margin: 0 0 25px 0;
+    padding: 8px 0 0 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+}
+
+/* Cada grupo de campo - Ajustado para que el input tenga el mismo ancho que el botón */
+#formulario-dispositivo-dinamico .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 0 0 0 4px;  /* Eliminamos el padding derecho de 10px para más ancho */
+    box-sizing: border-box;
+}
+
+/* LABEL - Mismo estilo que en configuración */
+#formulario-dispositivo-dinamico .input-label {
+    display: flex;
+    flex-direction: column;
+    font-size: 11px;
+    color: #050714;
+    text-align: left;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-left: 2px;
+    margin: 0;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+/* INPUT */
+/* INPUT - Ocupa todo el ancho disponible como el botón */
+#formulario-dispositivo-dinamico .modern-input {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #050714;
+    margin: 0;
+    outline: none;
+    transition: border-color 0.2s ease;
+    text-transform: uppercase;
+}
+
+#formulario-dispositivo-dinamico .modern-input::placeholder {
+    color: #94a3b8;
+    text-transform: none;
+}
+
+#formulario-dispositivo-dinamico .modern-input:focus {
+    border-color: #cbd5e1;
+}
+
+/* BOTÓN - MISMO que .btn-main en configuración */
+#btn-agregar-dispositivo {
+    width: 100%;
+    padding: 18px;
+    border-radius: 50px;
+    border: none;
+    background: #050714;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#btn-agregar-dispositivo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(5, 7, 20, 0.15);
+}
+
+#btn-agregar-dispositivo:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Modo confirmación */
+#btn-agregar-dispositivo.confirm-mode {
+    background-color: #ef4444 !important;
+    animation: pulse-red 1.5s infinite;
+}
+
+/* ============================================================
+   MODO OSCURO - MISMO que en configuración
+   ============================================================ */
+
+[data-theme="dark"] #contenedor-agregar-punto h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] #contenedor-agregar-punto .modal-icon-container {
+    background-color: rgba(56, 189, 248, 0.1);
+    border: 1px solid var(--ui-border);
+}
+
+[data-theme="dark"] #contenedor-agregar-punto .modal-icon-inner {
+    background-color: var(--accent);
+    border: none;
+    filter: brightness(0.85);
+}
+
+[data-theme="dark"] #contenedor-agregar-punto .modal-icon-inner svg {
+    color: #050714;
+}
+
+[data-theme="dark"] #formulario-dispositivo-dinamico .input-label {
+    color: #ffffff;
+}
+
+[data-theme="dark"] #formulario-dispositivo-dinamico .modern-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+[data-theme="dark"] #formulario-dispositivo-dinamico .modern-input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] #btn-agregar-dispositivo {
+    background: var(--accent);
+    color: #050714;
+    font-weight: 600;
+    filter: brightness(0.85);
+}
+
+[data-theme="dark"] #formulario-dispositivo-dinamico::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] #formulario-dispositivo-dinamico::-webkit-scrollbar-thumb {
+    background: #262626;
+}
+
+/* Modo oscuro - Estilo para el botón en estado de confirmación */
+[data-theme="dark"] #btn-agregar-dispositivo.confirm-mode {
+    background-color: transparent !important;
+    border: 1.5px solid #38bdf8 !important;
+    color: #38bdf8 !important;
+    animation: pulse-dark 1.5s infinite !important;
+}
+
+[data-theme="dark"] #btn-agregar-dispositivo.confirm-mode .confirm-text {
+    color: #38bdf8 !important;
+}
+
+/* ==========================================================================
+   ESTILOS PARA LOS MARCADORES EN EL MAPA
+   ========================================================================== */
+
+.marker-wrapper {
+    position: absolute;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    cursor: move;
+    padding: 10px;
+}
+
+.marker-wrapper:hover {
+    z-index: 9999 !important;
+}
+
+.info-box {
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    width: 320px;
+    background: var(--ui-bg);
+    backdrop-filter: blur(15px);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 15px;
+    color: var(--report-text-color);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease-out;
+    z-index: 100;
+    pointer-events: auto;
+    text-align: left;
+}
+
+.marker-wrapper:hover .info-box {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.info-box .scroll-content {
+    overflow-y: auto;
+    max-height: 280px;
+    padding-right: 8px;
+}
+
+.info-box .scroll-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.info-box .scroll-content::-webkit-scrollbar-track {
+    background: var(--scroll-track);
+    border-radius: 4px;
+}
+
+.info-box .scroll-content::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 4px;
+}
+
+.info-box .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--ui-border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.info-box .label-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--report-text-color);
+}
+
+.info-box .online-status {
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.info-box .label {
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.info-box .data {
+    font-size: 11px;
+    color: var(--report-text-color);
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.info-box .no-edit {
+    padding-left: 4px;
+}
+
+
+
+
+/* ==========================================================================
+   EFECTO DE ONDAS GIGANTES PARA NUEVOS PUNTOS
+   ========================================================================== */
+
+.punto {
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transition: background 0.5s;
+    z-index: 11;
+    pointer-events: none;
+}
+
+.punto.nuevo-punto {
+    background: #4ade80 !important;
+    box-shadow: 0 0 15px #4ade80;
+    animation: latido 0.3s ease-in-out;
+}
+
+.onda {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #4ade80;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Onda 1: empieza en 0s, dura 3s */
+.onda1 {
+    animation: onda-expand-gigante 3s ease-out forwards;
+}
+
+/* Onda 2: empieza en 1s, dura 3s */
+.onda2 {
+    animation: onda-expand-gigante 3s ease-out 1s forwards;
+}
+
+/* Onda 3: empieza en 2s, dura 3s */
+.onda3 {
+    animation: onda-expand-gigante 3s ease-out 2s forwards;
+}
+
+@keyframes pulse-dark {
+    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.3); }
+    70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+@keyframes onda-expand-gigante {
+    0% {
+        width: 22px;
+        height: 22px;
+        opacity: 0.8;
+        border-width: 3px;
+    }
+    100% {
+        width: 200vw;       /* 200% del ancho de la pantalla - MUY GRANDE */
+        height: 200vw;
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+@keyframes latido {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Para pantallas grandes, limitar un poco pero seguir siendo grandes */
+@media (min-width: 768px) {
+    @keyframes onda-expand-gigante {
+        0% {
+            width: 22px;
+            height: 22px;
+            opacity: 0.8;
+            border-width: 3px;
+        }
+        100% {
+            width: 800px;    /* 800px máximo en pantallas grandes */
+            height: 800px;
+            opacity: 0;
+            border-width: 1px;
+        }
+    }
 }

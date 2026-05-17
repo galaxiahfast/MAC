@@ -71,7 +71,67 @@ def borrar_apartado():
         eliminar_apartado_de_json(nombre)
         return jsonify({"status": "success", "message": f"Apartado {nombre} eliminado"}), 200
     except ValueError as e:
-        # Captura específica para el error de "no existe"
+        return jsonify({"status": "error", "message": str(e)}), 400
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+"""
+==========================================================================
+ENDPOINTS DE API PARA GESTIÓN DE DISPOSITIVOS (PUNTOS)
+==========================================================================
+"""
+
+@app.route('/api/dispositivos/listar', methods=['GET'])
+def listar_dispositivos():
+    """Devuelve la lista de todos los dispositivos"""
+    try:
+        ruta_json = os.path.join(app.root_path, 'static/data/dispositivos.json')
+        with open(ruta_json, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        response = jsonify({
+            "status": "success",
+            "dispositivos": data.get('dispositivos', [])
+        })
+        
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        return response, 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/api/dispositivos/agregar', methods=['POST'])
+def agregar_dispositivo():
+    """Agrega un nuevo dispositivo/punto al plano en el centro (50%, 50%)"""
+    datos = request.get_json()
+    
+    detalles = datos.get('detalles', {})
+    
+    if not detalles:
+        return jsonify({
+            "status": "error", 
+            "message": "Se requieren 'detalles' para el dispositivo"
+        }), 400
+    
+    # Coordenadas fijas: centro del mapa
+    x = "50%"
+    y = "50%"
+    
+    try:
+        from .utils import agregar_dispositivo_a_json
+        nuevo_dispositivo = agregar_dispositivo_a_json(x, y, detalles)
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Dispositivo {nuevo_dispositivo['id']} agregado correctamente",
+            "dispositivo": nuevo_dispositivo
+        }), 200
+        
+    except ValueError as e:
         return jsonify({"status": "error", "message": str(e)}), 400
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
