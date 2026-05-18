@@ -5,25 +5,39 @@
    @galaxiahfast SISTEMA DE NOTIFICACIONES
    ========================================================================== */
 
-/* @galaxiahfast Estado interno del sistema */
-let colaNotificaciones = [];
-let temporizadorActivo = false;
-let esPrimeraDelLote = true;
+/**
+ * ==========================================================================
+ * CONFIGURACIÓN
+ * ==========================================================================
+ */
 
-/* @galaxiahfast Número máximo de notificaciones visibles */
 const MAX_NOTIFICACIONES_VISIBLES = 6;
 
-/* @galaxiahfast Etiquetas visuales por tipo */
-const TIPOS_TEXTO = {
-    exito: "ÉXITO",
-    error: "ERROR",
-    advertencia: "ADVERTENCIA"
-};
+const DURACION_PRIMERA_NOTIFICACION = 3000;
 
-/* @galaxiahfast Iconos SVG por tipo */
-const ICONOS = {
+const DURACION_NOTIFICACION_NORMAL = 1000;
 
-    exito: `
+/* @galaxiahfast Tiempo del rebote horizontal */
+const DURACION_REBOTE_SALIDA = 420;
+
+/* @galaxiahfast Tiempo del colapso vertical */
+const DURACION_COLAPSO_VERTICAL = 650;
+
+const TIPOS_NOTIFICACION = Object.freeze({
+    EXITO: 'exito',
+    ERROR: 'error',
+    ADVERTENCIA: 'advertencia'
+});
+
+const TIPOS_TEXTO = Object.freeze({
+    [TIPOS_NOTIFICACION.EXITO]: 'ÉXITO',
+    [TIPOS_NOTIFICACION.ERROR]: 'ERROR',
+    [TIPOS_NOTIFICACION.ADVERTENCIA]: 'ADVERTENCIA'
+});
+
+const ICONOS = Object.freeze({
+
+    [TIPOS_NOTIFICACION.EXITO]: `
         <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -36,7 +50,7 @@ const ICONOS = {
         </svg>
     `,
 
-    error: `
+    [TIPOS_NOTIFICACION.ERROR]: `
         <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -63,7 +77,7 @@ const ICONOS = {
         </svg>
     `,
 
-    advertencia: `
+    [TIPOS_NOTIFICACION.ADVERTENCIA]: `
         <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -79,12 +93,44 @@ const ICONOS = {
             ></path>
         </svg>
     `
-};
+});
 
 /**
- * @galaxiahfast Obtiene la hora actual en formato de 12 horas.
+ * ==========================================================================
+ * ESTADO
+ * ==========================================================================
+ */
+
+let colaNotificaciones = [];
+
+let temporizadorActivo = false;
+
+let esPrimeraDelLote = true;
+
+/**
+ * ==========================================================================
+ * UTILIDADES
+ * ==========================================================================
+ */
+
+/**
+ * @galaxiahfast Espera.
  *
- * @returns {string} Hora formateada.
+ * @param {number} tiempo
+ *
+ * @returns {Promise<void>}
+ */
+function esperar(tiempo) {
+
+    return new Promise((resolve) => {
+        setTimeout(resolve, tiempo);
+    });
+}
+
+/**
+ * @galaxiahfast Hora actual.
+ *
+ * @returns {string}
  */
 function obtenerHoraActual() {
 
@@ -102,10 +148,12 @@ function obtenerHoraActual() {
         .toString()
         .padStart(2, '0');
 
-    const ampm = horas >= 12 ? 'PM' : 'AM';
+    const ampm =
+        horas >= 12
+            ? 'PM'
+            : 'AM';
 
-    horas = horas % 12;
-    horas = horas ? horas : 12;
+    horas = horas % 12 || 12;
 
     return `
         ${horas.toString().padStart(2, '0')}
@@ -118,111 +166,68 @@ function obtenerHoraActual() {
 }
 
 /**
- * @galaxiahfast Procesa la siguiente notificación almacenada en la cola.
+ * @galaxiahfast Obtiene contenedor.
  *
- * @returns {void}
+ * @returns {HTMLElement}
  */
-function procesarSiguienteNotificacion() {
+function obtenerContenedorNotificaciones() {
 
-    /* @galaxiahfast Validar disponibilidad de procesamiento */
-    if (colaNotificaciones.length === 0 || temporizadorActivo) {
-        return;
+    let contenedor =
+        document.getElementById(
+            'contenedor-notificaciones'
+        );
+
+    if (contenedor) {
+        return contenedor;
     }
 
-    const notificacion = colaNotificaciones[0];
+    contenedor =
+        document.createElement('div');
 
-    temporizadorActivo = true;
+    contenedor.id =
+        'contenedor-notificaciones';
 
-    /* @galaxiahfast Configurar tiempo de visualización */
-    const tiempoVisible = esPrimeraDelLote ? 3000 : 1000;
+    contenedor.setAttribute(
+        'aria-live',
+        'polite'
+    );
 
-    esPrimeraDelLote = false;
+    contenedor.setAttribute(
+        'role',
+        'status'
+    );
 
-    /* @galaxiahfast Ejecutar proceso de salida */
-    setTimeout(() => {
+    document.body.appendChild(
+        contenedor
+    );
 
-        /* @galaxiahfast Validar existencia del elemento */
-        if (!notificacion.elemento || !notificacion.elemento.isConnected) {
-            temporizadorActivo = false;
-            procesarSiguienteNotificacion();
-            return;
-        }
-
-        notificacion.elemento.classList.add('desvanecer');
-
-        /* @galaxiahfast Eliminar notificación y continuar cola */
-        setTimeout(() => {
-
-            if (notificacion.elemento?.remove) {
-                notificacion.elemento.remove();
-            }
-
-            colaNotificaciones.shift();
-
-            temporizadorActivo = false;
-
-            /* @galaxiahfast Reiniciar estado del lote */
-            if (colaNotificaciones.length === 0) {
-                esPrimeraDelLote = true;
-            }
-
-            procesarSiguienteNotificacion();
-
-        }, 400);
-
-    }, tiempoVisible);
+    return contenedor;
 }
 
 /**
- * @galaxiahfast Muestra una notificación temporal en pantalla.
- *
- * @param {string} mensaje - Texto de la notificación.
- * @param {"exito"|"error"|"advertencia"} [tipo="advertencia"]
- * Tipo visual de la notificación.
- *
- * @returns {void}
+ * ==========================================================================
+ * CREACIÓN
+ * ==========================================================================
  */
-function mostrarNotificacion(mensaje, tipo = "advertencia") {
 
-    /* @galaxiahfast Obtener o crear contenedor */
-    let contenedor = document.getElementById('contenedor-notificaciones');
+/**
+ * @galaxiahfast Crea notificación.
+ *
+ * @param {string} mensaje
+ * @param {string} tipo
+ *
+ * @returns {HTMLDivElement}
+ */
+function crearElementoNotificacion(
+    mensaje,
+    tipo
+) {
 
-    if (!contenedor) {
-        contenedor = document.createElement('div');
-        contenedor.id = 'contenedor-notificaciones';
-        document.body.appendChild(contenedor);
-    }
+    const notificacion =
+        document.createElement('div');
 
-    /* @galaxiahfast Limitar notificaciones visibles */
-    while (contenedor.children.length >= MAX_NOTIFICACIONES_VISIBLES) {
-
-        const notificacionAntigua = contenedor.children[0];
-
-        if (notificacionAntigua) {
-            notificacionAntigua.remove();
-        }
-
-        /* @galaxiahfast Sincronizar cola interna */
-        if (
-            colaNotificaciones.length > 0 &&
-            colaNotificaciones[0].elemento === notificacionAntigua
-        ) {
-            colaNotificaciones.shift();
-        }
-
-        /* @galaxiahfast Reiniciar estado del lote */
-        if (colaNotificaciones.length === 0) {
-            esPrimeraDelLote = true;
-            temporizadorActivo = false;
-        }
-    }
-
-    /* @galaxiahfast Crear estructura de notificación */
-    const notificacion = document.createElement('div');
-
-    notificacion.className = `notificacion ${tipo}`;
-
-    const mensajeMayusculas = mensaje.toUpperCase();
+    notificacion.className =
+        `notificacion ${tipo}`;
 
     notificacion.innerHTML = `
         <div class="notificacion-encabezado">
@@ -246,42 +251,273 @@ function mostrarNotificacion(mensaje, tipo = "advertencia") {
         </div>
 
         <div class="notificacion-cuerpo">
-            ${mensajeMayusculas}
+            ${mensaje.toUpperCase()}
         </div>
     `;
 
-    /* @galaxiahfast Insertar y registrar notificación */
-    contenedor.appendChild(notificacion);
+    return notificacion;
+}
+
+/* ==========================================================================
+   SALIDA SUAVE
+   ========================================================================== */
+
+/**
+ * @galaxiahfast Ejecuta salida suave.
+ *
+ * @param {HTMLElement} elemento
+ *
+ * @returns {Promise<void>}
+ */
+async function ejecutarSalidaSuave(
+    elemento
+) {
+
+    if (!elemento?.isConnected) {
+        return;
+    }
+
+    /* @galaxiahfast Altura REAL */
+    const altura =
+        elemento.offsetHeight;
+
+    /* @galaxiahfast Fijar altura */
+    elemento.style.height =
+        `${altura}px`;
+
+    /* @galaxiahfast Reflow */
+    void elemento.offsetHeight;
+
+    /* @galaxiahfast Activar salida */
+    elemento.classList.add(
+        'desvanecer'
+    );
+
+    /* @galaxiahfast Esperar rebote */
+    await esperar(
+        DURACION_REBOTE_SALIDA
+    );
+
+    /* @galaxiahfast Colapso ultra fluido */
+    elemento.style.height = '0';
+
+    elemento.style.opacity = '0';
+
+    elemento.style.marginBottom = '0';
+
+    elemento.style.borderWidth = '0';
+
+    const cuerpo =
+        elemento.querySelector(
+            '.notificacion-cuerpo'
+        );
+
+    const encabezado =
+        elemento.querySelector(
+            '.notificacion-encabezado'
+        );
+
+    if (cuerpo) {
+
+        cuerpo.style.paddingTop = '0';
+
+        cuerpo.style.paddingBottom = '0';
+    }
+
+    if (encabezado) {
+
+        encabezado.style.paddingTop = '0';
+
+        encabezado.style.paddingBottom = '0';
+    }
+
+    /* @galaxiahfast Esperar transición */
+    await esperar(
+        DURACION_COLAPSO_VERTICAL
+    );
+
+    /* @galaxiahfast Eliminar */
+    elemento.remove();
+}
+
+/**
+ * ==========================================================================
+ * PROCESAMIENTO
+ * ==========================================================================
+ */
+
+/**
+ * @galaxiahfast Procesa cola.
+ *
+ * @returns {Promise<void>}
+ */
+async function procesarSiguienteNotificacion() {
+
+    if (
+        colaNotificaciones.length === 0 ||
+        temporizadorActivo
+    ) {
+        return;
+    }
+
+    temporizadorActivo = true;
+
+    const notificacionActual =
+        colaNotificaciones[0];
+
+    const tiempoVisible =
+        esPrimeraDelLote
+            ? DURACION_PRIMERA_NOTIFICACION
+            : DURACION_NOTIFICACION_NORMAL;
+
+    esPrimeraDelLote = false;
+
+    await esperar(
+        tiempoVisible
+    );
+
+    if (
+        !notificacionActual.elemento ||
+        !notificacionActual.elemento.isConnected
+    ) {
+
+        colaNotificaciones =
+            colaNotificaciones.filter(
+                (item) =>
+                    item.elemento !==
+                    notificacionActual.elemento
+            );
+
+        temporizadorActivo = false;
+
+        if (
+            colaNotificaciones.length === 0
+        ) {
+            esPrimeraDelLote = true;
+        }
+
+        procesarSiguienteNotificacion();
+
+        return;
+    }
+
+    await ejecutarSalidaSuave(
+        notificacionActual.elemento
+    );
+
+    /* @galaxiahfast Eliminar referencia */
+    colaNotificaciones =
+        colaNotificaciones.filter(
+            (item) =>
+                item.elemento !==
+                notificacionActual.elemento
+        );
+
+    temporizadorActivo = false;
+
+    /* @galaxiahfast Reiniciar lote */
+    if (
+        colaNotificaciones.length === 0
+    ) {
+        esPrimeraDelLote = true;
+    }
+
+    procesarSiguienteNotificacion();
+}
+
+/**
+ * ==========================================================================
+ * API PÚBLICA
+ * ==========================================================================
+ */
+
+/**
+ * @galaxiahfast Muestra notificación.
+ *
+ * @param {string} mensaje
+ * @param {"exito"|"error"|"advertencia"} [
+ *     tipo="advertencia"
+ * ]
+ *
+ * @returns {void}
+ */
+function mostrarNotificacion(
+    mensaje,
+    tipo = TIPOS_NOTIFICACION.ADVERTENCIA
+) {
+
+    if (
+        typeof mensaje !== 'string' ||
+        mensaje.trim() === ''
+    ) {
+        return;
+    }
+
+    const contenedor =
+        obtenerContenedorNotificaciones();
+
+    /* @galaxiahfast Limitar visibles */
+    while (
+        contenedor.children.length >=
+        MAX_NOTIFICACIONES_VISIBLES
+    ) {
+
+        const notificacionAntigua =
+            contenedor.children[0];
+
+        if (notificacionAntigua) {
+            notificacionAntigua.remove();
+        }
+
+        colaNotificaciones =
+            colaNotificaciones.filter(
+                (item) =>
+                    item.elemento !==
+                    notificacionAntigua
+            );
+    }
+
+    const elementoNotificacion =
+        crearElementoNotificacion(
+            mensaje,
+            tipo
+        );
+
+    contenedor.appendChild(
+        elementoNotificacion
+    );
 
     colaNotificaciones.push({
-        elemento: notificacion,
-        mensaje: mensajeMayusculas,
+        elemento: elementoNotificacion,
+        mensaje,
         tipo
     });
 
-    /* @galaxiahfast Iniciar procesamiento */
     if (!temporizadorActivo) {
         procesarSiguienteNotificacion();
     }
 }
 
 /**
- * @galaxiahfast Elimina todas las notificaciones activas.
+ * @galaxiahfast Limpia todas.
  *
  * @returns {void}
  */
 function limpiarTodasLasNotificaciones() {
 
-    const contenedor = document.getElementById('contenedor-notificaciones');
+    const contenedor =
+        document.getElementById(
+            'contenedor-notificaciones'
+        );
 
-    /* @galaxiahfast Limpiar contenedor */
     if (contenedor) {
         contenedor.innerHTML = '';
     }
 
-    /* @galaxiahfast Reiniciar estado interno */
     colaNotificaciones = [];
+
     temporizadorActivo = false;
+
     esPrimeraDelLote = true;
 }
 

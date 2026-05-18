@@ -5,70 +5,135 @@
    @galaxiahfast SISTEMA DE NOTIFICACIONES
    ========================================================================== */
 
-/* @galaxiahfast Contenedor principal */
+/* ==========================================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================================== */
+
 #contenedor-notificaciones {
     position: fixed;
+
     top: 25px;
     left: 25px;
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    z-index: 10001;
-    pointer-events: none;
+
+    width: 100%;
     max-width: 360px;
+
+    z-index: 10001;
+
+    pointer-events: none;
 }
 
-/* @galaxiahfast Estructura principal de notificaciones */
+/* ==========================================================================
+   NOTIFICACIÓN
+   ========================================================================== */
+
 .notificacion {
+
+    /* @galaxiahfast Layout */
     width: 340px;
-    min-height: 80px;
-    background: var(--fondo-notificacion);
-    backdrop-filter: blur(15px);
-    border-radius: 12px;
-    border: 1px solid var(--borde-notificacion);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-    pointer-events: auto;
+
     overflow: hidden;
+
+    margin-bottom: 10px;
+
+    height: auto;
+
+    /* @galaxiahfast Apariencia */
+    background: var(--fondo-notificacion);
+
+    backdrop-filter: blur(15px);
+
+    border-radius: 12px;
+
+    border: 1px solid var(--borde-notificacion);
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.12);
+
+    /* @galaxiahfast Interacción */
+    pointer-events: auto;
 
     user-select: none;
     -webkit-user-select: none;
 
-    transition:
-        transform 2s ease-out,
-        opacity 2s ease-out,
-        margin 2s ease-out;
+    opacity: 1;
 
+    /* @galaxiahfast Optimización */
+    will-change:
+        transform,
+        height,
+        opacity;
+
+    /* @galaxiahfast Movimiento vertical ultra fluido */
+    transition:
+        height 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        padding 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        margin-bottom 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.40s ease,
+        border-width 0.45s ease;
+
+    /* @galaxiahfast Entrada */
     animation:
-        entradaNotificacion 0.35s
+        entradaNotificacion 0.40s
         cubic-bezier(0.175, 0.885, 0.32, 1.275)
         forwards;
 }
 
-/* @galaxiahfast Encabezado de la notificación */
+/* ==========================================================================
+   ENCABEZADO
+   ========================================================================== */
+
 .notificacion-encabezado {
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
     padding: 10px 16px;
-    background-color: var(--fondo-cabecera-notificacion);
-    border-bottom: 1px solid var(--borde-cabecera-notificacion);
+
+    background:
+        var(--fondo-cabecera-notificacion);
+
+    border-bottom:
+        1px solid
+        var(--borde-cabecera-notificacion);
+
+    transition:
+        padding 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* @galaxiahfast Grupo izquierdo del encabezado */
+/* ==========================================================================
+   GRUPO IZQUIERDO
+   ========================================================================== */
+
 .notificacion-encabezado-izquierdo {
     display: flex;
+
     align-items: center;
+
     gap: 10px;
 }
 
-/* @galaxiahfast Icono de notificación */
+/* ==========================================================================
+   ICONO
+   ========================================================================== */
+
 .notificacion-icono {
     width: 16px;
     height: 16px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
+    flex-shrink: 0;
 }
 
 .notificacion-icono svg {
@@ -76,56 +141,87 @@
     height: 100%;
 }
 
-/* @galaxiahfast Tipo de notificación */
+/* ==========================================================================
+   TIPO
+   ========================================================================== */
+
 .notificacion-tipo {
     font-family: 'Inter', sans-serif;
+
     font-size: 11px;
-    font-weight: 400;
+
+    font-weight: 500;
+
+    letter-spacing: 0.08em;
+
     text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
-/* @galaxiahfast Hora de la notificación */
+/* ==========================================================================
+   HORA
+   ========================================================================== */
+
 .notificacion-hora {
     font-family: 'Inter', sans-serif;
+
     font-size: 11px;
+
     font-weight: 400;
-    text-transform: uppercase;
+
     color: var(--color-hora-notificacion);
+
+    text-transform: uppercase;
+
+    flex-shrink: 0;
 }
 
-/* @galaxiahfast Contenido principal */
+/* ==========================================================================
+   CUERPO
+   ========================================================================== */
+
 .notificacion-cuerpo {
     padding: 12px 16px;
+
     font-family: 'Inter', sans-serif;
+
     font-size: 11px;
+
     font-weight: 400;
-    line-height: 2;
-    text-align: left;
-    word-wrap: break-word;
-    white-space: normal;
-    word-break: break-word;
-    text-transform: uppercase;
+
+    line-height: 1.9;
+
     color: var(--texto-notificacion);
+
+    text-transform: uppercase;
+
+    white-space: normal;
+
+    word-wrap: break-word;
+
+    word-break: break-word;
+
+    transition:
+        padding 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* @galaxiahfast Estado de desvanecimiento */
+/* ==========================================================================
+   ESTADO DE SALIDA
+   ========================================================================== */
+
 .notificacion.desvanecer {
 
-    /* @galaxiahfast Evitar interacción durante salida */
     pointer-events: none;
 
     animation:
-        salidaNotificacion 0.4s
-        cubic-bezier(0.6, -0.28, 0.735, 0.045)
+        salidaNotificacion 0.60s
+        cubic-bezier(0.22, 1, 0.36, 1)
         forwards;
 }
 
 /* ==========================================================================
-   @galaxiahfast ESTILOS POR TIPO
+   ÉXITO
    ========================================================================== */
 
-/* @galaxiahfast Notificación de éxito */
 .notificacion.exito .notificacion-tipo {
     color: #10b981;
 }
@@ -134,7 +230,10 @@
     stroke: #10b981;
 }
 
-/* @galaxiahfast Notificación de error */
+/* ==========================================================================
+   ERROR
+   ========================================================================== */
+
 .notificacion.error .notificacion-tipo {
     color: #ef4444;
 }
@@ -143,7 +242,10 @@
     stroke: #ef4444;
 }
 
-/* @galaxiahfast Notificación de advertencia */
+/* ==========================================================================
+   ADVERTENCIA
+   ========================================================================== */
+
 .notificacion.advertencia .notificacion-tipo {
     color: #f59e0b;
 }
@@ -153,47 +255,105 @@
 }
 
 /* ==========================================================================
-   @galaxiahfast ANIMACIONES
+   ENTRADA
    ========================================================================== */
 
-/* @galaxiahfast Animación de entrada */
 @keyframes entradaNotificacion {
 
     0% {
-        transform: translateX(-150%) scale(0.9);
+        opacity: 0;
+
+        transform:
+            translateX(-150%)
+            scale(0.90);
     }
 
     70% {
-        transform: translateX(3%) scale(1.02);
-    }
+        opacity: 1;
 
-    85% {
-        transform: translateX(-1%) scale(0.99);
+        transform:
+            translateX(3%)
+            scale(1.02);
     }
 
     100% {
-        transform: translateX(0) scale(1);
+        opacity: 1;
+
+        transform:
+            translateX(0)
+            scale(1);
     }
 }
 
-/* @galaxiahfast Animación de salida */
+/* ==========================================================================
+   SALIDA
+   ========================================================================== */
+
 @keyframes salidaNotificacion {
 
     0% {
-        transform: translateX(0) scale(1);
+        transform:
+            translateX(0)
+            scale(1);
     }
 
-    15% {
-        transform: translateX(-4%) scale(0.98);
-    }
+    25% {
 
-    30% {
-        transform: translateX(3%) scale(1.01);
+        transform:
+            translateX(10%)
+            scale(1.02);
     }
 
     100% {
-        transform: translateX(-150%) scale(0.92);
+
+        transform:
+            translateX(-170%)
+            scale(0.92);
+
+        opacity: 1;
     }
 }
 
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 480px) {
+
+    #contenedor-notificaciones {
+
+        top: 16px;
+        left: 16px;
+        right: 16px;
+
+        max-width: unset;
+    }
+
+    .notificacion {
+        width: 100%;
+    }
+}
+
+/* ==========================================================================
+   REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .notificacion {
+
+        animation: none;
+
+        transition:
+            opacity 0.2s ease,
+            height 0.2s ease;
+    }
+
+    .notificacion.desvanecer {
+
+        animation: none;
+
+        transform: none;
+    }
+}
 
