@@ -18,53 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     /* Precargar datos en segundo plano */
     setTimeout(() => {
-        PrecargarDatosEliminacion();
-        PrecargarDatosAgregar();
+        cargarApartados();
     }, 100);
-    
-    await API_PrecargarDatosApartados();
-    
+        
     /* Cargar dispositivos existentes */
     await CargarTodosLosDispositivos();
 });
-
-// 🆕 Función para precargar datos de eliminación en background
-async function PrecargarDatosEliminacion() {
-    if (datosEliminacionCache) return datosEliminacionCache;
-    
-    try {
-        const response = await fetch('/api/config/apartados/listar');
-        const data = await response.json();
-        if (data.status === 'success') {
-            datosEliminacionCache = data.apartados;
-            console.log("🗑️ Datos de eliminación precargados:", datosEliminacionCache);
-        }
-        return datosEliminacionCache;
-    } catch (error) {
-        console.error("Error precargando datos de eliminación:", error);
-        return [];
-    }
-}
-
-async function API_PrecargarDatosApartados() {
-    try {
-        const response = await fetch('/api/config/apartados/listar');
-        const data = await response.json();
-        if (data.status === 'success') {
-            datosApartadosGlobal = data.apartados;
-            // 🔄 Actualizar también el caché de eliminación
-            datosEliminacionCache = [...data.apartados];
-            console.log("📦 Datos cargados desde API:", datosApartadosGlobal);
-        } else {
-            throw new Error(data.message);
-        }
-        return datosApartadosGlobal;
-    } catch (error) {
-        console.error("Error precargando datos:", error);
-        mostrarNotificacion("No se pudieron precargar los parámetros", "error");
-        return [];
-    }
-}
 
 /* ==========================================================================
    CARGA DE DISPOSITIVOS EXISTENTES EN EL MAPA
@@ -163,14 +122,13 @@ function initEliminarApartadosManager() {
                 document.getElementById('contenedor-agregar').style.display = 'none';
                 document.getElementById('contenedor-eliminar').style.display = 'block';
                 
-                // ⚡ USAR CACHÉ INSTANTÁNEO (sin esperar)
-                if (datosEliminacionCache) {
-                    UI_RenderizarListaEliminacion(datosEliminacionCache);
+                /* ⚡ Usar caché unificado */
+                if (window.cacheEliminacion) {
+                    UI_RenderizarListaEliminacion(window.cacheEliminacion);
                 } else {
-                    // Primera vez: mostrar loading y cargar
-                    UI_RenderizarListaEliminacion([], true); // Modo loading
-                    await PrecargarDatosEliminacion();
-                    UI_RenderizarListaEliminacion(datosEliminacionCache);
+                    UI_RenderizarListaEliminacion([], true);
+                    await cargarApartados();
+                    UI_RenderizarListaEliminacion(window.cacheEliminacion);
                 }
                 
                 modalElement.style.display = 'flex';
@@ -190,12 +148,8 @@ async function API_EliminarApartadoEnJSON(nombre) {
 
         if (respuesta.ok) {
             mostrarNotificacion(data.message || "Parámetro eliminado", "exito");
-            await API_PrecargarDatosApartados();
-            
-            // 🔄 Actualizar también el caché de agregar punto
-            datosAgregarCache = [...datosApartadosGlobal];
-            
-            UI_RenderizarListaEliminacion(datosApartadosGlobal);
+            await cargarApartados(true);  // Forzar recarga
+            UI_RenderizarListaEliminacion(window.cacheEliminacion);
         } else {
             mostrarNotificacion(data.message || "No se pudo eliminar el parámetro", "error");
         }
@@ -243,11 +197,7 @@ async function API_GuardarNuevoApartadoEnJSON(nombre, valor) {
 
         if (respuesta.ok) {
             mostrarNotificacion(data.message || "Se agregó el nuevo parámetro", "exito");
-            await API_PrecargarDatosApartados();
-            
-            // 🔄 Actualizar también el caché de agregar punto
-            datosAgregarCache = [...datosApartadosGlobal];
-            
+            await cargarApartados(true);  // Forzar recarga
             UI_ResetearModalApartados();  
         } else {
             mostrarNotificacion(data.message || "El parámetro enviado no es válido", "error");
@@ -443,47 +393,17 @@ let datosDispositivoPendiente = null;
 let isWaitingForDispositivoConfirmation = false;
 let apartadosActivosFormulario = [];
 
-// 🆕 Función para precargar datos de agregar punto en background
-async function PrecargarDatosAgregar() {
-    if (datosAgregarCache) return datosAgregarCache;
-    
-    try {
-        const response = await fetch('/api/config/apartados/listar');
-        const data = await response.json();
-        if (data.status === 'success') {
-            datosAgregarCache = data.apartados;
-            console.log("➕ Datos de agregar precargados:", datosAgregarCache);
-        }
-        return datosAgregarCache;
-    } catch (error) {
-        console.error("Error precargando datos de agregar:", error);
-        return [];
-    }
-}
-
-// Función para obtener los apartados activos (usa caché)
 async function ObtenerApartadosActivos(forzarRefresh = false) {
-    if (!forzarRefresh && datosAgregarCache) {
-        apartadosActivosFormulario = datosAgregarCache;
+    if (!forzarRefresh && window.cacheAgregar) {
+        apartadosActivosFormulario = window.cacheAgregar;
         console.log("📋 Apartados desde caché:", apartadosActivosFormulario);
         return apartadosActivosFormulario;
     }
     
-    try {
-        const response = await fetch('/api/config/apartados/listar');
-        const data = await response.json();
-        if (data.status === 'success') {
-            apartadosActivosFormulario = data.apartados;
-            datosAgregarCache = [...data.apartados];
-            console.log("📋 Apartados desde API:", apartadosActivosFormulario);
-            return apartadosActivosFormulario;
-        }
-        return [];
-    } catch (error) {
-        console.error("Error obteniendo apartados:", error);
-        mostrarNotificacion("No se pudieron cargar los campos del formulario", "error");
-        return [];
-    }
+    const apartados = await cargarApartados(forzarRefresh);
+    apartadosActivosFormulario = apartados;
+    window.cacheAgregar = [...apartados];
+    return apartadosActivosFormulario;
 }
 
 // Función para renderizar el formulario dinámico de agregar punto
