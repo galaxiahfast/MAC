@@ -1,7 +1,8 @@
 {
     "configuracion": {
         "apartados": [
-            "DIRECCION_MAC_ADDRESS"
+            "DIRECCION_MAC_ADDRESS",
+            "SFD"
         ]
     },
     "dispositivos": [
@@ -10,7 +11,8 @@
             "x": "10%",
             "y": "20%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "VALOR1"
+                "DIRECCION_MAC_ADDRESS": "VALOR1",
+                "SFD": "asd"
             }
         },
         {
@@ -18,7 +20,8 @@
             "x": "30%",
             "y": "40%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "VALOR2"
+                "DIRECCION_MAC_ADDRESS": "VALOR2",
+                "SFD": "asd"
             }
         },
         {
@@ -26,7 +29,8 @@
             "x": "60%",
             "y": "70%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "VALOR3"
+                "DIRECCION_MAC_ADDRESS": "VALOR3",
+                "SFD": "asd"
             }
         },
         {
@@ -34,7 +38,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SDAF"
+                "DIRECCION_MAC_ADDRESS": "SDAF",
+                "SFD": "asd"
             }
         },
         {
@@ -42,7 +47,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SDF"
+                "DIRECCION_MAC_ADDRESS": "SDF",
+                "SFD": "asd"
             }
         },
         {
@@ -50,7 +56,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "XVC"
+                "DIRECCION_MAC_ADDRESS": "XVC",
+                "SFD": "asd"
             }
         },
         {
@@ -58,7 +65,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SDF"
+                "DIRECCION_MAC_ADDRESS": "SDF",
+                "SFD": "asd"
             }
         },
         {
@@ -66,7 +74,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SAD"
+                "DIRECCION_MAC_ADDRESS": "SAD",
+                "SFD": "asd"
             }
         },
         {
@@ -74,7 +83,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "ASD"
+                "DIRECCION_MAC_ADDRESS": "ASD",
+                "SFD": "asd"
             }
         },
         {
@@ -82,7 +92,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SA"
+                "DIRECCION_MAC_ADDRESS": "SA",
+                "SFD": "asd"
             }
         },
         {
@@ -90,7 +101,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "D"
+                "DIRECCION_MAC_ADDRESS": "D",
+                "SFD": "asd"
             }
         },
         {
@@ -98,7 +110,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "D"
+                "DIRECCION_MAC_ADDRESS": "D",
+                "SFD": "asd"
             }
         },
         {
@@ -106,7 +119,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "ASD"
+                "DIRECCION_MAC_ADDRESS": "ASD",
+                "SFD": "asd"
             }
         },
         {
@@ -114,7 +128,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SDF"
+                "DIRECCION_MAC_ADDRESS": "SDF",
+                "SFD": "asd"
             }
         },
         {
@@ -122,7 +137,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "AD"
+                "DIRECCION_MAC_ADDRESS": "AD",
+                "SFD": "asd"
             }
         },
         {
@@ -130,7 +146,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "SD"
+                "DIRECCION_MAC_ADDRESS": "SD",
+                "SFD": "asd"
             }
         },
         {
@@ -138,7 +155,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "ASD"
+                "DIRECCION_MAC_ADDRESS": "ASD",
+                "SFD": "asd"
             }
         },
         {
@@ -146,7 +164,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "12"
+                "DIRECCION_MAC_ADDRESS": "12",
+                "SFD": "asd"
             }
         },
         {
@@ -154,7 +173,8 @@
             "x": "50%",
             "y": "50%",
             "detalles": {
-                "DIRECCION_MAC_ADDRESS": "E"
+                "DIRECCION_MAC_ADDRESS": "E",
+                "SFD": "asd"
             }
         }
     ]
