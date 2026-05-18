@@ -30,7 +30,7 @@ const DURACION_NOTIFICACION_NORMAL = 1000;
 
 /* @galaxiahfast Tiempos de animación. */
 const DURACION_REBOTE_SALIDA = 500;
-const DURACION_COLAPSO_VERTICAL = 760;
+const DURACION_COLAPSO_VERTICAL = 1600;
 
 /* @galaxiahfast Tipos de notificación. */
 const TIPOS_NOTIFICACION = Object.freeze({
