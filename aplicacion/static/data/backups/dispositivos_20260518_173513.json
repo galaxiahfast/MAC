@@ -1,0 +1,43 @@
+{
+  "version": 3,
+  "configuracion": {
+    "apartados": [
+      {
+        "clave": "DIRECCION_MAC_ADDRESS",
+        "etiqueta": "Dirección MAC Address",
+        "valor_por_defecto": "VALOR1",
+        "tipo": "texto"
+      },
+      {
+        "clave": "SFD",
+        "etiqueta": "SFD",
+        "valor_por_defecto": "",
+        "tipo": "texto"
+      },
+      {
+        "clave": "XCV",
+        "etiqueta": "XCV",
+        "valor_por_defecto": "",
+        "tipo": "texto"
+      }
+    ]
+  },
+  "dispositivos": [
+    {
+      "id": "pc_01",
+      "coordenadas": {
+        "x": "10%",
+        "y": "20%"
+      },
+      "detalles": {
+        "DIRECCION_MAC_ADDRESS": "VALOR1",
+        "SFD": "asd",
+        "XCV": "xcv"
+      },
+      "metadatos": {
+        "creado_en": "2026-05-18T00:00:00",
+        "actualizado_en": null
+      }
+    }
+  ]
+}
