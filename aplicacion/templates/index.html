@@ -94,6 +94,8 @@
     <!-- Modal: Configuración de parámetros -->
     <div id="modal-config" class="modal-overlay" style="display: none;">
         <div class="modal-content">
+
+            <!-- CONTENEDOR PARA AGREGAR APARTADOS (CORREGIDO) -->
             <div id="contenedor-agregar">
                 <div class="modal-icon-container">
                     <div class="modal-icon-inner">
@@ -108,24 +110,34 @@
 
                 <h3 class="caps-text">Configuración de Parámetros Globales</h3>
                 <p class="modal-description caps-text">ADMINISTRE LOS CAMPOS DE DATOS PARA LA ORGANIZACIÓN TÉCNICA.</p>
-                
-                <div class="modal-inputs-stack">
-                    <div class="input-group">
-                        <span class="input-label caps-text">Nombre del Parámetro</span>
-                        <input type="text" id="nombre-apartado" class="modern-input" placeholder="EJ: NETWORK_ID_IDENTIFIER" style="text-transform: uppercase;">
+
+                <!-- FORMULARIO PARA CREAR APARTADOS -->
+                <form id="formApartado">
+                    <div class="modal-inputs-stack">
+                        <div class="input-group">
+                            <span class="input-label caps-text">Nombre del Parámetro</span>
+                            <!-- ID CORREGIDO: inputNombreApartado -->
+                            <input type="text" id="inputNombreApartado" class="modern-input" placeholder="EJ: NETWORK_ID_IDENTIFIER" style="text-transform: uppercase;" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-label caps-text">Valor Predeterminado</span>
+                            <!-- ID CORREGIDO: inputValorPredeterminado -->
+                            <input type="text" id="inputValorPredeterminado" class="modern-input" placeholder="EJ: 192.168.1.254" style="text-transform: uppercase;">
+                        </div>
                     </div>
 
-                    <div class="input-group">
-                        <span class="input-label caps-text">Valor Predeterminado</span>
-                        <input type="text" id="valor-default-apartado" class="modern-input" placeholder="EJ: 192.168.1.254" style="text-transform: uppercase;">
-                    </div>
-                </div>
+                    <!-- BOTÓN DE ENVÍO PARA EL FORMULARIO -->
+                    <button type="submit" class="btn-main caps-text">
+                        Añadir Parámetro
+                    </button>
+                </form>
 
-                <button id="btn-accion-apartado" onclick="UI_ManejarCicloConfirmacionApartado()" class="btn-main caps-text">
-                    Añadir Parámetro
-                </button>
+                <!-- CONTENEDOR PARA LISTAR APARTADOS -->
+                <div id="listaApartados"></div>
             </div>
 
+            <!-- CONTENEDOR PARA ELIMINAR APARTADOS (OPCIONAL, PERO SE DEJA) -->
             <div id="contenedor-eliminar" style="display: none;">
                 <div class="modal-icon-container">
                     <div class="modal-icon-inner">
@@ -140,7 +152,8 @@
 
                 <h3 class="caps-text">Eliminar Parámetros</h3>
                 <p class="modal-description caps-text">SELECCIONE EL APARTADO QUE DESEA REMOVER DE TODOS LOS REGISTROS.</p>
-                
+
+                <!-- CONTENEDOR PARA LISTA DE ELIMINACIÓN -->
                 <div id="lista-apartados-existentes"></div>
             </div>
         </div>
@@ -156,6 +169,7 @@
     </div>
 
     <!-- JavaScript -->
+     <script src="{{ url_for('static', filename='js/peticionCrearApartado.js') }}"></script>
     <script src="{{ url_for('static', filename='js/manejoCaracteresEspeciales.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sistemaNotificaciones.js') }}"></script>
     <script src="{{ url_for('static', filename='js/precargaDatos.js') }}"></script>

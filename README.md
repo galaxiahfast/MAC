@@ -49,123 +49,120 @@ USE mapa_dispositivos;
 
 /* ==========================================================================
    TABLA: DISPOSITIVOS
-   ==========================================================================
+   ========================================================================== 
    @galaxiahfast: Almacena los nodos de red y sus coordenadas para el mapa.
    ========================================================================== */
-
 CREATE TABLE dispositivos (
 
     -- @galaxiahfast: ID único autoincremental del hardware.
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    -- @galaxiahfast: Coordenada horizontal del nodo.
+    -- @galaxiahfast: Coordenada X (soporta porcentajes o píxeles).
     posicionX VARCHAR(10) NOT NULL,
 
-    -- @galaxiahfast: Coordenada vertical del nodo.
+    -- @galaxiahfast: Coordenada Y (soporta porcentajes o píxeles).
     posicionY VARCHAR(10) NOT NULL,
 
-    -- @galaxiahfast: Controla si el dispositivo debe renderizarse visualmente.
+    -- @galaxiahfast: Control de visibilidad en el mapa del frontend.
     estadoVisible BOOLEAN NOT NULL DEFAULT TRUE,
 
-    -- @galaxiahfast: Bandera de borrado lógico para papelera de reciclaje.
+    -- @galaxiahfast: Bandera de borrado lógico (Soft Delete).
     estadoEliminado BOOLEAN NOT NULL DEFAULT FALSE,
 
-    -- @galaxiahfast: Fecha y hora de creación del dispositivo.
+    -- @galaxiahfast: Fecha y hora de creación del registro.
     fechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    -- @galaxiahfast: Fecha y hora de eliminación lógica.
+    -- @galaxiahfast: Timestamp del borrado lógico (NULL si está activo).
     fechaEliminacion DATETIME NULL
 );
 
 /* ==========================================================================
    TABLA: APARTADOS
-   ==========================================================================
-   @galaxiahfast: Catálogo maestro de atributos dinámicos reutilizables.
+   ========================================================================== 
+   @galaxiahfast: Catálogo maestro de campos técnicos dinámicos (IP, MAC, etc.).
    ========================================================================== */
-
 CREATE TABLE apartados (
-
-    -- @galaxiahfast: ID único autoincremental del apartado.
+  
+    -- @galaxiahfast: ID único del atributo dinámico.
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    -- @galaxiahfast: Nombre técnico del atributo dinámico.
-    nombreApartado VARCHAR(100) NOT NULL,
+    -- @galaxiahfast: Nombre único de la propiedad técnica.
+    nombreApartado VARCHAR(100) NOT NULL UNIQUE,
 
-    -- @galaxiahfast: Valor global asignado automáticamente a nuevos registros.
+    -- @galaxiahfast: Valor asignado por defecto si no se especifica uno.
     valorPredeterminado TEXT NULL,
 
-    -- @galaxiahfast: Bandera de borrado lógico para papelera de reciclaje.
+    -- @galaxiahfast: Bandera de borrado lógico para el atributo.
     estadoEliminado BOOLEAN NOT NULL DEFAULT FALSE,
 
-    -- @galaxiahfast: Fecha y hora de creación del apartado.
+    -- @galaxiahfast: Fecha y hora de alta del atributo en el catálogo.
     fechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    -- @galaxiahfast: Fecha y hora de eliminación lógica.
+    -- @galaxiahfast: Timestamp de la eliminación del atributo.
     fechaEliminacion DATETIME NULL
 );
 
 /* ==========================================================================
    TABLA: DETALLES DE DISPOSITIVOS
-   ==========================================================================
-   @galaxiahfast: Tabla EAV que almacena valores dinámicos por dispositivo.
+   ========================================================================== 
+   @galaxiahfast: Tabla pivote EAV que asigna los valores técnicos a los dispositivos.
    ========================================================================== */
-
 CREATE TABLE detallesDispositivos (
 
-    -- @galaxiahfast: ID único autoincremental del detalle dinámico.
+    -- @galaxiahfast: ID único de la relación valor-propiedad.
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    -- @galaxiahfast: FK del dispositivo asociado.
+    -- @galaxiahfast: FK del dispositivo origen.
     idDispositivo INT NOT NULL,
 
-    -- @galaxiahfast: FK del apartado dinámico asociado.
+    -- @galaxiahfast: FK del atributo dinámico.
     idApartado INT NOT NULL,
 
-    -- @galaxiahfast: Valor específico almacenado para el dispositivo.
+    -- @galaxiahfast: Valor específico del atributo para el dispositivo.
     valorDetalle TEXT NULL,
 
-    -- @galaxiahfast: Indica si el valor fue modificado manualmente por el usuario.
-    fuePersonalizado BOOLEAN NOT NULL DEFAULT FALSE,
-
-    -- @galaxiahfast: Fecha automática de creación y actualización del detalle.
-    fechaActualizacion DATETIME NOT NULL
-        DEFAULT CURRENT_TIMESTAMP
+    -- @galaxiahfast: Fecha de inserción y actualización automática de cambios.
+    fechaActualizacion DATETIME NOT NULL 
+        DEFAULT CURRENT_TIMESTAMP 
         ON UPDATE CURRENT_TIMESTAMP,
 
-    -- @galaxiahfast: Relación de integridad hacia dispositivos.
-    CONSTRAINT fk_detalle_dispositivo
-        FOREIGN KEY (idDispositivo) REFERENCES dispositivos(id),
+    -- @galaxiahfast: Relación de integridad con la tabla dispositivos.
+    CONSTRAINT relacionDetalleDispositivo
+        FOREIGN KEY (idDispositivo)
+        REFERENCES dispositivos(id),
 
-    -- @galaxiahfast: Relación de integridad hacia apartados.
-    CONSTRAINT fk_detalle_apartado
-        FOREIGN KEY (idApartado) REFERENCES apartados(id),
+    -- @galaxiahfast: Relación de integridad con la tabla apartados.
+    CONSTRAINT relacionDetalleApartado
+        FOREIGN KEY (idApartado)
+        REFERENCES apartados(id),
 
-    -- @galaxiahfast: Impide duplicar un mismo apartado dentro del mismo dispositivo.
-    CONSTRAINT uq_dispositivo_apartado
+    -- @galaxiahfast: Garantiza un único valor por propiedad por dispositivo.
+    CONSTRAINT relacionUnicaDispositivoApartado
         UNIQUE (idDispositivo, idApartado)
 );
 
 /* ==========================================================================
-   ÍNDICES DE OPTIMIZACIÓN
-   ==========================================================================
-   @galaxiahfast: Índices B-Tree para acelerar búsquedas y filtros frecuentes.
+   ÍNDICES (OPTIMIZACIÓN DE CONSULTAS)
+   ========================================================================== 
+   @galaxiahfast: Índices B-Tree para acelerar la lectura, JOINs y filtros del API.
    ========================================================================== */
 
--- @galaxiahfast: Optimiza reconstrucción dinámica de propiedades por dispositivo.
-CREATE INDEX idx_detalles_dispositivo ON detallesDispositivos(idDispositivo);
+-- @galaxiahfast: Acelera la reconstrucción del JSON del dispositivo y sus relaciones.
+CREATE INDEX indiceDetallesPorDispositivo
+ON detallesDispositivos(idDispositivo);
 
--- @galaxiahfast: Optimiza búsquedas inversas por apartado dinámico.
-CREATE INDEX idx_detalles_apartado ON detallesDispositivos(idApartado);
+-- @galaxiahfast: Optimiza la búsqueda inversa de dispositivos por propiedades (ej. buscar por IP).
+CREATE INDEX indiceDetallesPorApartado
+ON detallesDispositivos(idApartado);
 
--- @galaxiahfast: Optimiza consultas filtrando dispositivos eliminados.
-CREATE INDEX idx_dispositivos_eliminados ON dispositivos(estadoEliminado);
+-- @galaxiahfast: Acelera el filtrado del mapa excluyendo equipos eliminados.
+CREATE INDEX indiceDispositivosEliminados
+ON dispositivos(estadoEliminado);
 
--- @galaxiahfast: Optimiza consultas filtrando apartados eliminados.
-CREATE INDEX idx_apartados_eliminados ON apartados(estadoEliminado);
+-- @galaxiahfast: Optimiza la carga en UI listando solo atributos vigentes.
+CREATE INDEX indiceApartadosEliminados
+ON apartados(estadoEliminado);
 
--- @galaxiahfast: Garantiza nombres únicos únicamente entre apartados activos.
-CREATE UNIQUE INDEX uq_apartado_activo
-ON apartados(nombreApartado);
 
 
 

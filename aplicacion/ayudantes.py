@@ -4,33 +4,27 @@
 import re
 import unicodedata
 
-# @galaxiahfast - Normaliza nombres técnicos eliminando acentos, espacios y caracteres inconsistentes. Recibe nombreApartado (str). Retorna str (texto normalizado).
-def normalizarNombreApartado(
-    nombreApartado: str
-) -> str:
 
-    # @galaxiahfast - Limpia espacios laterales y convierte el texto a mayúsculas técnicas.
+
+# @galaxiahfast - Normaliza nombres técnicos eliminando acentos, espacios laterales y caracteres inconsistentes. Recibe nombreApartado (str). Retorna str (texto procesado).
+def normalizarNombreApartado(nombreApartado: str) -> str:
+
+    # @galaxiahfast - Remueve espacios en los extremos y convierte la cadena a mayúsculas.
     nombreNormalizado = nombreApartado.strip().upper()
 
-    # @galaxiahfast - Elimina tildes y caracteres unicode complejos conservando solo ASCII limpio.
+    # @galaxiahfast - Descompone la cadena para eliminar tildes y caracteres no ASCII.
     nombreNormalizado = unicodedata.normalize(
         'NFKD',
         nombreNormalizado
     ).encode(
         'ASCII',
         'ignore'
-    ).decode(
-        'utf-8'
-    )
+    ).decode('utf-8')
 
-    # @galaxiahfast - Sustituye múltiples espacios internos consecutivos por un único guion bajo.
-    nombreNormalizado = re.sub(
-        r'\s+',
-        '_',
-        nombreNormalizado
-    )
+    # @galaxiahfast - Reemplaza los espacios en blanco internos por guiones bajos.
+    nombreNormalizado = re.sub(r'\s+', '_', nombreNormalizado)
 
-    # @galaxiahfast - Retorna la cadena de texto completamente procesada y normalizada.
+    # @galaxiahfast - Retorna la cadena de texto final completamente limpia y estandarizada.
     return nombreNormalizado
 
 
