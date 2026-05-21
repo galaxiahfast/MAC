@@ -4,11 +4,11 @@
 import {
     getApartados,
     suscribirse
-} from '../core/memoriaCache.js';
+} from './memoriaCache.js';
 import {
     restaurarApartado,
     eliminarApartadoDefinitivo
-} from '../core/sincronizarApartados.js';
+} from './sincronizarApartados.js';
 
 
 
@@ -16,7 +16,7 @@ import {
 function renderTrash() {
 
     // @galaxiahfast - Recupera el contenedor de la papelera y limpia el contenido previo si existe.
-    const contenedor = document.getElementById('listaPapelera');
+    const contenedor = document.getElementById('listaApartadosEliminados');
     if (!contenedor) return;
     contenedor.innerHTML = '';
 

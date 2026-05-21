@@ -1,8 +1,8 @@
 
 
 
-import { getApartados, suscribirse } from '../core/memoriaCache.js';
-import { eliminarApartado } from '../core/sincronizarApartados.js';
+import { getApartados, suscribirse } from './memoriaCache.js';
+import { eliminarApartado } from './sincronizarApartados.js';
 
 
 
@@ -10,7 +10,7 @@ import { eliminarApartado } from '../core/sincronizarApartados.js';
 function render() {
 
     // @galaxiahfast - Recupera el contenedor maestro y limpia el contenido HTML previo si existe.
-    const contenedor = document.getElementById('listaApartados');
+    const contenedor = document.getElementById('listaApartadosActivos');
     if (!contenedor) return;
     contenedor.innerHTML = '';
 

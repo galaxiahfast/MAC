@@ -16,9 +16,9 @@
 function iniciarControlTema() {
 
     /* @galaxiahfast Obtener elementos principales */
-    const botonTema = document.getElementById('theme-toggle');
+    const botonTema = document.getElementById('botonAlternarTema');
     const cuerpo = document.body;
-    const icono = document.getElementById('theme-icon');
+    const icono = document.getElementById('iconoTema');
 
     /* @galaxiahfast Validar elementos requeridos */
     if (!botonTema || !icono) {

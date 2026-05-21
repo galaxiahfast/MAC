@@ -1,188 +1,424 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Configuración técnica y administración de parámetros globales para la organización de dispositivos.">
-    <title>Monitor de Red - DATAMID</title>
 
-    <!-- Variables globales PRIMERO -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/temas.css') }}">
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Configuración técnica y administración de parámetros globales para la organización de dispositivos."
+    >
+
+    <title>
+        Monitor de Red - DATAMID
+    </title>
+
+    <!-- Variables globales -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/temas.css') }}"
+    >
 
     <!-- Estilos principales -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" media="print" onload="this.media='all'">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+        media="print"
+        onload="this.media='all'"
+    >
 
-    <!-- Notificaciones (ahora usa variables.css) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
-    
-    <!-- Fuentes y precargas -->
+    <!-- Notificaciones -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/notificaciones.css') }}"
+    >
+
+    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-    <!-- Precarga de imágenes responsive -->
-    <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
-    <link rel="preload" href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}" as="image" media="(max-width: 600px) and (min-resolution: 2dppx)">
-    <link rel="preload" href="{{ url_for('static', filename='img/plano-medium.webp') }}" as="image" media="(min-width: 1201px)">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap"
+        rel="stylesheet"
+        media="print"
+        onload="this.media='all'"
+    >
+
+    <!-- Precargas -->
+    <link
+        rel="preload"
+        href="{{ url_for('static', filename='img/plano-mobile.webp') }}"
+        as="image"
+        media="(max-width: 600px) and (resolution: 1dppx)"
+    >
+
+    <link
+        rel="preload"
+        href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}"
+        as="image"
+        media="(max-width: 600px) and (min-resolution: 2dppx)"
+    >
+
+    <link
+        rel="preload"
+        href="{{ url_for('static', filename='img/plano-medium.webp') }}"
+        as="image"
+        media="(min-width: 1201px)"
+    >
+
 </head>
+
 <body data-theme="claro">
 
     <!-- Barra lateral -->
-    <div class="sidebar-tools" role="complementary" aria-label="Barra de herramientas">
-        <button class="tool-btn" id="theme-toggle" aria-label="Cambiar tema de color">
-            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+    <div
+        class="sidebar-tools"
+        role="complementary"
+        aria-label="Barra de herramientas"
+    >
+
+        <!-- Tema -->
+        <button
+            class="tool-btn"
+            id="botonAlternarTema"
+            aria-label="Cambiar tema de color"
+        >
+
+            <svg
+                id="iconoTema"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
+
         </button>
+
         <div class="theme-separator"></div>
-        <button class="tool-btn" aria-label="Añadir nuevo elemento">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+
+        <!-- Añadir -->
+        <button
+            class="tool-btn"
+            aria-label="Añadir nuevo elemento"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+
         </button>
-        <button class="tool-btn" aria-label="Eliminar elemento seleccionado">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+
+        <!-- Eliminar -->
+        <button
+            class="tool-btn"
+            aria-label="Eliminar elemento seleccionado"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polyline points="3 6 5 6 21 6"></polyline>
+
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+
         </button>
-        <button class="tool-btn" aria-label="Editar propiedades">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+
+        <!-- Editar -->
+        <button
+            class="tool-btn"
+            aria-label="Editar propiedades"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+
         </button>
-        <button class="tool-btn" aria-label="Ajustar rejilla o dimensiones">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+
+        <!-- Ajustar -->
+        <button
+            class="tool-btn"
+            aria-label="Ajustar rejilla o dimensiones"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <polyline points="5 9 2 12 5 15"></polyline>
+                <polyline points="9 5 12 2 15 5"></polyline>
+                <polyline points="15 19 12 22 9 19"></polyline>
+                <polyline points="19 9 22 12 19 15"></polyline>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <line x1="12" y1="2" x2="12" y2="22"></line>
+            </svg>
+
         </button>
-        <button class="tool-btn" aria-label="Alternar visibilidad de capas">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="12" x2="23" y2="23"></line></svg>
+
+        <!-- Capas -->
+        <button
+            class="tool-btn"
+            aria-label="Alternar visibilidad de capas"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+
+                <line x1="1" y1="12" x2="23" y2="23"></line>
+            </svg>
+
         </button>
-        <button class="tool-btn" id="btn-config" aria-label="Abrir panel de configuración de parámetros">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+        <!-- Parámetros -->
+        <button
+            class="tool-btn"
+            id="botonAbrirAgregarApartados"
+            aria-label="Abrir panel de parámetros"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect>
                 <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
+
         </button>
-        <button class="tool-btn" id="btn-delete-params" title="Eliminar Parámetros" aria-label="Abrir panel para eliminar parámetros existentes">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+
+        <!-- Papelera -->
+        <button
+            class="tool-btn"
+            id="botonAbrirPapeleraApartados"
+            aria-label="Abrir papelera de parámetros"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
                 <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
+
+                <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6
+                    m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
             </svg>
+
         </button>
+
     </div>
 
     <!-- Contenido principal -->
-    <main id="contenido-principal">
-        <div class="map-container" id="map">
-            <img 
+    <main id="contenidoPrincipal">
+
+        <div
+            class="map-container"
+            id="contenedorMapa"
+        >
+
+            <img
                 src="{{ url_for('static', filename='img/plano-mobile.webp') }}"
-                srcset="{{ url_for('static', filename='img/plano-mobile.webp') }} 412w,
-                        {{ url_for('static', filename='img/plano-mobile-2x.webp') }} 824w,
-                        {{ url_for('static', filename='img/plano-low.webp') }} 750w,
-                        {{ url_for('static', filename='img/plano-medium.webp') }} 1200w,
-                        {{ url_for('static', filename='img/plano-high.webp') }} 2294w"
-                sizes="(max-width: 600px) 100vw,
+
+                srcset="
+                    {{ url_for('static', filename='img/plano-mobile.webp') }} 412w,
+                    {{ url_for('static', filename='img/plano-mobile-2x.webp') }} 824w,
+                    {{ url_for('static', filename='img/plano-low.webp') }} 750w,
+                    {{ url_for('static', filename='img/plano-medium.webp') }} 1200w,
+                    {{ url_for('static', filename='img/plano-high.webp') }} 2294w
+                "
+
+                sizes="
+                    (max-width: 600px) 100vw,
                     (max-width: 1200px) 800px,
-                    2294px"
+                    2294px
+                "
+
                 width="2294"
                 height="2722"
+
                 fetchpriority="high"
-                class="plano-base" 
+
+                class="plano-base"
+
                 alt="Plano técnico de distribución de dispositivos"
             >
+
             <div class="grid-overlay"></div>
-            <div id="devices-layer"></div>
+
+            <div id="capaDispositivos"></div>
+
         </div>
+
     </main>
 
-    <!-- Modal: Configuración de parámetros -->
-    <div id="modal-config" class="modal-overlay" style="display: none;">
+    <!-- Modal agregar parámetros -->
+    <div
+        id="modalAgregarApartados"
+        class="modal-overlay"
+        style="display: none;"
+    >
+
         <div class="modal-content">
 
-            <!-- CONTENEDOR PARA AGREGAR APARTADOS (CORREGIDO) -->
-            <div id="contenedor-agregar">
-                <div class="modal-icon-container">
-                    <div class="modal-icon-inner">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                    </div>
-                </div>
+            <div id="contenedorAgregarApartados">
 
-                <h3 class="caps-text">Configuración de Parámetros Globales</h3>
-                <p class="modal-description caps-text">ADMINISTRE LOS CAMPOS DE DATOS PARA LA ORGANIZACIÓN TÉCNICA.</p>
+                <h3 class="caps-text">
+                    Configuración de Parámetros Globales
+                </h3>
 
-                <!-- FORMULARIO PARA CREAR APARTADOS -->
-                <form id="formApartado">
+                <p class="modal-description caps-text">
+                    ADMINISTRE LOS CAMPOS DE DATOS PARA LA ORGANIZACIÓN TÉCNICA.
+                </p>
+
+                <form id="formularioCrearApartado">
+
                     <div class="modal-inputs-stack">
+
                         <div class="input-group">
-                            <span class="input-label caps-text">Nombre del Parámetro</span>
-                            <!-- ID CORREGIDO: inputNombreApartado -->
-                            <input type="text" id="inputNombreApartado" class="modern-input" placeholder="EJ: NETWORK_ID_IDENTIFIER" style="text-transform: uppercase;" required>
+
+                            <span class="input-label caps-text">
+                                Nombre del Parámetro
+                            </span>
+
+                            <input
+                                type="text"
+                                id="inputNombreApartado"
+                                class="modern-input"
+                                placeholder="EJ: NETWORK_ID_IDENTIFIER"
+                                style="text-transform: uppercase;"
+                                required
+                            >
+
                         </div>
 
                         <div class="input-group">
-                            <span class="input-label caps-text">Valor Predeterminado</span>
-                            <!-- ID CORREGIDO: inputValorPredeterminado -->
-                            <input type="text" id="inputValorPredeterminado" class="modern-input" placeholder="EJ: 192.168.1.254" style="text-transform: uppercase;">
+
+                            <span class="input-label caps-text">
+                                Valor Predeterminado
+                            </span>
+
+                            <input
+                                type="text"
+                                id="inputValorPredeterminado"
+                                class="modern-input"
+                                placeholder="EJ: 192.168.1.254"
+                                style="text-transform: uppercase;"
+                            >
+
                         </div>
+
                     </div>
 
-                    <!-- BOTÓN DE ENVÍO PARA EL FORMULARIO -->
-                    <button type="submit" class="btn-main caps-text">
+                    <button
+                        type="submit"
+                        class="btn-main caps-text"
+                    >
                         Añadir Parámetro
                     </button>
+
                 </form>
 
-                <!-- CONTENEDOR PARA LISTAR APARTADOS -->
-                <div id="listaApartados"></div>
             </div>
 
-            <!-- CONTENEDOR PARA ELIMINAR APARTADOS (OPCIONAL, PERO SE DEJA) -->
-            <div id="contenedor-eliminar" style="display: none;">
-                <div class="modal-icon-container">
-                    <div class="modal-icon-inner">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                    </div>
-                </div>
-
-                <h3 class="caps-text">Eliminar Parámetros</h3>
-                <p class="modal-description caps-text">SELECCIONE EL APARTADO QUE DESEA REMOVER DE TODOS LOS REGISTROS.</p>
-
-                <!-- CONTENEDOR PARA LISTA DE ELIMINACIÓN -->
-                <div id="lista-apartados-existentes"></div>
-            </div>
         </div>
+
     </div>
-    
-    <!-- Modal: Agregar nuevo punto (dispositivo) -->
-    <div id="modal-agregar-punto" class="modal-overlay" style="display: none;">
+
+    <!-- Modal papelera -->
+    <div
+        id="modalPapeleraApartados"
+        class="modal-overlay"
+        style="display: none;"
+    >
+
         <div class="modal-content">
-            <div id="contenedor-agregar-punto">
-                <!-- El contenido se generará dinámicamente con JavaScript -->
+
+            <div id="contenedorPapeleraApartados">
+
+                <h3 class="caps-text">
+                    Papelera de Parámetros
+                </h3>
+
+                <p class="modal-description caps-text">
+                    RESTAURE O ELIMINE DEFINITIVAMENTE LOS REGISTROS.
+                </p>
+
+                <div id="listaApartadosEliminados"></div>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/apartados/peticionCrearApartado.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/apartados/comunicacionHTTP.js') }}"></script>
+    <!-- Modal dispositivos -->
+    <div
+        id="contenedorModalAgregarPunto"
+        class="modal-overlay"
+        style="display: none;"
+    >
 
+        <div class="modal-content">
+            <div id="contenedorAgregarPunto"></div>
+        </div>
 
+    </div>
 
-
-    <script src="{{ url_for('static', filename='js/manejoCaracteresEspeciales.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/precargaDatos.js') }}"></script>
-
-    <!-- <script src="{{ url_for('static', filename='js/gestionApartados.js') }}"></script> -->
-    <!-- <script src="{{ url_for('static', filename='js/gestionDispositivos.js') }}"></script> -->
-
+    <!-- Scripts generales -->
     <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/main.js') }}" defer></script>
+
+    <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
+
+    <!-- Entry point módulos -->
+    <script
+        type="module"
+        src="{{ url_for('static', filename='js/main.js') }}"
+    ></script>
+
 </body>
 </html>
