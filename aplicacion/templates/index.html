@@ -1,424 +1,156 @@
+
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Configuración técnica y administración de parámetros globales para la organización de dispositivos.">
+    <title>Monitor de Red - @galaxiahfast</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <!-- @galaxiahfast Estilos principales. -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/temas.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fondosPantalla.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menuInferiorCentrado.css') }}">
 
-    <meta
-        name="description"
-        content="Configuración técnica y administración de parámetros globales para la organización de dispositivos."
-    >
-
-    <title>
-        Monitor de Red - DATAMID
-    </title>
-
-    <!-- Variables globales -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/temas.css') }}"
-    >
-
-    <!-- Estilos principales -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-        media="print"
-        onload="this.media='all'"
-    >
-
-    <!-- Notificaciones -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/notificaciones.css') }}"
-    >
-
-    <!-- Fuentes -->
+    <!-- @galaxiahfast Fuentes. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap"
-        rel="stylesheet"
-        media="print"
-        onload="this.media='all'"
-    >
-
-    <!-- Precargas -->
-    <link
-        rel="preload"
-        href="{{ url_for('static', filename='img/plano-mobile.webp') }}"
-        as="image"
-        media="(max-width: 600px) and (resolution: 1dppx)"
-    >
-
-    <link
-        rel="preload"
-        href="{{ url_for('static', filename='img/plano-mobile-2x.webp') }}"
-        as="image"
-        media="(max-width: 600px) and (min-resolution: 2dppx)"
-    >
-
-    <link
-        rel="preload"
-        href="{{ url_for('static', filename='img/plano-medium.webp') }}"
-        as="image"
-        media="(min-width: 1201px)"
-    >
-
+    <!-- @galaxiahfast Preload de imágenes para optimizar la carga. -->
+    <link rel="preload" href="{{ url_for('static', filename='imagenes/planoMovil.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
+    <link rel="preload" href="{{ url_for('static', filename='imagenes/planoMovil2x.webp') }}" as="image" media="(max-width: 600px) and (min-resolution: 2dppx)">
+    <link rel="preload" href="{{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }}" as="image" media="(min-width: 1201px)">
 </head>
 
+
+
+<!-- @galaxiahfast El atributo data-theme se utiliza para controlar el tema de color a través de CSS. -->
 <body data-theme="claro">
 
-    <!-- Barra lateral -->
-    <div
-        class="sidebar-tools"
-        role="complementary"
-        aria-label="Barra de herramientas"
-    >
-
-        <!-- Tema -->
-        <button
-            class="tool-btn"
-            id="botonAlternarTema"
-            aria-label="Cambiar tema de color"
-        >
-
-            <svg
-                id="iconoTema"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+    <!-- @galaxiahfast - Barra lateral de herramientas con botones accesibles. -->
+    <div class="barra-herramientas-lateral" role="complementary" aria-label="Barra de herramientas">
+        
+        <!-- @galaxiahfast - Botón 1: cambiar tema claro/oscuro. -->
+        <button class="boton-control-tema" id="controlAlternarTema" aria-label="Cambiar tema de color">
+            <svg id="iconoTemaSistema" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
-
         </button>
-
-        <div class="theme-separator"></div>
-
-        <!-- Añadir -->
-        <button
-            class="tool-btn"
-            aria-label="Añadir nuevo elemento"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Separador de temas. -->
+        <div class="divisor-seccion-temas"></div>
+        
+        <!-- @galaxiahfast - Botón 2: agregar punto. -->
+        <button class="boton-control-punto" id="accionAgregarDispositivo" aria-label="Agregar nuevo punto con todos sus apartados">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-
         </button>
-
-        <!-- Eliminar -->
-        <button
-            class="tool-btn"
-            aria-label="Eliminar elemento seleccionado"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Botón 3: eliminar punto (activa botón en cada punto, al presionarlo va a la papelera). -->
+        <button class="boton-control-punto" id="accionEliminarDispositivo" aria-label="Eliminar punto - activa botón en cada punto, al presionarlo va a la papelera">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
-
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-
         </button>
-
-        <!-- Editar -->
-        <button
-            class="tool-btn"
-            aria-label="Editar propiedades"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Botón 4: editar punto. -->
+        <button class="boton-control-punto" id="accionEditarDispositivo" aria-label="Editar propiedades y apartados del punto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
             </svg>
-
         </button>
-
-        <!-- Ajustar -->
-        <button
-            class="tool-btn"
-            aria-label="Ajustar rejilla o dimensiones"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Botón 5: mover punto (arrastra puntos por el mapa y guarda coordenadas x,y). -->
+        <button class="boton-control-punto" id="accionMoverDispositivo" aria-label="Mover punto - arrastra puntos por el mapa y guarda sus coordenadas X,Y">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="12" r="1"></circle>
+                <circle cx="15" cy="12" r="1"></circle>
+                <circle cx="12" cy="9" r="1"></circle>
+                <circle cx="12" cy="15" r="1"></circle>
                 <polyline points="5 9 2 12 5 15"></polyline>
                 <polyline points="9 5 12 2 15 5"></polyline>
                 <polyline points="15 19 12 22 9 19"></polyline>
                 <polyline points="19 9 22 12 19 15"></polyline>
-                <line x1="2" y1="12" x2="22" y2="12"></line>
-                <line x1="12" y1="2" x2="12" y2="22"></line>
             </svg>
-
         </button>
-
-        <!-- Capas -->
-        <button
-            class="tool-btn"
-            aria-label="Alternar visibilidad de capas"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Botón 6: ocultar punto (activa botón en cada punto para ocultarlo o mostrarlo). -->
+        <button class="boton-control-punto" id="accionOcultarDispositivo" aria-label="Ocultar punto - activa botón en cada punto para ocultarlo o mostrarlo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-
                 <line x1="1" y1="12" x2="23" y2="23"></line>
             </svg>
-
         </button>
-
-        <!-- Parámetros -->
-        <button
-            class="tool-btn"
-            id="botonAbrirAgregarApartados"
-            aria-label="Abrir panel de parámetros"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
+        
+        <!-- @galaxiahfast - Botón 7: agregar apartado punto (agrega un nuevo apartado a todos los puntos con valor default). -->
+        <button class="boton-control-apartado" id="accionAgregarCampoDispositivo" aria-label="Agregar apartado a todos los puntos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
             </svg>
-
         </button>
-
-        <!-- Papelera -->
-        <button
-            class="tool-btn"
-            id="botonAbrirPapeleraApartados"
-            aria-label="Abrir papelera de parámetros"
-        >
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
+        
+        <!-- @galaxiahfast - Botón 8: eliminar apartado punto. -->
+        <button class="boton-control-apartado" id="accionEliminarCampoDispositivo" aria-label="Eliminar apartados de los puntos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+        </button>
+        
+        <!-- @galaxiahfast - Botón 9: restaurar punto y apartado (papelera de parámetros y puntos eliminados). -->
+        <button class="boton-control-papelera" id="accionRestaurarDispositivoCampo" aria-label="Restaurar punto y apartado - papelera de parámetros y puntos eliminados">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="3 6 5 6 21 6"></polyline>
-
-                <path
-                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6
-                    m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                ></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
             </svg>
-
         </button>
-
     </div>
 
-    <!-- Contenido principal -->
+
+
     <main id="contenidoPrincipal">
-
-        <div
-            class="map-container"
-            id="contenedorMapa"
-        >
-
-            <img
-                src="{{ url_for('static', filename='img/plano-mobile.webp') }}"
-
+        <div class="map-container" id="contenedorMapa">
+            
+            <img src="{{ url_for('static', filename='imagenes/planoMovil.webp') }}"
                 srcset="
-                    {{ url_for('static', filename='img/plano-mobile.webp') }} 412w,
-                    {{ url_for('static', filename='img/plano-mobile-2x.webp') }} 824w,
-                    {{ url_for('static', filename='img/plano-low.webp') }} 750w,
-                    {{ url_for('static', filename='img/plano-medium.webp') }} 1200w,
-                    {{ url_for('static', filename='img/plano-high.webp') }} 2294w
+                    {{ url_for('static', filename='imagenes/planoMovil.webp') }} 412w,
+                    {{ url_for('static', filename='imagenes/planoMovil2x.webp') }} 824w,
+                    {{ url_for('static', filename='imagenes/planoBajaResolucion.webp') }} 750w,
+                    {{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }} 1200w,
+                    {{ url_for('static', filename='imagenes/planoAltaResolucion.webp') }} 2294w
                 "
-
                 sizes="
                     (max-width: 600px) 100vw,
                     (max-width: 1200px) 800px,
                     2294px
                 "
-
                 width="2294"
                 height="2722"
-
                 fetchpriority="high"
-
                 class="plano-base"
-
                 alt="Plano técnico de distribución de dispositivos"
             >
-
+            
             <div class="grid-overlay"></div>
-
             <div id="capaDispositivos"></div>
-
+            
         </div>
-
     </main>
 
-    <!-- Modal agregar parámetros -->
-    <div
-        id="modalAgregarApartados"
-        class="modal-overlay"
-        style="display: none;"
-    >
-
-        <div class="modal-content">
-
-            <div id="contenedorAgregarApartados">
-
-                <h3 class="caps-text">
-                    Configuración de Parámetros Globales
-                </h3>
-
-                <p class="modal-description caps-text">
-                    ADMINISTRE LOS CAMPOS DE DATOS PARA LA ORGANIZACIÓN TÉCNICA.
-                </p>
-
-                <form id="formularioCrearApartado">
-
-                    <div class="modal-inputs-stack">
-
-                        <div class="input-group">
-
-                            <span class="input-label caps-text">
-                                Nombre del Parámetro
-                            </span>
-
-                            <input
-                                type="text"
-                                id="inputNombreApartado"
-                                class="modern-input"
-                                placeholder="EJ: NETWORK_ID_IDENTIFIER"
-                                style="text-transform: uppercase;"
-                                required
-                            >
-
-                        </div>
-
-                        <div class="input-group">
-
-                            <span class="input-label caps-text">
-                                Valor Predeterminado
-                            </span>
-
-                            <input
-                                type="text"
-                                id="inputValorPredeterminado"
-                                class="modern-input"
-                                placeholder="EJ: 192.168.1.254"
-                                style="text-transform: uppercase;"
-                            >
-
-                        </div>
-
-                    </div>
-
-                    <button
-                        type="submit"
-                        class="btn-main caps-text"
-                    >
-                        Añadir Parámetro
-                    </button>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Modal papelera -->
-    <div
-        id="modalPapeleraApartados"
-        class="modal-overlay"
-        style="display: none;"
-    >
-
-        <div class="modal-content">
-
-            <div id="contenedorPapeleraApartados">
-
-                <h3 class="caps-text">
-                    Papelera de Parámetros
-                </h3>
-
-                <p class="modal-description caps-text">
-                    RESTAURE O ELIMINE DEFINITIVAMENTE LOS REGISTROS.
-                </p>
-
-                <div id="listaApartadosEliminados"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Modal dispositivos -->
-    <div
-        id="contenedorModalAgregarPunto"
-        class="modal-overlay"
-        style="display: none;"
-    >
-
-        <div class="modal-content">
-            <div id="contenedorAgregarPunto"></div>
-        </div>
-
-    </div>
-
-    <!-- Scripts generales -->
     <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
-
     <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
-
-    <!-- Entry point módulos -->
-    <script
-        type="module"
-        src="{{ url_for('static', filename='js/main.js') }}"
-    ></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 </body>
 </html>
+
+

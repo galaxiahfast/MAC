@@ -1,0 +1,250 @@
+
+
+
+/* @galaxiahfast - Barra inferior tipo dock centrada. */
+.barra-herramientas-lateral {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    z-index: 9999;
+    padding: 12px 24px;
+    background: var(--fondo-ventana);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--borde-ventana);
+    border-radius: 60px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+/* @galaxiahfast - Animación sutil al cargar la barra. */
+.barra-herramientas-lateral {
+    animation: deslizarArriba 0.4s ease-out;
+}
+
+/* @galaxiahfast - Efecto hover en la barra completa (sombra azul, sin borde negro). */
+.barra-herramientas-lateral:hover {
+    padding: 12px 28px;
+    gap: 16px;
+    box-shadow: 0 8px 30px rgba(56, 189, 248, 0.3);
+    border-color: rgba(56, 189, 248, 0.5);
+}
+
+/* @galaxiahfast - Estilos base compartidos por todos los botones de control. */
+.boton-control-tema,
+.boton-control-punto,
+.boton-control-apartado,
+.boton-control-papelera {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    color: var(--color-acento);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* @galaxiahfast - Estilos de los iconos SVG dentro de los botones. */
+.boton-control-tema svg,
+.boton-control-punto svg,
+.boton-control-apartado svg,
+.boton-control-papelera svg {
+    width: 22px;
+    height: 22px;
+    stroke-width: 2;
+    transition: transform 0.2s ease;
+}
+
+/* @galaxiahfast - Efecto hover para todos los botones (sin elevarse, solo cambio de color). */
+.boton-control-tema:hover,
+.boton-control-punto:hover,
+.boton-control-apartado:hover,
+.boton-control-papelera:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--color-acento);
+}
+
+.boton-control-tema:hover svg,
+.boton-control-punto:hover svg,
+.boton-control-apartado:hover svg,
+.boton-control-papelera:hover svg {
+    transform: scale(1.1);
+}
+
+/* @galaxiahfast - Efecto de clic en los botones. */
+.boton-control-tema:active,
+.boton-control-punto:active,
+.boton-control-apartado:active,
+.boton-control-papelera:active {
+    transform: scale(0.95);
+}
+
+/* @galaxiahfast - Estado activo para botones de control de punto. */
+.boton-control-punto.activo {
+    background: var(--color-acento);
+    color: #050714;
+    border-color: var(--color-acento);
+    animation: pulso-activo 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado de eliminación activo para botones de punto. */
+.boton-control-punto.modo-eliminar {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    animation: pulso-rojo 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado de edición activo para botones de punto. */
+.boton-control-punto.modo-editar {
+    background: #f59e0b;
+    color: #050714;
+    border-color: #f59e0b;
+    animation: pulso-naranja 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado de mover activo para botones de punto. */
+.boton-control-punto.modo-mover {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+    animation: pulso-verde 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado de ocultar activo para botones de punto. */
+.boton-control-punto.modo-ocultar {
+    background: #8b5cf6;
+    color: white;
+    border-color: #8b5cf6;
+    animation: pulso-morado 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado activo para botones de control de apartado. */
+.boton-control-apartado.activo {
+    background: var(--color-acento);
+    color: #050714;
+    border-color: var(--color-acento);
+    animation: pulso-activo 1.5s infinite;
+}
+
+/* @galaxiahfast - Estado activo para botón de control de papelera. */
+.boton-control-papelera.activo {
+    background: var(--color-acento);
+    color: #050714;
+    border-color: var(--color-acento);
+    animation: pulso-activo 1.5s infinite;
+}
+
+/* @galaxiahfast - Modo oscuro: estados activos para botones de punto. */
+[data-theme="dark"] .boton-control-punto.activo,
+[data-theme="dark"] .boton-control-apartado.activo,
+[data-theme="dark"] .boton-control-papelera.activo {
+    background: var(--color-acento);
+    color: #050714;
+}
+
+/* @galaxiahfast - Modo oscuro: estado de eliminación. */
+[data-theme="dark"] .boton-control-punto.modo-eliminar {
+    background: transparent;
+    border: 1.5px solid #ef4444;
+    color: #ef4444;
+}
+
+/* @galaxiahfast - Modo oscuro: estado de edición. */
+[data-theme="dark"] .boton-control-punto.modo-editar {
+    background: transparent;
+    border: 1.5px solid #f59e0b;
+    color: #f59e0b;
+}
+
+/* @galaxiahfast - Modo oscuro: estado de mover. */
+[data-theme="dark"] .boton-control-punto.modo-mover {
+    background: transparent;
+    border: 1.5px solid #10b981;
+    color: #10b981;
+}
+
+/* @galaxiahfast - Modo oscuro: estado de ocultar. */
+[data-theme="dark"] .boton-control-punto.modo-ocultar {
+    background: transparent;
+    border: 1.5px solid #8b5cf6;
+    color: #8b5cf6;
+}
+
+/* @galaxiahfast - Modo oscuro: estado activo para apartado. */
+[data-theme="dark"] .boton-control-apartado.activo {
+    background: transparent;
+    border: 1.5px solid var(--color-acento);
+    color: var(--color-acento);
+}
+
+/* @galaxiahfast - Modo oscuro: estado activo para papelera. */
+[data-theme="dark"] .boton-control-papelera.activo {
+    background: transparent;
+    border: 1.5px solid var(--color-acento);
+    color: var(--color-acento);
+}
+
+/* @galaxiahfast - Divisor visual entre secciones. */
+.divisor-seccion-temas {
+    width: 1px;
+    height: 30px;
+    background: var(--borde-ventana);
+    margin: 0 5px;
+}
+
+/* @galaxiahfast - Animación de entrada de la barra. */
+@keyframes deslizarArriba {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* @galaxiahfast - Animación de pulso para estado activo general. */
+@keyframes pulso-activo {
+    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+/* @galaxiahfast - Animación de pulso para estado de eliminación. */
+@keyframes pulso-rojo {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* @galaxiahfast - Animación de pulso para estado de edición. */
+@keyframes pulso-naranja {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* @galaxiahfast - Animación de pulso para estado de mover. */
+@keyframes pulso-verde {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* @galaxiahfast - Animación de pulso para estado de ocultar. */
+@keyframes pulso-morado {
+    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+
