@@ -1,250 +1,440 @@
+/* ==========================================================================
+   @galaxiahfast VARIABLES DE INTERFAZ
+   ========================================================================== */
 
+:root {
 
+    /* @galaxiahfast - Configuración scrollbar overlay. */
+    --scrollbar-overlay-width: 4px;
 
-/* @galaxiahfast - Barra inferior tipo dock centrada. */
+    /* @galaxiahfast - Compensación visual del centro óptico. */
+    --compensacion-visual-scroll:
+        calc(var(--scrollbar-overlay-width) * 2);
+}
+
+/* ==========================================================================
+   @galaxiahfast SCROLLBAR PERSONALIZADO
+   ========================================================================== */
+
+/* @galaxiahfast - Scrollbar global. */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--fondo-scroll);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-scroll);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-scroll-hover);
+}
+
+/* ==========================================================================
+   @galaxiahfast BARRA LATERAL PRINCIPAL
+   ========================================================================== */
+
+/* @galaxiahfast - Barra lateral principal. */
 .barra-herramientas-lateral {
     position: fixed;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 86px;
+
     display: flex;
-    flex-direction: row;
-    gap: 12px;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 10px;
+
     z-index: 9999;
-    padding: 12px 24px;
+
+    padding:
+        24px
+        0
+        24px
+        var(--compensacion-visual-scroll);
+
     background: var(--fondo-ventana);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--borde-ventana);
-    border-radius: 60px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+
+    backdrop-filter: blur(16px);
+
+    border-right: 1px solid var(--borde-ventana);
+
+    box-shadow: var(--sombra-media);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    overscroll-behavior: contain;
+
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    transition:
+        width 0.24s cubic-bezier(0.2, 0.9, 0.4, 1),
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+
+    animation: deslizarIzquierda 0.4s ease-out;
 }
 
-/* @galaxiahfast - Animación sutil al cargar la barra. */
-.barra-herramientas-lateral {
-    animation: deslizarArriba 0.4s ease-out;
+/* @galaxiahfast - Scrollbar overlay real. */
+.barra-herramientas-lateral::-webkit-scrollbar {
+    width: var(--scrollbar-overlay-width);
 }
 
-/* @galaxiahfast - Efecto hover en la barra completa (sombra azul, sin borde negro). */
+.barra-herramientas-lateral::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.barra-herramientas-lateral::-webkit-scrollbar-thumb {
+    background: transparent;
+
+    border-radius: 999px;
+}
+
+/* @galaxiahfast - Mostrar scrollbar hover. */
 .barra-herramientas-lateral:hover {
-    padding: 12px 28px;
-    gap: 16px;
-    box-shadow: 0 8px 30px rgba(56, 189, 248, 0.3);
-    border-color: rgba(56, 189, 248, 0.5);
+    scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+
+    border-right-color: var(--borde-fuerte);
 }
 
-/* @galaxiahfast - Estilos base compartidos por todos los botones de control. */
+.barra-herramientas-lateral:hover::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.45);
+}
+
+/* @galaxiahfast - Hover modo oscuro. */
+[data-theme="dark"] .barra-herramientas-lateral:hover {
+    box-shadow: 0 8px 28px rgba(56, 189, 248, 0.08);
+}
+
+[data-theme="dark"] .barra-herramientas-lateral:hover::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.34);
+}
+
+/* ==========================================================================
+   @galaxiahfast BOTONES
+   ========================================================================== */
+
+/* @galaxiahfast - Botones principales. */
+.boton-control-menu,
 .boton-control-tema,
 .boton-control-punto,
 .boton-control-apartado,
-.boton-control-papelera {
-    width: 45px;
-    height: 45px;
+.boton-control-papelera,
+.boton-control-configuracion,
+.boton-control-salida,
+.boton-control-usuario {
+    width: 54px;
+    height: 54px;
+
+    min-width: 54px;
+    min-height: 54px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: transparent;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    color: var(--color-acento);
+
+    border: none;
+    border-radius: 16px;
+
+    color: var(--color-acento-suave);
+
     cursor: pointer;
-    transition: all 0.2s ease;
+
+    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
 }
 
-/* @galaxiahfast - Estilos de los iconos SVG dentro de los botones. */
+/* @galaxiahfast - Iconos SVG. */
+.boton-control-menu svg,
 .boton-control-tema svg,
 .boton-control-punto svg,
 .boton-control-apartado svg,
-.boton-control-papelera svg {
-    width: 22px;
-    height: 22px;
-    stroke-width: 2;
+.boton-control-papelera svg,
+.boton-control-configuracion svg,
+.boton-control-salida svg,
+.boton-control-usuario svg {
+    width: 28px;
+    height: 28px;
+
+    stroke-width: 1.75;
+
     transition: transform 0.2s ease;
 }
 
-/* @galaxiahfast - Efecto hover para todos los botones (sin elevarse, solo cambio de color). */
+/* @galaxiahfast - Hover botones. */
+.boton-control-menu:hover,
 .boton-control-tema:hover,
 .boton-control-punto:hover,
 .boton-control-apartado:hover,
-.boton-control-papelera:hover {
-    background: rgba(56, 189, 248, 0.15);
-    border-color: var(--color-acento);
+.boton-control-papelera:hover,
+.boton-control-configuracion:hover,
+.boton-control-salida:hover,
+.boton-control-usuario:hover {
+    background: rgba(30, 41, 59, 0.06);
+
+    color: var(--color-acento-hover);
 }
 
+/* @galaxiahfast - Hover oscuro. */
+[data-theme="dark"] .boton-control-menu:hover,
+[data-theme="dark"] .boton-control-tema:hover,
+[data-theme="dark"] .boton-control-punto:hover,
+[data-theme="dark"] .boton-control-apartado:hover,
+[data-theme="dark"] .boton-control-papelera:hover,
+[data-theme="dark"] .boton-control-configuracion:hover,
+[data-theme="dark"] .boton-control-salida:hover,
+[data-theme="dark"] .boton-control-usuario:hover {
+    background: rgba(56, 189, 248, 0.08);
+
+    color: #38bdf8;
+}
+
+/* @galaxiahfast - Hover iconos. */
+.boton-control-menu:hover svg,
 .boton-control-tema:hover svg,
 .boton-control-punto:hover svg,
 .boton-control-apartado:hover svg,
-.boton-control-papelera:hover svg {
-    transform: scale(1.1);
+.boton-control-papelera:hover svg,
+.boton-control-configuracion:hover svg,
+.boton-control-salida:hover svg,
+.boton-control-usuario:hover svg {
+    transform: scale(1.05);
 }
 
-/* @galaxiahfast - Efecto de clic en los botones. */
+/* @galaxiahfast - Click botones. */
+.boton-control-menu:active,
 .boton-control-tema:active,
 .boton-control-punto:active,
 .boton-control-apartado:active,
-.boton-control-papelera:active {
-    transform: scale(0.95);
+.boton-control-papelera:active,
+.boton-control-configuracion:active,
+.boton-control-salida:active,
+.boton-control-usuario:active {
+    transform: scale(0.96);
 }
 
-/* @galaxiahfast - Estado activo para botones de control de punto. */
-.boton-control-punto.activo {
-    background: var(--color-acento);
-    color: #050714;
-    border-color: var(--color-acento);
-    animation: pulso-activo 1.5s infinite;
-}
+/* ==========================================================================
+   @galaxiahfast MODOS ACTIVOS
+   ========================================================================== */
 
-/* @galaxiahfast - Estado de eliminación activo para botones de punto. */
 .boton-control-punto.modo-eliminar {
-    background: #ef4444;
-    color: white;
-    border-color: #ef4444;
-    animation: pulso-rojo 1.5s infinite;
-}
-
-/* @galaxiahfast - Estado de edición activo para botones de punto. */
-.boton-control-punto.modo-editar {
-    background: #f59e0b;
-    color: #050714;
-    border-color: #f59e0b;
-    animation: pulso-naranja 1.5s infinite;
-}
-
-/* @galaxiahfast - Estado de mover activo para botones de punto. */
-.boton-control-punto.modo-mover {
-    background: #10b981;
-    color: white;
-    border-color: #10b981;
-    animation: pulso-verde 1.5s infinite;
-}
-
-/* @galaxiahfast - Estado de ocultar activo para botones de punto. */
-.boton-control-punto.modo-ocultar {
-    background: #8b5cf6;
-    color: white;
-    border-color: #8b5cf6;
-    animation: pulso-morado 1.5s infinite;
-}
-
-/* @galaxiahfast - Estado activo para botones de control de apartado. */
-.boton-control-apartado.activo {
-    background: var(--color-acento);
-    color: #050714;
-    border-color: var(--color-acento);
-    animation: pulso-activo 1.5s infinite;
-}
-
-/* @galaxiahfast - Estado activo para botón de control de papelera. */
-.boton-control-papelera.activo {
-    background: var(--color-acento);
-    color: #050714;
-    border-color: var(--color-acento);
-    animation: pulso-activo 1.5s infinite;
-}
-
-/* @galaxiahfast - Modo oscuro: estados activos para botones de punto. */
-[data-theme="dark"] .boton-control-punto.activo,
-[data-theme="dark"] .boton-control-apartado.activo,
-[data-theme="dark"] .boton-control-papelera.activo {
-    background: var(--color-acento);
-    color: #050714;
-}
-
-/* @galaxiahfast - Modo oscuro: estado de eliminación. */
-[data-theme="dark"] .boton-control-punto.modo-eliminar {
-    background: transparent;
-    border: 1.5px solid #ef4444;
+    background: rgba(239, 68, 68, 0.12);
     color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-/* @galaxiahfast - Modo oscuro: estado de edición. */
-[data-theme="dark"] .boton-control-punto.modo-editar {
-    background: transparent;
-    border: 1.5px solid #f59e0b;
+.boton-control-punto.modo-editar {
+    background: rgba(245, 158, 11, 0.12);
     color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-/* @galaxiahfast - Modo oscuro: estado de mover. */
-[data-theme="dark"] .boton-control-punto.modo-mover {
-    background: transparent;
-    border: 1.5px solid #10b981;
+.boton-control-punto.modo-mover {
+    background: rgba(16, 185, 129, 0.12);
     color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* @galaxiahfast - Modo oscuro: estado de ocultar. */
-[data-theme="dark"] .boton-control-punto.modo-ocultar {
-    background: transparent;
-    border: 1.5px solid #8b5cf6;
+.boton-control-punto.modo-ocultar {
+    background: rgba(139, 92, 246, 0.12);
     color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
-/* @galaxiahfast - Modo oscuro: estado activo para apartado. */
-[data-theme="dark"] .boton-control-apartado.activo {
+/* ==========================================================================
+   @galaxiahfast SEPARADORES
+   ========================================================================== */
+
+.divisor-seccion-menu,
+.divisor-seccion-temas,
+.divisor-seccion-config,
+.divisor-seccion-usuario {
+    width: 40px;
+
+    height: 2px;
+    min-height: 2px;
+
+    flex-shrink: 0;
+
+    margin: 12px 0;
+
+    align-self: center;
+
+    border-radius: 999px;
+
+    background: #cbd5e1;
+}
+
+/* @galaxiahfast - Separadores oscuro. */
+[data-theme="dark"] .divisor-seccion-menu,
+[data-theme="dark"] .divisor-seccion-temas,
+[data-theme="dark"] .divisor-seccion-config,
+[data-theme="dark"] .divisor-seccion-usuario {
+    background: #38bdf8;
+
+    opacity: 0.7;
+}
+
+/* ==========================================================================
+   @galaxiahfast MENÚ EXPANDIDO
+   ========================================================================== */
+
+/* @galaxiahfast - Menú expandido más compacto. */
+.menu-expandido {
+    width: 228px !important;
+
+    align-items: flex-start !important;
+
+    padding: 20px 12px !important;
+}
+
+/* @galaxiahfast - Botones expandido. */
+.menu-expandido .boton-control-menu,
+.menu-expandido .boton-control-tema,
+.menu-expandido .boton-control-punto,
+.menu-expandido .boton-control-apartado,
+.menu-expandido .boton-control-papelera,
+.menu-expandido .boton-control-configuracion,
+.menu-expandido .boton-control-salida,
+.menu-expandido .boton-control-usuario {
+    width: calc(100% - 8px);
+
+    justify-content: flex-start;
+
+    gap: 14px;
+
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* @galaxiahfast - Separadores expandido. */
+.menu-expandido .divisor-seccion-menu,
+.menu-expandido .divisor-seccion-temas,
+.menu-expandido .divisor-seccion-config,
+.menu-expandido .divisor-seccion-usuario {
+    width: calc(100% - 12px);
+
+    height: auto;
+
+    margin: 10px 0 6px 0;
+
     background: transparent;
-    border: 1.5px solid var(--color-acento);
-    color: var(--color-acento);
 }
 
-/* @galaxiahfast - Modo oscuro: estado activo para papelera. */
-[data-theme="dark"] .boton-control-papelera.activo {
-    background: transparent;
-    border: 1.5px solid var(--color-acento);
-    color: var(--color-acento);
-}
+/* @galaxiahfast - Línea debajo del título. */
+.menu-expandido .divisor-seccion-menu::after,
+.menu-expandido .divisor-seccion-temas::after,
+.menu-expandido .divisor-seccion-config::after,
+.menu-expandido .divisor-seccion-usuario::after {
+    content: '';
 
-/* @galaxiahfast - Divisor visual entre secciones. */
-.divisor-seccion-temas {
-    width: 1px;
-    height: 30px;
+    display: block;
+
+    width: 100%;
+    height: 1px;
+
+    margin-top: 4px;
+
     background: var(--borde-ventana);
-    margin: 0 5px;
 }
 
-/* @galaxiahfast - Animación de entrada de la barra. */
-@keyframes deslizarArriba {
+/* @galaxiahfast - Línea oscuro. */
+[data-theme="dark"] .menu-expandido .divisor-seccion-menu::after,
+[data-theme="dark"] .menu-expandido .divisor-seccion-temas::after,
+[data-theme="dark"] .menu-expandido .divisor-seccion-config::after,
+[data-theme="dark"] .menu-expandido .divisor-seccion-usuario::after {
+    background: rgba(56, 189, 248, 0.42);
+}
+
+/* @galaxiahfast - Texto botones. */
+.texto-boton {
+    flex: 1;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    text-align: left;
+
+    font-size: 14px;
+    font-weight: 450;
+
+    letter-spacing: -0.01em;
+
+    color: var(--color-acento-suave);
+}
+
+/* @galaxiahfast - Hover texto. */
+.menu-expandido .boton-control-menu:hover .texto-boton,
+.menu-expandido .boton-control-tema:hover .texto-boton,
+.menu-expandido .boton-control-punto:hover .texto-boton,
+.menu-expandido .boton-control-apartado:hover .texto-boton,
+.menu-expandido .boton-control-papelera:hover .texto-boton,
+.menu-expandido .boton-control-configuracion:hover .texto-boton,
+.menu-expandido .boton-control-salida:hover .texto-boton,
+.menu-expandido .boton-control-usuario:hover .texto-boton {
+    color: var(--color-acento-hover);
+}
+
+/* @galaxiahfast - Hover texto oscuro. */
+[data-theme="dark"] .menu-expandido .boton-control-menu:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-tema:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-punto:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-apartado:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-papelera:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-configuracion:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-salida:hover .texto-boton,
+[data-theme="dark"] .menu-expandido .boton-control-usuario:hover .texto-boton {
+    color: #38bdf8;
+}
+
+/* @galaxiahfast - Títulos separadores. */
+.titulo-separador {
+    display: block;
+
+    margin-bottom: 0;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+
+    color: var(--color-acento-suave);
+
+    opacity: 0.52;
+}
+
+/* ==========================================================================
+   @galaxiahfast ANIMACIONES
+   ========================================================================== */
+
+/* @galaxiahfast - Entrada lateral. */
+@keyframes deslizarIzquierda {
     0% {
         opacity: 0;
-        transform: translateX(-50%) translateY(20px);
+        transform: translateX(-100%);
     }
+
     100% {
         opacity: 1;
-        transform: translateX(-50%) translateY(0);
+        transform: translateX(0);
     }
 }
-
-/* @galaxiahfast - Animación de pulso para estado activo general. */
-@keyframes pulso-activo {
-    0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
-}
-
-/* @galaxiahfast - Animación de pulso para estado de eliminación. */
-@keyframes pulso-rojo {
-    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-/* @galaxiahfast - Animación de pulso para estado de edición. */
-@keyframes pulso-naranja {
-    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-}
-
-/* @galaxiahfast - Animación de pulso para estado de mover. */
-@keyframes pulso-verde {
-    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-/* @galaxiahfast - Animación de pulso para estado de ocultar. */
-@keyframes pulso-morado {
-    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-}
-
-
