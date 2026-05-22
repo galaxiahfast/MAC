@@ -1,440 +1,241 @@
 /* ==========================================================================
-   @galaxiahfast VARIABLES DE INTERFAZ
+   VARIABLES
    ========================================================================== */
-
 :root {
-
-    /* @galaxiahfast - Configuración scrollbar overlay. */
-    --scrollbar-overlay-width: 4px;
-
-    /* @galaxiahfast - Compensación visual del centro óptico. */
-    --compensacion-visual-scroll:
-        calc(var(--scrollbar-overlay-width) * 2);
+    --ancho-menu-colapsado: 88px;
+    --ancho-boton-menu: 54px;
+    --alto-boton-menu: 54px;
+    --padding-menu-superior: 24px;
+    --padding-menu-inferior: 24px;
+    --padding-menu-izquierdo: 16px;
+    --padding-menu-derecho: 16px;
+    --espaciado-elementos-menu: 10px;
 }
 
 /* ==========================================================================
-   @galaxiahfast SCROLLBAR PERSONALIZADO
+   MENÚ LATERAL
    ========================================================================== */
-
-/* @galaxiahfast - Scrollbar global. */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--fondo-scroll);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--color-scroll);
-    border-radius: 4px;
-    transition: background 0.2s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--color-scroll-hover);
-}
-
-/* ==========================================================================
-   @galaxiahfast BARRA LATERAL PRINCIPAL
-   ========================================================================== */
-
-/* @galaxiahfast - Barra lateral principal. */
-.barra-herramientas-lateral {
+.contenedor-barra-herramientas-principal {
     position: fixed;
-
     left: 0;
     top: 0;
-    bottom: 0;
 
-    width: 86px;
+    height: 100vh;
+    width: var(--ancho-menu-colapsado);
+
+    z-index: 9999;
+
+    display: flex;
+
+    background: var(--fondo-ventana);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid var(--borde-ventana);
+    box-shadow: var(--sombra-media);
+
+    overflow: hidden;
+
+    transition:
+        width 0.24s cubic-bezier(0.2, 0.9, 0.4, 1),
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* ==========================================================================
+   CONTENEDOR INTERNO (SCROLL REAL)
+   ========================================================================== */
+.contenedor-interno-barra-herramientas {
+    flex: 1;
+    min-height: 0;
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    gap: 10px;
-
-    z-index: 9999;
+    gap: var(--espaciado-elementos-menu);
 
     padding:
-        24px
-        0
-        24px
-        var(--compensacion-visual-scroll);
-
-    background: var(--fondo-ventana);
-
-    backdrop-filter: blur(16px);
-
-    border-right: 1px solid var(--borde-ventana);
-
-    box-shadow: var(--sombra-media);
+        var(--padding-menu-superior)
+        var(--padding-menu-derecho)
+        var(--padding-menu-inferior)
+        var(--padding-menu-izquierdo);
 
     overflow-y: auto;
     overflow-x: hidden;
 
     overscroll-behavior: contain;
 
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-
-    transition:
-        width 0.24s cubic-bezier(0.2, 0.9, 0.4, 1),
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
-
-    animation: deslizarIzquierda 0.4s ease-out;
-}
-
-/* @galaxiahfast - Scrollbar overlay real. */
-.barra-herramientas-lateral::-webkit-scrollbar {
-    width: var(--scrollbar-overlay-width);
-}
-
-.barra-herramientas-lateral::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.barra-herramientas-lateral::-webkit-scrollbar-thumb {
-    background: transparent;
-
-    border-radius: 999px;
-}
-
-/* @galaxiahfast - Mostrar scrollbar hover. */
-.barra-herramientas-lateral:hover {
-    scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
-
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
-
-    border-right-color: var(--borde-fuerte);
-}
-
-.barra-herramientas-lateral:hover::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.45);
-}
-
-/* @galaxiahfast - Hover modo oscuro. */
-[data-theme="dark"] .barra-herramientas-lateral:hover {
-    box-shadow: 0 8px 28px rgba(56, 189, 248, 0.08);
-}
-
-[data-theme="dark"] .barra-herramientas-lateral:hover::-webkit-scrollbar-thumb {
-    background: rgba(56, 189, 248, 0.34);
+    scrollbar-gutter: stable;
 }
 
 /* ==========================================================================
-   @galaxiahfast BOTONES
+   SCROLLBAR (FIX REAL SIN “RAIL BLANCO”)
    ========================================================================== */
 
-/* @galaxiahfast - Botones principales. */
-.boton-control-menu,
-.boton-control-tema,
-.boton-control-punto,
-.boton-control-apartado,
-.boton-control-papelera,
-.boton-control-configuracion,
-.boton-control-salida,
-.boton-control-usuario {
-    width: 54px;
-    height: 54px;
+/* ancho fijo siempre */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar {
+    width: 15px;
+    background: transparent; /* elimina canal del sistema */
+}
 
-    min-width: 54px;
-    min-height: 54px;
+/* elimina completamente el track visible */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-track {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* elimina esquina fantasma (importante en Windows/Edge) */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* estado base: invisible real (no blanco del sistema) */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+}
+
+/* visible SOLO al interactuar con el menú */
+.contenedor-barra-herramientas-principal:hover
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* hover del thumb */
+.contenedor-barra-herramientas-principal:hover
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================================================
+   TIPOGRAFÍA
+   ========================================================================== */
+.contenedor-barra-herramientas-principal,
+.contenedor-barra-herramientas-principal * {
+    font-family: Inter, system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   BOTONES
+   ========================================================================== */
+.boton-menu-herramienta {
+    width: var(--ancho-boton-menu);
+    height: var(--alto-boton-menu);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    border: none;
     background: transparent;
 
-    border: none;
-    border-radius: 16px;
-
-    color: var(--color-acento-suave);
-
+    border-radius: 12px;
     cursor: pointer;
 
-    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1);
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
-/* @galaxiahfast - Iconos SVG. */
-.boton-control-menu svg,
-.boton-control-tema svg,
-.boton-control-punto svg,
-.boton-control-apartado svg,
-.boton-control-papelera svg,
-.boton-control-configuracion svg,
-.boton-control-salida svg,
-.boton-control-usuario svg {
-    width: 28px;
-    height: 28px;
-
-    stroke-width: 1.75;
-
-    transition: transform 0.2s ease;
+.boton-menu-herramienta:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
-/* @galaxiahfast - Hover botones. */
-.boton-control-menu:hover,
-.boton-control-tema:hover,
-.boton-control-punto:hover,
-.boton-control-apartado:hover,
-.boton-control-papelera:hover,
-.boton-control-configuracion:hover,
-.boton-control-salida:hover,
-.boton-control-usuario:hover {
-    background: rgba(30, 41, 59, 0.06);
-
-    color: var(--color-acento-hover);
-}
-
-/* @galaxiahfast - Hover oscuro. */
-[data-theme="dark"] .boton-control-menu:hover,
-[data-theme="dark"] .boton-control-tema:hover,
-[data-theme="dark"] .boton-control-punto:hover,
-[data-theme="dark"] .boton-control-apartado:hover,
-[data-theme="dark"] .boton-control-papelera:hover,
-[data-theme="dark"] .boton-control-configuracion:hover,
-[data-theme="dark"] .boton-control-salida:hover,
-[data-theme="dark"] .boton-control-usuario:hover {
-    background: rgba(56, 189, 248, 0.08);
-
-    color: #38bdf8;
-}
-
-/* @galaxiahfast - Hover iconos. */
-.boton-control-menu:hover svg,
-.boton-control-tema:hover svg,
-.boton-control-punto:hover svg,
-.boton-control-apartado:hover svg,
-.boton-control-papelera:hover svg,
-.boton-control-configuracion:hover svg,
-.boton-control-salida:hover svg,
-.boton-control-usuario:hover svg {
-    transform: scale(1.05);
-}
-
-/* @galaxiahfast - Click botones. */
-.boton-control-menu:active,
-.boton-control-tema:active,
-.boton-control-punto:active,
-.boton-control-apartado:active,
-.boton-control-papelera:active,
-.boton-control-configuracion:active,
-.boton-control-salida:active,
-.boton-control-usuario:active {
+.boton-menu-herramienta:active {
     transform: scale(0.96);
 }
 
-/* ==========================================================================
-   @galaxiahfast MODOS ACTIVOS
-   ========================================================================== */
-
-.boton-control-punto.modo-eliminar {
-    background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.boton-control-punto.modo-editar {
-    background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.boton-control-punto.modo-mover {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.boton-control-punto.modo-ocultar {
-    background: rgba(139, 92, 246, 0.12);
-    color: #8b5cf6;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-/* ==========================================================================
-   @galaxiahfast SEPARADORES
-   ========================================================================== */
-
-.divisor-seccion-menu,
-.divisor-seccion-temas,
-.divisor-seccion-config,
-.divisor-seccion-usuario {
-    width: 40px;
-
-    height: 2px;
-    min-height: 2px;
-
+.boton-menu-herramienta svg {
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
-
-    margin: 12px 0;
-
-    align-self: center;
-
-    border-radius: 999px;
-
-    background: #cbd5e1;
-}
-
-/* @galaxiahfast - Separadores oscuro. */
-[data-theme="dark"] .divisor-seccion-menu,
-[data-theme="dark"] .divisor-seccion-temas,
-[data-theme="dark"] .divisor-seccion-config,
-[data-theme="dark"] .divisor-seccion-usuario {
-    background: #38bdf8;
-
-    opacity: 0.7;
 }
 
 /* ==========================================================================
-   @galaxiahfast MENÚ EXPANDIDO
+   EXPANSIÓN MENÚ
    ========================================================================== */
-
-/* @galaxiahfast - Menú expandido más compacto. */
-.menu-expandido {
-    width: 228px !important;
-
-    align-items: flex-start !important;
-
-    padding: 20px 12px !important;
+.contenedor-barra-herramientas-principal.menu-lateral-expandido {
+    width: var(--ancho-expandido-menu-lateral, 280px);
 }
 
-/* @galaxiahfast - Botones expandido. */
-.menu-expandido .boton-control-menu,
-.menu-expandido .boton-control-tema,
-.menu-expandido .boton-control-punto,
-.menu-expandido .boton-control-apartado,
-.menu-expandido .boton-control-papelera,
-.menu-expandido .boton-control-configuracion,
-.menu-expandido .boton-control-salida,
-.menu-expandido .boton-control-usuario {
-    width: calc(100% - 8px);
+.menu-lateral-expandido .contenedor-interno-barra-herramientas {
+    align-items: stretch;
+}
 
+.menu-lateral-expandido .boton-menu-herramienta {
     justify-content: flex-start;
-
-    gap: 14px;
-
-    padding-left: 12px;
-    padding-right: 12px;
-}
-
-/* @galaxiahfast - Separadores expandido. */
-.menu-expandido .divisor-seccion-menu,
-.menu-expandido .divisor-seccion-temas,
-.menu-expandido .divisor-seccion-config,
-.menu-expandido .divisor-seccion-usuario {
-    width: calc(100% - 12px);
-
-    height: auto;
-
-    margin: 10px 0 6px 0;
-
-    background: transparent;
-}
-
-/* @galaxiahfast - Línea debajo del título. */
-.menu-expandido .divisor-seccion-menu::after,
-.menu-expandido .divisor-seccion-temas::after,
-.menu-expandido .divisor-seccion-config::after,
-.menu-expandido .divisor-seccion-usuario::after {
-    content: '';
-
-    display: block;
-
+    padding-left: 14px;
     width: 100%;
-    height: 1px;
-
-    margin-top: 4px;
-
-    background: var(--borde-ventana);
 }
 
-/* @galaxiahfast - Línea oscuro. */
-[data-theme="dark"] .menu-expandido .divisor-seccion-menu::after,
-[data-theme="dark"] .menu-expandido .divisor-seccion-temas::after,
-[data-theme="dark"] .menu-expandido .divisor-seccion-config::after,
-[data-theme="dark"] .menu-expandido .divisor-seccion-usuario::after {
-    background: rgba(56, 189, 248, 0.42);
-}
-
-/* @galaxiahfast - Texto botones. */
-.texto-boton {
-    flex: 1;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    text-align: left;
-
+/* ==========================================================================
+   TEXTO DINÁMICO
+   ========================================================================== */
+.texto-expandido-boton-menu {
+    margin-left: 12px;
     font-size: 14px;
     font-weight: 450;
-
-    letter-spacing: -0.01em;
-
-    color: var(--color-acento-suave);
-}
-
-/* @galaxiahfast - Hover texto. */
-.menu-expandido .boton-control-menu:hover .texto-boton,
-.menu-expandido .boton-control-tema:hover .texto-boton,
-.menu-expandido .boton-control-punto:hover .texto-boton,
-.menu-expandido .boton-control-apartado:hover .texto-boton,
-.menu-expandido .boton-control-papelera:hover .texto-boton,
-.menu-expandido .boton-control-configuracion:hover .texto-boton,
-.menu-expandido .boton-control-salida:hover .texto-boton,
-.menu-expandido .boton-control-usuario:hover .texto-boton {
-    color: var(--color-acento-hover);
-}
-
-/* @galaxiahfast - Hover texto oscuro. */
-[data-theme="dark"] .menu-expandido .boton-control-menu:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-tema:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-punto:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-apartado:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-papelera:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-configuracion:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-salida:hover .texto-boton,
-[data-theme="dark"] .menu-expandido .boton-control-usuario:hover .texto-boton {
-    color: #38bdf8;
-}
-
-/* @galaxiahfast - Títulos separadores. */
-.titulo-separador {
-    display: block;
-
-    margin-bottom: 0;
-
-    font-size: 10px;
-    font-weight: 600;
-
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-
-    color: var(--color-acento-suave);
-
-    opacity: 0.52;
+    white-space: nowrap;
+    opacity: 0.9;
 }
 
 /* ==========================================================================
-   @galaxiahfast ANIMACIONES
+   SEPARADORES
    ========================================================================== */
+.contenedor-separador-seccion-menu-lateral {
+    width: 100%;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0;
+}
 
-/* @galaxiahfast - Entrada lateral. */
-@keyframes deslizarIzquierda {
-    0% {
-        opacity: 0;
-        transform: translateX(-100%);
-    }
+.contenedor-titulo-separador-menu {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    gap: 4px;
+}
 
-    100% {
-        opacity: 1;
-        transform: translateX(0);
+.menu-lateral-expandido .contenedor-titulo-separador-menu {
+    display: flex;
+}
+
+.texto-separador-menu {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    padding-left: 8px;
+}
+
+.linea-separador-menu {
+    height: 1px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+/* ==========================================================================
+   ESTADOS
+   ========================================================================== */
+.estado-menu-eliminacion-activo {
+    background: rgba(255, 80, 80, 0.15);
+}
+
+.estado-menu-edicion-activo {
+    background: rgba(80, 120, 255, 0.15);
+}
+
+.estado-menu-movimiento-activo {
+    background: rgba(255, 180, 80, 0.15);
+}
+
+.estado-menu-visibilidad-activo {
+    background: rgba(120, 255, 120, 0.15);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .contenedor-barra-herramientas-principal {
+        width: 72px;
     }
 }

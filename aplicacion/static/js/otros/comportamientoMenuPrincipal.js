@@ -1,299 +1,145 @@
-/* @galaxiahfast - Comportamiento del menú lateral. */
+function iniciarComportamientoMenuLateralPrincipal() {
+    const contenedorBarraHerramientas = document.querySelector('.contenedor-barra-herramientas-principal');
+    const contenedorInternoBarraHerramientas = document.querySelector('.contenedor-interno-barra-herramientas');
+    const botonAlternarExpansionMenu = document.getElementById('botonAlternarExpansionMenuLateralPrincipal');
 
-/* @galaxiahfast - Inicializa todos los eventos del menú. */
-function iniciarComportamientoMenu() {
+    if (!contenedorBarraHerramientas || !contenedorInternoBarraHerramientas || !botonAlternarExpansionMenu) {
+        console.error('No se pudo inicializar el menú lateral principal.');
+        return;
+    }
 
-    /* @galaxiahfast - Obtener todos los botones del menú. */
-    const botonMenu = document.getElementById('controlMenuHamburguesa');
-    const menuBarra = document.querySelector('.barra-herramientas-lateral');
-    
-    /* @galaxiahfast - Estado del menú expandido. */
-    let menuExpandido = false;
+    let menuLateralExpandido = false;
 
-    /* @galaxiahfast - Función para calcular el ancho automático basado en el texto más largo. */
-    function calcularAnchoAutomatico() {
-        const botonesConTexto = menuBarra.querySelectorAll('.boton-control-menu, .boton-control-tema, .boton-control-punto, .boton-control-apartado, .boton-control-papelera, .boton-control-configuracion, .boton-control-salida, .boton-control-usuario');
+    const selectorBotonesMenu = `
+        .boton-menu-herramienta-navegacion,
+        .boton-menu-herramienta-dispositivo,
+        .boton-menu-herramienta-apartado,
+        .boton-menu-herramienta-papelera,
+        .boton-menu-herramienta-tema,
+        .boton-menu-herramienta-configuracion,
+        .boton-menu-herramienta-sesion,
+        .boton-menu-herramienta-usuario
+    `;
+
+    const textosBotonesExpandibles = {
+        botonAlternarExpansionMenuLateralPrincipal: 'Menú',
+        botonRegistrarNuevoDispositivoPlano: 'Nuevo dispositivo',
+        botonActivarModoEliminacionDispositivos: 'Eliminar dispositivo',
+        botonActivarModoEdicionDispositivos: 'Editar dispositivo',
+        botonActivarModoReubicacionDispositivos: 'Mover dispositivo',
+        botonAlternarVisibilidadDispositivosRenderizados: 'Visibilidad dispositivos',
+        botonRegistrarNuevoApartadoGlobalDispositivos: 'Nuevo apartado',
+        botonEliminarApartadosExistentesDispositivos: 'Eliminar apartado',
+        botonAbrirPanelRestauracionElementosEliminados: 'Papelera',
+        botonAlternarTemaVisualAplicacion: 'Tema visual',
+        botonAbrirConfiguracionGeneralSistema: 'Configuración',
+        botonCerrarSesionUsuarioActualSistema: 'Cerrar sesión',
+        botonAbrirPerfilUsuarioAutenticadoSistema: 'Perfil usuario'
+    };
+
+    const titulosSeparadoresMenu = {
+        'gestion-dispositivos': 'DISPOSITIVOS',
+        'preferencias-visuales': 'APARIENCIA',
+        'configuracion-general': 'SISTEMA',
+        'perfil-usuario': 'USUARIO'
+    };
+
+    function calcularAnchoAutomaticoMenuExpandido() {
+        const botonesMenu = contenedorInternoBarraHerramientas.querySelectorAll(selectorBotonesMenu);
         let anchoMaximo = 0;
-        
-        botonesConTexto.forEach(boton => {
-            const texto = boton.querySelector('.texto-boton');
-            if (texto) {
-                /* @galaxiahfast - Medir el ancho del texto temporalmente. */
-                const spanMedicion = document.createElement('span');
-                spanMedicion.style.cssText = 'position: absolute; visibility: hidden; font-size: 14px; font-weight: 450; white-space: nowrap;';
-                spanMedicion.textContent = texto.textContent;
-                document.body.appendChild(spanMedicion);
-                const anchoTexto = spanMedicion.offsetWidth;
-                document.body.removeChild(spanMedicion);
-                
-                /* @galaxiahfast - Ancho total = icono (54px) + gap (14px) + texto + padding (28px) */
-                const anchoTotal = 54 + 14 + anchoTexto + 28;
-                if (anchoTotal > anchoMaximo) anchoMaximo = anchoTotal;
+
+        botonesMenu.forEach(boton => {
+            const texto = textosBotonesExpandibles[boton.id];
+            if (!texto) return;
+
+            const temp = document.createElement('span');
+            temp.style.position = 'absolute';
+            temp.style.visibility = 'hidden';
+            temp.style.whiteSpace = 'nowrap';
+            temp.style.fontSize = '14px';
+            temp.style.fontWeight = '450';
+            temp.textContent = texto;
+
+            document.body.appendChild(temp);
+
+            const ancho = temp.offsetWidth;
+            document.body.removeChild(temp);
+
+            const total = 54 + 16 + ancho + 36;
+
+            if (total > anchoMaximo) {
+                anchoMaximo = total;
             }
         });
-        
-        /* @galaxiahfast - Ancho mínimo de 260px, máximo de 320px */
-        return Math.min(Math.max(anchoMaximo, 260), 320);
+
+        return Math.min(Math.max(anchoMaximo, 240), 340);
     }
 
-    /* @galaxiahfast - Función para crear el menú expandido. */
-    function expandirMenu() {
-        if (!menuBarra) return;
-        
-        /* @galaxiahfast - Calcular ancho automático. */
-        const anchoAutomatico = calcularAnchoAutomatico();
-        
-        menuBarra.classList.add('menu-expandido');
-        menuBarra.style.width = anchoAutomatico + 'px';
-        menuBarra.style.alignItems = 'flex-start';
-        /* @galaxiahfast - Padding: arriba/abajo 24px, izquierdo 16px, derecho 16px + espacio scroll */
-        menuBarra.style.padding = '24px 22px 24px 16px';
-        
-        /* @galaxiahfast - Modificar el botón menú hamburguesa para incluir texto. */
-        const botonMenuElement = document.getElementById('controlMenuHamburguesa');
-        if (botonMenuElement && !botonMenuElement.querySelector('.texto-boton')) {
-            const textoMenu = document.createElement('span');
-            textoMenu.className = 'texto-boton';
-            textoMenu.textContent = 'Menú';
-            botonMenuElement.appendChild(textoMenu);
-        }
-        
-        /* @galaxiahfast - Agregar texto a todos los demás botones. */
-        const botones = menuBarra.querySelectorAll('.boton-control-punto, .boton-control-apartado, .boton-control-papelera, .boton-control-tema, .boton-control-configuracion, .boton-control-salida, .boton-control-usuario');
-        
-        /* @galaxiahfast - Textos formales sin palabras repetitivas. */
-        const textosBotones = {
-            'accionAgregarDispositivo': 'Nuevo',
-            'accionEliminarDispositivo': 'Eliminar',
-            'accionEditarDispositivo': 'Editar',
-            'accionMoverDispositivo': 'Mover',
-            'accionOcultarDispositivo': 'Ocultar',
-            'accionAgregarCampoDispositivo': 'Nueva',
-            'accionEliminarCampoDispositivo': 'Eliminar',
-            'accionRestaurarDispositivoCampo': 'Papelera',
-            'controlAlternarTema': 'Tema',
-            'controlConfiguracion': 'Ajustes',
-            'controlSalida': 'Salir',
-            'controlPerfilUsuario': 'Perfil'
-        };
-        
-        botones.forEach(boton => {
-            const texto = textosBotones[boton.id];
-            if (texto && !boton.querySelector('.texto-boton')) {
-                const span = document.createElement('span');
-                span.className = 'texto-boton';
-                span.textContent = texto;
-                boton.appendChild(span);
-            }
-        });
-        
-        /* @galaxiahfast - Agregar títulos a los separadores (debajo de la línea). */
-        const separadores = menuBarra.querySelectorAll('.divisor-seccion-menu, .divisor-seccion-final, .divisor-seccion-config');
-        
-        const titulosSeparadores = {
-            'divisor-seccion-menu': 'EQUIPOS',
-            'divisor-seccion-final': 'PROPIEDADES',
-            'divisor-seccion-config': 'SISTEMA'
-        };
-        
-        separadores.forEach(separador => {
-            const clase = separador.className;
-            const titulo = titulosSeparadores[clase];
-            if (titulo && !separador.querySelector('.titulo-separador')) {
-                const tituloSpan = document.createElement('span');
-                tituloSpan.className = 'titulo-separador';
-                tituloSpan.textContent = titulo;
-                separador.appendChild(tituloSpan);
-            }
-        });
-        
-        menuExpandido = true;
-    }
-    
-    /* @galaxiahfast - Función para colapsar el menú original. */
-    function colapsarMenu() {
-        if (!menuBarra) return;
-        
-        menuBarra.classList.remove('menu-expandido');
-        menuBarra.style.width = '';
-        menuBarra.style.alignItems = '';
-        menuBarra.style.padding = '';
-        
-        /* @galaxiahfast - Restaurar botón menú hamburguesa original. */
-        const botonMenuElement = document.getElementById('controlMenuHamburguesa');
-        if (botonMenuElement) {
-            const textoExtra = botonMenuElement.querySelector('.texto-boton');
-            if (textoExtra) textoExtra.remove();
-        }
-        
-        /* @galaxiahfast - Eliminar textos de los botones. */
-        const textos = menuBarra.querySelectorAll('.texto-boton');
-        textos.forEach(texto => texto.remove());
-        
-        /* @galaxiahfast - Eliminar títulos de los separadores. */
-        const titulos = menuBarra.querySelectorAll('.titulo-separador');
-        titulos.forEach(titulo => titulo.remove());
-        
-        menuExpandido = false;
-    }
-    
-    /* @galaxiahfast - Alternar menú hamburguesa. */
-    if (botonMenu) {
-        botonMenu.addEventListener('click', (evento) => {
-            evento.stopPropagation();
-            
-            if (menuExpandido) {
-                colapsarMenu();
-            } else {
-                expandirMenu();
-            }
-        });
-    }
-    
-    /* @galaxiahfast - Obtener todos los botones de acción. */
-    const botonAgregarEquipo = document.getElementById('accionAgregarDispositivo');
-    const botonEliminarEquipo = document.getElementById('accionEliminarDispositivo');
-    const botonEditarEquipo = document.getElementById('accionEditarDispositivo');
-    const botonMoverEquipo = document.getElementById('accionMoverDispositivo');
-    const botonOcultarEquipo = document.getElementById('accionOcultarDispositivo');
-    const botonAgregarPropiedad = document.getElementById('accionAgregarCampoDispositivo');
-    const botonEliminarPropiedad = document.getElementById('accionEliminarCampoDispositivo');
-    const botonPapelera = document.getElementById('accionRestaurarDispositivoCampo');
-    const botonConfiguracion = document.getElementById('controlConfiguracion');
-    const botonSalida = document.getElementById('controlSalida');
-    const botonPerfil = document.getElementById('controlPerfilUsuario');
+    function agregarTextoExpandidoBoton(boton, texto) {
+        if (!boton || !texto) return;
+        if (boton.querySelector('.texto-expandido-boton-menu')) return;
 
-    /* @galaxiahfast - Estado de modos activos. */
-    let modoEliminarActivo = false;
-    let modoEditarActivo = false;
-    let modoMoverActivo = false;
-    let modoOcultarActivo = false;
+        const span = document.createElement('span');
+        span.className = 'texto-expandido-boton-menu';
+        span.textContent = texto;
 
-    /* @galaxiahfast - Función para resetear todos los modos. */
-    function resetearModos() {
-        modoEliminarActivo = false;
-        modoEditarActivo = false;
-        modoMoverActivo = false;
-        modoOcultarActivo = false;
-        
-        if (botonEliminarEquipo) botonEliminarEquipo.classList.remove('modo-eliminar');
-        if (botonEditarEquipo) botonEditarEquipo.classList.remove('modo-editar');
-        if (botonMoverEquipo) botonMoverEquipo.classList.remove('modo-mover');
-        if (botonOcultarEquipo) botonOcultarEquipo.classList.remove('modo-ocultar');
-        
-        /* @galaxiahfast - Ocultar todos los botones de acción en los puntos. */
-        document.querySelectorAll('.equipo-boton-eliminar, .equipo-boton-editar, .equipo-boton-mover, .equipo-boton-ocultar').forEach(boton => {
-            boton.style.display = 'none';
-        });
+        boton.appendChild(span);
     }
 
-    /* @galaxiahfast - Botón agregar equipo. */
-    if (botonAgregarEquipo) {
-        botonAgregarEquipo.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Abrir formulario para agregar nuevo equipo');
-        });
+    function agregarTituloSeparadorMenu(separador, titulo) {
+        if (!separador || !titulo) return;
+        if (separador.querySelector('.contenedor-titulo-separador-menu')) return;
+
+        const contenedor = document.createElement('div');
+        contenedor.className = 'contenedor-titulo-separador-menu';
+
+        const texto = document.createElement('span');
+        texto.className = 'texto-separador-menu';
+        texto.textContent = titulo;
+
+        const linea = document.createElement('div');
+        linea.className = 'linea-separador-menu';
+
+        contenedor.appendChild(texto);
+        contenedor.appendChild(linea);
+        separador.appendChild(contenedor);
     }
 
-    /* @galaxiahfast - Botón eliminar equipo. */
-    if (botonEliminarEquipo) {
-        botonEliminarEquipo.addEventListener('click', () => {
-            resetearModos();
-            modoEliminarActivo = true;
-            botonEliminarEquipo.classList.add('modo-eliminar');
-            console.log('@galaxiahfast - Modo eliminar activado');
-            
-            document.querySelectorAll('.equipo').forEach(equipo => {
-                const botonEliminar = equipo.querySelector('.equipo-boton-eliminar');
-                if (botonEliminar) botonEliminar.style.display = 'flex';
-            });
-        });
+    function expandir() {
+        const ancho = calcularAnchoAutomaticoMenuExpandido();
+
+        contenedorBarraHerramientas.classList.add('menu-lateral-expandido');
+        contenedorBarraHerramientas.style.setProperty('--ancho-expandido-menu-lateral', `${ancho}px`);
+
+        contenedorInternoBarraHerramientas
+            .querySelectorAll(selectorBotonesMenu)
+            .forEach(b => agregarTextoExpandidoBoton(b, textosBotonesExpandibles[b.id]));
+
+        contenedorInternoBarraHerramientas
+            .querySelectorAll('.contenedor-separador-seccion-menu-lateral')
+            .forEach(s => agregarTituloSeparadorMenu(s, titulosSeparadoresMenu[s.dataset.seccionMenu]));
+
+        menuLateralExpandido = true;
     }
 
-    /* @galaxiahfast - Botón editar equipo. */
-    if (botonEditarEquipo) {
-        botonEditarEquipo.addEventListener('click', () => {
-            resetearModos();
-            modoEditarActivo = true;
-            botonEditarEquipo.classList.add('modo-editar');
-            console.log('@galaxiahfast - Modo editar activado');
-        });
+    function colapsar() {
+        contenedorBarraHerramientas.classList.remove('menu-lateral-expandido');
+        contenedorBarraHerramientas.style.removeProperty('--ancho-expandido-menu-lateral');
+
+        document.querySelectorAll('.texto-expandido-boton-menu')
+            .forEach(e => e.remove());
+
+        // FIX: NO destruir separadores, CSS controla visibilidad
+        document.querySelectorAll('.contenedor-titulo-separador-menu')
+            .forEach(e => e.remove());
+
+        menuLateralExpandido = false;
     }
 
-    /* @galaxiahfast - Botón mover equipo. */
-    if (botonMoverEquipo) {
-        botonMoverEquipo.addEventListener('click', () => {
-            resetearModos();
-            modoMoverActivo = true;
-            botonMoverEquipo.classList.add('modo-mover');
-            console.log('@galaxiahfast - Modo mover activado');
-        });
-    }
-
-    /* @galaxiahfast - Botón ocultar equipo. */
-    if (botonOcultarEquipo) {
-        botonOcultarEquipo.addEventListener('click', () => {
-            resetearModos();
-            modoOcultarActivo = true;
-            botonOcultarEquipo.classList.add('modo-ocultar');
-            console.log('@galaxiahfast - Modo ocultar activado');
-        });
-    }
-
-    /* @galaxiahfast - Botón agregar propiedad. */
-    if (botonAgregarPropiedad) {
-        botonAgregarPropiedad.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Abrir formulario para agregar nueva propiedad');
-        });
-    }
-
-    /* @galaxiahfast - Botón eliminar propiedad. */
-    if (botonEliminarPropiedad) {
-        botonEliminarPropiedad.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Modo eliminar propiedad activado');
-        });
-    }
-
-    /* @galaxiahfast - Botón papelera. */
-    if (botonPapelera) {
-        botonPapelera.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Abrir papelera');
-        });
-    }
-
-    /* @galaxiahfast - Botón configuración. */
-    if (botonConfiguracion) {
-        botonConfiguracion.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Abrir panel de ajustes');
-        });
-    }
-
-    /* @galaxiahfast - Botón salir. */
-    if (botonSalida) {
-        botonSalida.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Cerrar sesión');
-            if (confirm('¿Estás seguro de que deseas salir?')) {
-                window.location.href = '/logout';
-            }
-        });
-    }
-
-    /* @galaxiahfast - Botón perfil. */
-    if (botonPerfil) {
-        botonPerfil.addEventListener('click', () => {
-            resetearModos();
-            console.log('@galaxiahfast - Abrir mi cuenta');
-        });
-    }
+    botonAlternarExpansionMenu.addEventListener('click', e => {
+        e.stopPropagation();
+        menuLateralExpandido ? colapsar() : expandir();
+    });
 }
 
-/* @galaxiahfast - Inicializar comportamiento del menú al cargar el documento. */
-document.addEventListener(
-    'DOMContentLoaded',
-    iniciarComportamientoMenu
-);
+document.addEventListener('DOMContentLoaded', iniciarComportamientoMenuLateralPrincipal);

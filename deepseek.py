@@ -1,151 +1,58 @@
-"""
-@galaxiahfast Generador de respaldo consolidado de archivos.
+import os
 
-Descripción:
-    Recorre recursivamente una carpeta y concatena el contenido
-    de todos los archivos encontrados dentro de un único TXT.
-
-Características:
-    - Incluye subcarpetas automáticamente.
-    - Agrega encabezado con ruta y nombre del archivo.
-    - Elimina líneas vacías innecesarias.
-    - Ignora archivos binarios incompatibles.
-    - Usa UTF-8 cuando es posible.
-    - Mantiene separación clara entre archivos.
-
-Caso de uso:
-    Consolidar proyectos JS/CSS/HTML/PY/etc. en un único archivo
-    para auditoría, IA, respaldo o revisión técnica.
-"""
-
-from pathlib import Path
-
-# ============================================================================
-# CONFIGURACIÓN
-# ============================================================================
-
-CARPETA_BASE = Path(
-    r"C:\Users\MOISES INFORMATICA\Desktop\MAC\aplicacion\static\js"
-)
-
-ARCHIVO_SALIDA = Path(
-    r"C:\Users\MOISES INFORMATICA\Desktop\MAC\contenido_unificado.txt"
-)
-
-# Extensiones opcionales permitidas.
-# Puedes agregar más si lo necesitas.
-EXTENSIONES_VALIDAS = {
-    ".js",
-    ".ts",
-    ".json",
-    ".html",
-    ".css",
-    ".py",
-    ".txt",
-    ".md"
-}
-
-# ============================================================================
-# FUNCIONES
-# ============================================================================
-
-def eliminar_lineas_vacias(contenido: str) -> str:
+def concatenar_archivos(ruta_destino, rutas_origen):
     """
-    Elimina líneas completamente vacías.
-
+    Concatena varios archivos en un documento de destino.
+    Si el documento destino existe, lo sobrescribe.
+    Elimina líneas en blanco de cada archivo.
+    
     Args:
-        contenido: Texto original.
-
-    Returns:
-        Texto limpio sin líneas vacías.
+        ruta_destino (str): Ruta del archivo de destino
+        rutas_origen (list): Lista con las rutas de los archivos a concatenar
     """
-
-    lineas_limpias = [
-        linea.rstrip()
-        for linea in contenido.splitlines()
-        if linea.strip()
-    ]
-
-    return "\n".join(lineas_limpias)
-
-
-def leer_archivo(ruta_archivo: Path) -> str | None:
-    """
-    Intenta leer un archivo usando UTF-8.
-
-    Args:
-        ruta_archivo: Archivo a leer.
-
-    Returns:
-        Contenido del archivo o None si falla.
-    """
-
     try:
-        return ruta_archivo.read_text(
-            encoding="utf-8",
-            errors="ignore"
-        )
+        # Abrir el archivo de destino en modo escritura (sobrescribe si existe)
+        with open(ruta_destino, 'w', encoding='utf-8') as archivo_destino:
+            
+            for ruta_origen in rutas_origen:
+                # Verificar si el archivo origen existe
+                if not os.path.exists(ruta_origen):
+                    print(f"Advertencia: El archivo {ruta_origen} no existe. Se omite.")
+                    continue
+                
+                # Escribir encabezado con el nombre y ubicación del archivo
+                nombre_archivo = os.path.basename(ruta_origen)
+                ubicacion = os.path.dirname(ruta_origen)
+                
+                archivo_destino.write(f"=== NOMBRE: {nombre_archivo} ===\n")
+                archivo_destino.write(f"=== UBICACIÓN: {ubicacion} ===\n")
+                archivo_destino.write("=== CONTENIDO ===\n")
+                
+                # Leer y escribir el contenido del archivo origen sin líneas en blanco
+                with open(ruta_origen, 'r', encoding='utf-8') as archivo_origen:
+                    for linea in archivo_origen:
+                        # Eliminar espacios en blanco al inicio y final, y saltar si la línea está vacía
+                        linea_limpia = linea.rstrip('\n\r')
+                        if linea_limpia.strip():  # Solo escribir si no es una línea en blanco
+                            archivo_destino.write(linea_limpia + '\n')
+                
+                # Agregar una línea separadora entre archivos (opcional)
+                archivo_destino.write("\n" + "="*50 + "\n\n")
+        
+        print(f"¡Éxito! Los archivos se han concatenado en: {ruta_destino}")
+        
+    except Exception as e:
+        print(f"Error al procesar los archivos: {e}")
 
-    except Exception as error:
-        print(f"[ERROR] No se pudo leer: {ruta_archivo}")
-        print(f"Motivo: {error}")
+# Definir las rutas de los archivos a concatenar
+rutas_archivos = [
+    r"C:\Users\ortiz\Downloads\MAC\aplicacion\static\js\otros\comportamientoMenuPrincipal.js",
+    r"C:\Users\ortiz\Downloads\MAC\aplicacion\templates\index.html",
+    r"C:\Users\ortiz\Downloads\MAC\aplicacion\static\css\menuInferiorCentrado.css"
+]
 
-        return None
+# Definir la ruta del documento de destino
+documento_destino = r"C:\Users\ortiz\Downloads\documento.txt"
 
-
-def generar_consolidado() -> None:
-    """
-    Genera el archivo consolidado.
-    """
-
-    archivos_procesados = 0
-
-    with ARCHIVO_SALIDA.open(
-        mode="w",
-        encoding="utf-8"
-    ) as salida:
-
-        for archivo in CARPETA_BASE.rglob("*"):
-
-            if not archivo.is_file():
-                continue
-
-            if archivo.suffix.lower() not in EXTENSIONES_VALIDAS:
-                continue
-
-            contenido = leer_archivo(archivo)
-
-            if contenido is None:
-                continue
-
-            contenido = eliminar_lineas_vacias(contenido)
-
-            encabezado = (
-                "\n"
-                + "=" * 100
-                + "\n"
-                + f"ARCHIVO: {archivo.name}\n"
-                + f"UBICACIÓN: {archivo}\n"
-                + "=" * 100
-                + "\n\n"
-            )
-
-            salida.write(encabezado)
-            salida.write(contenido)
-            salida.write("\n\n")
-
-            archivos_procesados += 1
-
-    print("=" * 60)
-    print("PROCESO FINALIZADO")
-    print(f"Archivos procesados: {archivos_procesados}")
-    print(f"Archivo generado: {ARCHIVO_SALIDA}")
-    print("=" * 60)
-
-
-# ============================================================================
-# EJECUCIÓN
-# ============================================================================
-
-if __name__ == "__main__":
-    generar_consolidado()
+# Ejecutar la función
+concatenar_archivos(documento_destino, rutas_archivos)
