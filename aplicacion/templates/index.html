@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,8 +24,6 @@
 
 <!-- @galaxiahfast - El atributo data-theme se utiliza para controlar el tema de color a través de CSS. -->
 <body data-theme="claro">
-
-
 
     <!-- @galaxiahfast - Barra lateral principal del sistema. -->
     <aside class="contenedor-barra-herramientas-principal" role="complementary" aria-label="Panel lateral principal del sistema">
@@ -160,42 +157,48 @@
         </div>
     </aside>
 
+    <!-- @galaxiahfast - Contenedor principal con scroll para toda la aplicación. -->
+    <div class="contenedor-principal-aplicacion">
 
+        <!-- @galaxiahfast - Contenedor principal del mapa interactivo. -->
+        <main id="contenidoPrincipal">
 
-    <!-- @galaxiahfast - Contenedor principal del mapa interactivo. -->
-    <main id="contenidoPrincipal">
+            <!-- @galaxiahfast - Contenedor del plano técnico con capas superpuestas. -->
+            <div class="map-container" id="contenedorMapa">
+                
+                <!-- ✅ NUEVO: Contenedor interno para centrar la imagen -->
+                <div class="contenedor-imagen-centrada">
+                    <!-- @galaxiahfast - Imagen del plano base con srcset responsive. -->
+                    <img src="{{ url_for('static', filename='imagenes/planoMovil.webp') }}"
+                        srcset="
+                            {{ url_for('static', filename='imagenes/planoMovil.webp') }} 412w,
+                            {{ url_for('static', filename='imagenes/planoMovil2x.webp') }} 824w,
+                            {{ url_for('static', filename='imagenes/planoBajaResolucion.webp') }} 750w,
+                            {{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }} 1200w,
+                            {{ url_for('static', filename='imagenes/planoAltaResolucion.webp') }} 2294w
+                        "
+                        sizes="
+                            (max-width: 600px) 100vw,
+                            (max-width: 1200px) 800px,
+                            2294px
+                        "
+                        width="2294"
+                        height="2722"
+                        fetchpriority="high"
+                        class="plano-base"
+                        alt="Plano técnico de distribución de dispositivos"
+                    >
+                </div>
+                
+                <!-- @galaxiahfast - Capa de cuadrícula superpuesta al plano (solo visual). -->
+                <div class="grid-overlay"></div>
+                
+                <!-- @galaxiahfast - Capa dinámica donde se renderizan los dispositivos/puntos. -->
+                <div id="capaDispositivos"></div>
+            </div>
+        </main>
 
-        <!-- @galaxiahfast - Contenedor del plano técnico con capas superpuestas. -->
-        <div class="map-container" id="contenedorMapa">
-            
-            <!-- @galaxiahfast - Imagen del plano base con srcset responsive. -->
-            <img src="{{ url_for('static', filename='imagenes/planoMovil.webp') }}"
-                srcset="
-                    {{ url_for('static', filename='imagenes/planoMovil.webp') }} 412w,
-                    {{ url_for('static', filename='imagenes/planoMovil2x.webp') }} 824w,
-                    {{ url_for('static', filename='imagenes/planoBajaResolucion.webp') }} 750w,
-                    {{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }} 1200w,
-                    {{ url_for('static', filename='imagenes/planoAltaResolucion.webp') }} 2294w
-                "
-                sizes="
-                    (max-width: 600px) 100vw,
-                    (max-width: 1200px) 800px,
-                    2294px
-                "
-                width="2294"
-                height="2722"
-                fetchpriority="high"
-                class="plano-base"
-                alt="Plano técnico de distribución de dispositivos"
-            >
-            
-            <!-- @galaxiahfast - Capa de cuadrícula superpuesta al plano (solo visual). -->
-            <div class="grid-overlay"></div>
-            
-            <!-- @galaxiahfast - Capa dinámica donde se renderizan los dispositivos/puntos. -->
-            <div id="capaDispositivos"></div>
-        </div>
-    </main>
+    </div>
 
     <!-- @galaxiahfast - Scripts para control de temas, sistema de notificaciones y lógica principal. -->
     <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>

@@ -7,7 +7,7 @@
     --alto-boton-menu: 54px;
     --padding-menu-superior: 24px;
     --padding-menu-inferior: 24px;
-    --padding-menu-izquierdo: 16px;
+    --padding-menu-izquierdo: 20px;
     --padding-menu-derecho: 16px;
     --espaciado-elementos-menu: 10px;
 }
@@ -17,22 +17,29 @@
    ========================================================================== */
 .contenedor-barra-herramientas-principal {
     position: fixed;
+
     left: 0;
     top: 0;
 
-    height: 100vh;
+    height: 100dvh;
     width: var(--ancho-menu-colapsado);
 
     z-index: 9999;
 
     display: flex;
+    flex-direction: column;
 
     background: var(--fondo-ventana);
+
     backdrop-filter: blur(16px);
-    border-right: 1px solid var(--borde-ventana);
+
+    border: 1px solid var(--borde-ventana);
+
     box-shadow: var(--sombra-media);
 
-    overflow: hidden;
+    overflow: visible;
+
+    isolation: isolate;
 
     transition:
         width 0.24s cubic-bezier(0.2, 0.9, 0.4, 1),
@@ -41,15 +48,17 @@
 }
 
 /* ==========================================================================
-   CONTENEDOR INTERNO (SCROLL REAL)
+   CONTENEDOR INTERNO
    ========================================================================== */
 .contenedor-interno-barra-herramientas {
     flex: 1;
+
     min-height: 0;
 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
 
     gap: var(--espaciado-elementos-menu);
 
@@ -65,54 +74,123 @@
     overscroll-behavior: contain;
 
     scrollbar-gutter: stable;
+
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
 }
 
 /* ==========================================================================
-   SCROLLBAR (FIX REAL SIN “RAIL BLANCO”)
+   SCROLLBAR
    ========================================================================== */
-
-/* ancho fijo siempre */
-.contenedor-interno-barra-herramientas::-webkit-scrollbar {
-    width: 15px;
-    background: transparent; /* elimina canal del sistema */
+.contenedor-barra-herramientas-principal:hover
+.contenedor-interno-barra-herramientas {
+    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 }
 
-/* elimina completamente el track visible */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar {
+    width: 10px;
+}
+
 .contenedor-interno-barra-herramientas::-webkit-scrollbar-track {
     background: transparent;
-    border: none;
-    box-shadow: none;
 }
 
-/* elimina esquina fantasma (importante en Windows/Edge) */
 .contenedor-interno-barra-herramientas::-webkit-scrollbar-corner {
     background: transparent;
 }
 
-/* estado base: invisible real (no blanco del sistema) */
 .contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
     background: transparent;
-    border-radius: 10px;
+
+    border-radius: 999px;
+
+    transition:
+        background 0.2s ease,
+        opacity 0.2s ease;
 }
 
-/* visible SOLO al interactuar con el menú */
+/* @galaxiahfast - Mostrar scrollbar al hover del menú completo. */
 .contenedor-barra-herramientas-principal:hover
 .contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.35);
 }
 
-/* hover del thumb */
-.contenedor-barra-herramientas-principal:hover
+/* @galaxiahfast - Hover thumb. */
 .contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.55);
 }
 
+/* @galaxiahfast - Active thumb. */
+.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 255, 255, 0.75);
+}
+
 /* ==========================================================================
-   TIPOGRAFÍA
+   SEPARADORES
    ========================================================================== */
-.contenedor-barra-herramientas-principal,
-.contenedor-barra-herramientas-principal * {
-    font-family: Inter, system-ui, sans-serif;
+.contenedor-separador-seccion-menu-lateral {
+    width: 100%;
+
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 8px 0;
+    margin: 4px 0;
+}
+
+/* @galaxiahfast - Línea divisoria. */
+.contenedor-separador-seccion-menu-lateral::before {
+    content: '';
+
+    display: block;
+
+    width: calc(100% - 8px);
+    height: 1px;
+
+    background: var(--borde-ventana, rgba(255, 255, 255, 0.14));
+
+    border-radius: 2px;
+
+    margin-left: 4px;
+}
+
+/* @galaxiahfast - Título expandido. */
+.contenedor-titulo-separador-menu {
+    display: none;
+
+    width: 100%;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    margin-top: 4px;
+}
+
+.menu-lateral-expandido .contenedor-titulo-separador-menu {
+    display: flex;
+}
+
+.texto-separador-menu {
+    font-size: 11px;
+
+    letter-spacing: 0.08em;
+
+    opacity: 0.55;
+
+    padding-left: 12px;
+}
+
+.linea-separador-menu {
+    height: 1px;
+
+    width: calc(100% - 16px);
+
+    background: var(--borde-ventana, rgba(255, 255, 255, 0.14));
+
+    margin-left: 8px;
 }
 
 /* ==========================================================================
@@ -122,17 +200,26 @@
     width: var(--ancho-boton-menu);
     height: var(--alto-boton-menu);
 
+    min-width: var(--ancho-boton-menu);
+    min-height: var(--alto-boton-menu);
+
+    flex-shrink: 0;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
     border: none;
+
     background: transparent;
 
     border-radius: 12px;
+
     cursor: pointer;
 
-    transition: background 0.2s ease, transform 0.1s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.1s ease;
 }
 
 .boton-menu-herramienta:hover {
@@ -146,6 +233,7 @@
 .boton-menu-herramienta svg {
     width: 22px;
     height: 22px;
+
     flex-shrink: 0;
 }
 
@@ -161,9 +249,17 @@
 }
 
 .menu-lateral-expandido .boton-menu-herramienta {
-    justify-content: flex-start;
-    padding-left: 14px;
     width: 100%;
+
+    justify-content: flex-start;
+
+    padding-left: 14px;
+}
+
+.menu-lateral-expandido .contenedor-separador-seccion-menu-lateral::before {
+    width: calc(100% - 24px);
+
+    margin-left: 12px;
 }
 
 /* ==========================================================================
@@ -171,45 +267,13 @@
    ========================================================================== */
 .texto-expandido-boton-menu {
     margin-left: 12px;
+
     font-size: 14px;
     font-weight: 450;
+
     white-space: nowrap;
+
     opacity: 0.9;
-}
-
-/* ==========================================================================
-   SEPARADORES
-   ========================================================================== */
-.contenedor-separador-seccion-menu-lateral {
-    width: 100%;
-    align-self: stretch;
-    display: flex;
-    flex-direction: column;
-    padding: 6px 0;
-}
-
-.contenedor-titulo-separador-menu {
-    display: none;
-    width: 100%;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.menu-lateral-expandido .contenedor-titulo-separador-menu {
-    display: flex;
-}
-
-.texto-separador-menu {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    opacity: 0.55;
-    padding-left: 8px;
-}
-
-.linea-separador-menu {
-    height: 1px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.14);
 }
 
 /* ==========================================================================
@@ -237,5 +301,42 @@
 @media (max-width: 768px) {
     .contenedor-barra-herramientas-principal {
         width: 72px;
+    }
+
+    .boton-menu-herramienta {
+        width: 52px;
+        height: 52px;
+
+        min-width: 52px;
+        min-height: 52px;
+    }
+
+    :root {
+        --padding-menu-izquierdo: 10px;
+    }
+}
+
+/* ==========================================================================
+   VENTANAS MUY PEQUEÑAS
+   ========================================================================== */
+@media (max-height: 600px) {
+    .contenedor-interno-barra-herramientas {
+        padding-top: 12px;
+        padding-bottom: 12px;
+
+        gap: 6px;
+    }
+
+    .boton-menu-herramienta {
+        width: 48px;
+        height: 48px;
+
+        min-width: 48px;
+        min-height: 48px;
+    }
+
+    .boton-menu-herramienta svg {
+        width: 20px;
+        height: 20px;
     }
 }

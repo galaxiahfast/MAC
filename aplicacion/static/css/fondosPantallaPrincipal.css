@@ -1,96 +1,171 @@
 /* ==========================================================================
-   @galaxiahfast ESTRUCTURA PRINCIPAL Y CONTENEDORES
+   RESET Y CONFIGURACIÓN BASE - Body 100% sin scroll
    ========================================================================== */
 
+/* Asegurar que html y body ocupen toda la pantalla */
 html, body {
+    width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
-    width: 100%;
-    min-height: 100vh;
-    background-color: var(--fondo-mapa);
-    overscroll-behavior: none;
-    transition: background-color 0.4s ease;
 }
 
+/* Body sin scroll propio */
 body {
-    display: block; 
-    overflow-y: auto;
-    overflow-x: hidden;
-    line-height: normal; 
-}
-
-/* @galaxiahfast Personalización de la barra de desplazamiento global */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--fondo-scroll);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--color-scroll);
-    border-radius: 5px;
-    border: 2px solid var(--fondo-scroll);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
 }
 
 /* ==========================================================================
-   @galaxiahfast ÁREA DEL PLANO INTERACTIVO
+   CONTENEDOR PRINCIPAL CON SCROLL (SOLO VERTICAL) - SIN VIBRACIÓN
+   ========================================================================== */
+.contenedor-principal-aplicacion {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
+
+/* ==========================================================================
+   DISEÑO DEL SCROLLBAR - ESTABLE (COMO ESTABA ORIGINALMENTE)
    ========================================================================== */
 
+/* Ancho del scrollbar */
+.contenedor-principal-aplicacion::-webkit-scrollbar {
+    width: 6px;
+    background: transparent;
+}
+
+/* Track (fondo) - invisible */
+.contenedor-principal-aplicacion::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+    margin: 4px 0;
+}
+
+/* Thumb (barra) */
+.contenedor-principal-aplicacion::-webkit-scrollbar-thumb {
+    background: var(--color-scroll, #f97316);
+    border-radius: 10px;
+    transition: none;
+    min-height: 40px;
+}
+
+/* Thumb al hacer hover */
+.contenedor-principal-aplicacion::-webkit-scrollbar-thumb:hover {
+    background: var(--color-scroll-hover, #ea580c);
+}
+
+/* Thumb al hacer click activo */
+.contenedor-principal-aplicacion::-webkit-scrollbar-thumb:active {
+    background: var(--color-acento, #050714);
+}
+
+/* Esquina del scrollbar */
+.contenedor-principal-aplicacion::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* ==========================================================================
+   SOPORTE PARA FIREFOX
+   ========================================================================== */
+.contenedor-principal-aplicacion {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scroll, #f97316) transparent;
+}
+
+/* ==========================================================================
+   AJUSTE DEL CONTENIDO PRINCIPAL (main)
+   ========================================================================== */
+#contenidoPrincipal {
+    height: 100%;
+    margin-left: var(--ancho-menu-colapsado, 88px);
+    width: calc(100% - var(--ancho-menu-colapsado, 88px));
+}
+
+/* Cuando el menú está expandido */
+.menu-lateral-expandido ~ .contenedor-principal-aplicacion #contenidoPrincipal,
+body:has(.menu-lateral-expandido) #contenidoPrincipal {
+    margin-left: var(--ancho-expandido-menu-lateral, 280px);
+    width: calc(100% - var(--ancho-expandido-menu-lateral, 280px));
+}
+
+/* ==========================================================================
+   AJUSTE DEL MAPA (IMAGEN RESPONSIVE) - SCROLL NORMAL DESDE ARRIBA
+   ========================================================================== */
 .map-container {
-    position: relative;
     width: 100%;
-    aspect-ratio: 2294 / 2722;
-    max-width: 2294px;
-    margin: 0 auto;
-    background-color: var(--fondo-mapa);
-    z-index: 1;
+    min-height: 100%;
+    position: relative;
+    display: block;
 }
 
-@media (max-width: 600px) {
-    .map-container {
-        max-width: 100vw;
-    }
+/* Contenedor interno para la imagen */
+.contenedor-imagen-centrada {
+    width: 100%;
+    display: block;
 }
 
+/* La imagen del plano - se ajusta al ancho, altura automática */
 .plano-base {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    image-rendering: auto; 
-    user-select: none;
-    -webkit-user-drag: none;
-    transition: filter 0.4s ease;
-    filter: none; 
+    object-fit: contain;
 }
 
-/* @galaxiahfast Procesamiento visual del plano técnico en modo nocturno */
-[data-theme="dark"] .plano-base {
-    filter: invert(0.93) hue-rotate(180deg) brightness(0.8);
-}
-
-/* @galaxiahfast Capas superpuestas: Cuadrícula y contenedor de nodos */
-.grid-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    pointer-events: none;
-    z-index: 2;
-}
-
+/* Capa de dispositivos superpuesta */
 #capaDispositivos {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 3;
-    pointer-events: auto;
+    pointer-events: none;
+}
+
+/* Cuadrícula overlay */
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   OPCIONAL: SCROLL SUTIL CON BRILLO (SOLO MODO OSCURO)
+   ========================================================================== */
+@keyframes scrollGlow {
+    0% {
+        box-shadow: 0 0 0px rgba(249, 115, 22, 0);
+    }
+    100% {
+        box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);
+    }
+}
+
+/* Efecto opcional al hacer scroll (solo modo oscuro) */
+body[data-theme="dark"] .contenedor-principal-aplicacion:active::-webkit-scrollbar-thumb {
+    animation: scrollGlow 0.3s ease-out;
+}
+
+/* ==========================================================================
+   RESPONSIVE: Ajustes para móviles
+   ========================================================================== */
+@media (max-width: 768px) {
+    .contenedor-principal-aplicacion::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .contenedor-principal-aplicacion {
+        scrollbar-width: thin;
+    }
 }
