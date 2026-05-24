@@ -1,35 +1,18 @@
 /* ==========================================================================
-   VARIABLES (Control Manual Absoluto)
+   VARIABLES
    ========================================================================== */
 :root {
     --pad-top: 25px;
     --pad-bottom: 25px;
-    
-    /* Colchón de la caja verde: 12.5px por lado = 25px de espacio total horizontal */
     --pad-lateral-inicial: 12.5px; 
-
-    /* Micro-colchón interno del botón: Genera el cuadrado 1:1 perfecto con el SVG */
     --pad-interno-boton: 12.5px;
-
-    /* Separación exacta entre el bloque del SVG y el inicio del texto al expandirse */
     --gap-interno-boton: 12.5px;
-
-    /* Espaciado automático entre elementos dentro de la caja verde */
     --gap-menu: 25px;
     --color-separador: rgb(11, 27, 61);
-
-    /* ==========================================================================
-       VARIABLES DE CONTROL PARA LOS TÍTULOS DE SECCIÓN (MENÚ EXPANDIDO)
-       Modifica estos valores para controlar los espacios y tamaño del título flotante.
-       ========================================================================== */
-    --seccion-titulo-size: 16px;          /* ¡Aumentado! Tamaño de fuente de los títulos */
-    --seccion-titulo-espacio-arriba: 25px; /* Distancia entre la línea rosa y el título */
-    --seccion-titulo-espacio-abajo: 25px;  /* Distancia entre el título y el botón inferior */
-
-    /* ==========================================================================
-       VARIABLE PARA EL BOTÓN CUANDO ESTÁ SELECCIONADO (MARCADO)
-       ========================================================================== */
-    --color-boton-seleccionado: #cbd5e1;   /* Color gris destacado para el estado marcado */
+    --seccion-titulo-size: 16px; 
+    --seccion-titulo-espacio-arriba: 25px; 
+    --seccion-titulo-espacio-abajo: 25px;  
+    --color-boton-seleccionado: #cbd5e1;
 }
 
 /* ==========================================================================
@@ -40,24 +23,21 @@
     left: 0;
     top: 0;
     height: 100dvh;
-    width: auto; /* Se adapta orgánicamente a sus hijos */
-
+    width: auto;
     display: flex;
     flex-direction: column;
-
     background: var(--fondo-ventana);
+    /* Borde derecho recuperado */
     border-right: 1px solid var(--borde-ventana);
-
-    z-index: 9999; /* Por encima del overlay gris */
+    z-index: 9999;
     overflow-x: visible; 
     overflow-y: hidden;
-
     color-scheme: light;
     transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
 /* ==========================================================================
-   SCROLL CONTAINER
+   SCROLL Y CONTENIDO
    ========================================================================== */
 .barra-herramientas-scroll {
     flex: 1;
@@ -75,13 +55,10 @@
 .contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll { scrollbar-color: rgba(0, 0, 0, 0.08) transparent; }
 .contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.08); }
 
-/* ==========================================================================
-   CONTENIDO INTERNO (CAJA VERDE)
-   ========================================================================== */
 .contenedor-interno-barra-herramientas {
     display: flex;
     flex-direction: column;
-    align-items: stretch; /* El botón más largo arrastra el ancho de los demás */
+    align-items: stretch;
     gap: var(--gap-menu);
     padding: var(--pad-top) var(--pad-lateral-inicial) var(--pad-bottom) var(--pad-lateral-inicial);
     width: auto; 
@@ -89,21 +66,16 @@
 }
 
 /* ==========================================================================
-   BOTONES (ROJO)
+   BOTONES
    ========================================================================== */
 .boton-menu-herramienta {
     width: auto;
     height: auto;
-    
-    /* Control absoluto: Reservamos un espacio rígido de 25px para mitigar el aire del SVG */
     display: inline-grid;
     grid-template-columns: 25px auto; 
     align-items: center;
     flex-shrink: 0;
-
-    /* Colchón matemático perfecto y simétrico en las 4 direcciones */
     padding: var(--pad-interno-boton);
-
     border: none;
     background: #f4f4f6; 
     border-radius: 12px;
@@ -113,28 +85,19 @@
 }
 .boton-menu-herramienta:hover { background: #e4e4e9; }
 .boton-menu-herramienta:active { transform: scale(0.96); }
+.boton-menu-herramienta.activo { background-color: var(--color-boton-seleccionado); }
+.boton-menu-herramienta.activo:hover { filter: brightness(0.95); }
 
-/* ESTADO MARCADO / SELECCIONADO DEL BOTÓN 
-   Cuando tu JS le agregue la clase 'activo' al botón, se quedará con este color permanente */
-.boton-menu-herramienta.activo {
-    background-color: var(--color-boton-seleccionado);
-}
-/* Mantiene un comportamiento visual limpio si pasas el mouse por encima del botón seleccionado */
-.boton-menu-herramienta.activo:hover {
-    filter: brightness(0.95);
-}
-
-/* El SVG se acopla al centro de su columna de 25px */
 .boton-menu-herramienta svg {
     width: 25px;
     height: 25px;
     flex-shrink: 0;
     display: block;
-    justify-self: center; /* Absorbe el aire visual y centra el dibujo perfectamente */
+    justify-self: center;
 }
 
 /* ==========================================================================
-   TEXTO GENERADO (HIJO INTERNO DEL BOTÓN)
+   TEXTO Y SEPARADORES
    ========================================================================== */
 .texto-ayuda-boton {
     display: none;
@@ -144,125 +107,62 @@
     white-space: nowrap;
     font-weight: 500;
     opacity: 0;
-    
-    /* Distancia exacta respecto a la caja invisible de 25px del SVG */
     margin-left: var(--gap-interno-boton); 
     pointer-events: none;
 }
 
-/* ==========================================================================
-   SEPARADORES (ROSA)
-   ========================================================================== */
 .contenedor-separador-seccion-menu-lateral {
     width: 50px;
     height: 1px;
     background: var(--color-separador);
     flex-shrink: 0;
-    position: relative; /* Clave para posicionar el título inyectado */
+    position: relative;
     margin-bottom: 0px;
     transition: margin-bottom 0.25s ease, width 0.3s ease;
 }
 
 /* ==========================================================================
-   TITULOS DE SECCIÓN DINÁMICOS (SÓLO EN MODO EXPANDIDO)
+   TITULOS Y MODO EXPANDIDO
    ========================================================================== */
 .contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral {
     width: 100%; 
-    
-    /* Calcula dinámicamente el margen inferior usando la variable de tamaño de fuente */
     margin-bottom: calc(var(--seccion-titulo-espacio-arriba) + var(--seccion-titulo-size) + var(--seccion-titulo-espacio-abajo) - var(--gap-menu)); 
 }
 
-/* Inyección de texto según la sección correspondiente */
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="gestion-dispositivos"]::after {
-    content: "Gestión de Dispositivos";
-}
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="preferencias-visuales"]::after {
-    content: "Preferencias Visuales";
-}
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="configuracion-general"]::after {
-    content: "Sistema";
-}
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="perfil-usuario"]::after {
-    content: "Cuenta";
-}
-
-/* Estilos comunes para los textos de los títulos */
 .contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral::after {
     display: block;
     position: absolute;
     left: 0;
-    
-    /* Toma de forma rígida y limpia el valor de la variable del root */
     top: var(--seccion-titulo-espacio-arriba); 
-    
     color: #000000; 
-    font-size: var(--seccion-titulo-size); /* Control dinámico de tamaño */
+    font-size: var(--seccion-titulo-size);
     font-family: 'Inter', sans-serif; 
-    font-weight: 500; 
+    font-weight: 500;
     white-space: nowrap;
-    
     animation: aparecerTexto 0.25s ease-out 0.05s forwards;
-
-    /* DEBUG ASIGNADO AL TITULO FLOTANTE */
-    outline: 2px dashed #0022ff !important;
 }
 
-/* ==========================================================================
-   ESTADO EXPANDIDO GENERAL
-   ========================================================================== */
-.contenedor-barra-herramientas-principal[data-expandido="true"] {
-    width: auto; 
-}
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas {
-    align-items: stretch; 
-    padding-left: var(--pad-lateral-inicial);
-    padding-right: var(--pad-lateral-inicial); 
-}
+/* Contenido de títulos */
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="gestion-dispositivos"]::after { content: "Gestión de Dispositivos"; }
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="preferencias-visuales"]::after { content: "Preferencias Visuales"; }
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="configuracion-general"]::after { content: "Sistema"; }
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="perfil-usuario"]::after { content: "Cuenta"; }
+
 .contenedor-barra-herramientas-principal[data-expandido="true"] .texto-ayuda-boton {
     display: inline-block;
     animation: aparecerTexto 0.25s ease-out 0.05s forwards;
 }
 
 /* ==========================================================================
-   ANIMACIONES, OVERLAY Y GLOBAL
+   ANIMACIONES Y OVERLAY
    ========================================================================== */
 * { box-sizing: border-box; }
+@keyframes aparecerTexto { 0% { opacity: 0; transform: translateX(-8px); } 100% { opacity: 1; transform: translateX(0); } }
+@keyframes desaparecerTexto { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-8px); } }
 
-@keyframes aparecerTexto {
-    0% { opacity: 0; transform: translateX(-8px); }
-    100% { opacity: 1; transform: translateX(0); }
-}
-@keyframes desaparecerTexto {
-    0% { opacity: 1; transform: translateX(0); }
-    100% { opacity: 0; transform: translateX(-8px); }
-}
-
-/* Capa de fondo que resalta el menú y opaca el resto de la aplicación */
 .overlay-cierre-menu {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    right: 0; 
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4); /* Gris oscuro transparente elegante */
-    z-index: 9998; /* Justo debajo del menú lateral principal */
-    display: none;
-    opacity: 0;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4); z-index: 9998; display: none; opacity: 0;
     transition: opacity 0.3s ease;
 }
-.overlay-cierre-menu.activo { 
-    display: block; 
-    opacity: 1;
-}
-
-/* ==========================================================================
-   DEBUG ACTIVO
-   ========================================================================== */
-.contenedor-barra-herramientas-principal { outline: 2px solid rgba(85, 85, 85, 0.8) !important; }
-.barra-herramientas-scroll { outline: 1px solid rgba(0, 119, 255, 0.8) !important; }
-.contenedor-interno-barra-herramientas { outline: 3px solid rgba(0, 212, 106, 0.8) !important; outline-offset: -3px; }
-.boton-menu-herramienta { outline: 1px solid rgba(255, 0, 0, 0.8) !important; }
-.boton-menu-herramienta svg { outline: 1px solid rgba(0, 242, 254, 1) !important; }
-.texto-ayuda-boton { outline: 1px dotted rgba(255, 136, 0, 0.9) !important; }
-.contenedor-separador-seccion-menu-lateral { outline: 1px solid rgba(255, 0, 191, 0.7) !important; }
+.overlay-cierre-menu.activo { display: block; opacity: 1; }
