@@ -171,3 +171,145 @@
 * {
     box-sizing: border-box;
 }
+
+
+
+
+
+/* =========================
+   ESTILOS PARA MENÚ CON TEXTO LATERAL
+   ========================= */
+
+/* Contenedor principal del menú */
+.contenedor-barra-herramientas-principal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100dvh;
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    background: var(--fondo-ventana);
+    border-right: 1px solid var(--borde-ventana);
+    z-index: 9999;
+    overflow-x: visible; /* Cambiado para que no corte el texto */
+    overflow-y: auto;
+    transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+/* Scroll personalizado */
+.barra-herramientas-scroll {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: visible; /* Cambiado */
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+/* Contenedor interno */
+.contenedor-interno-barra-herramientas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap-menu);
+    padding: var(--pad-top) 0 var(--pad-bottom) 0;
+    width: 100%;
+    position: relative;
+}
+
+/* Botones - SIEMPRE centrados */
+.contenedor-interno-barra-herramientas .boton-menu-herramienta {
+    width: var(--ancho-boton);
+    height: var(--alto-boton);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: static; /* Cambiado de relative a static */
+}
+
+/* ========== ESTADO EXPANDIDO ========== */
+.contenedor-barra-herramientas-principal[data-expandido="true"] {
+    width: auto; /* Ancho automático */
+    min-width: 320px; /* Ancho mínimo */
+    max-width: 400px; /* Ancho máximo */
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas {
+    align-items: flex-start;
+    padding-left: 20px;
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas .boton-menu-herramienta {
+    justify-content: flex-start;
+    width: auto;
+    min-width: var(--ancho-boton);
+    gap: 15px; /* Espacio entre icono y texto */
+    padding-right: 20px; /* Padding derecho */
+}
+
+/* El texto ahora está en el flujo normal, no absoluto */
+.texto-ayuda-boton {
+    display: none;
+    color: #000000;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    font-weight: 500;
+    opacity: 0;
+}
+
+/* Mostrar texto cuando el menú está expandido */
+.contenedor-barra-herramientas-principal[data-expandido="true"] .texto-ayuda-boton {
+    display: inline-block;
+    animation: aparecerTexto 0.2s ease-out 0.1s forwards;
+}
+
+/* Animación de aparición del texto */
+@keyframes aparecerTexto {
+    0% {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Animación de desaparición */
+@keyframes desaparecerTexto {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+}
+
+/* Overlay para cerrar al hacer clic fuera */
+.overlay-cierre-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 9998;
+    display: none;
+}
+
+.overlay-cierre-menu.activo {
+    display: block;
+}
+
+/* Separadores en modo expandido */
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral {
+    width: calc(100% - 40px);
+    margin-left: 20px;
+}
