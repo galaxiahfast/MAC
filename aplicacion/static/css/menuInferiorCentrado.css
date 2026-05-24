@@ -1,342 +1,173 @@
-/* ==========================================================================
+/* =========================
    VARIABLES
-   ========================================================================== */
+   ========================= */
 :root {
-    --ancho-menu-colapsado: 88px;
-    --ancho-boton-menu: 54px;
-    --alto-boton-menu: 54px;
-    --padding-menu-superior: 24px;
-    --padding-menu-inferior: 24px;
-    --padding-menu-izquierdo: 20px;
-    --padding-menu-derecho: 16px;
-    --espaciado-elementos-menu: 10px;
+    --ancho-menu: 100px;
+    --ancho-boton: 50px;
+    --alto-boton: 50px;
+
+    --pad-top: 25px;
+    --pad-bottom: 25px;
+
+    --gap-menu: 25px;
+    --color-separador: rgb(11, 27, 61);
 }
 
-/* ==========================================================================
-   MENÚ LATERAL
-   ========================================================================== */
+/* =========================
+   CONTENEDOR PRINCIPAL
+   ========================= */
 .contenedor-barra-herramientas-principal {
     position: fixed;
-
     left: 0;
     top: 0;
-
     height: 100dvh;
-    width: var(--ancho-menu-colapsado);
-
-    z-index: 9999;
+    width: var(--ancho-menu);
 
     display: flex;
     flex-direction: column;
 
     background: var(--fondo-ventana);
+    border-right: 1px solid var(--borde-ventana);
 
-    backdrop-filter: blur(16px);
+    z-index: 9999;
 
-    border: 1px solid var(--borde-ventana);
+    overflow: hidden;
 
-    box-shadow: var(--sombra-media);
-
-    overflow: visible;
-
-    isolation: isolate;
-
-    transition:
-        width 0.24s cubic-bezier(0.2, 0.9, 0.4, 1),
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    /* CLAVE: evita overrides de tema del sistema en scrollbar */
+    color-scheme: light;
 }
 
-/* ==========================================================================
-   CONTENEDOR INTERNO
-   ========================================================================== */
-.contenedor-interno-barra-herramientas {
+/* =========================
+   SCROLL CONTAINER
+   ========================= */
+.barra-herramientas-scroll {
     flex: 1;
-
     min-height: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-
-    gap: var(--espaciado-elementos-menu);
-
-    padding:
-        var(--padding-menu-superior)
-        var(--padding-menu-derecho)
-        var(--padding-menu-inferior)
-        var(--padding-menu-izquierdo);
+    width: 100%;
 
     overflow-y: auto;
     overflow-x: hidden;
 
-    overscroll-behavior: contain;
-
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
 
     scrollbar-width: thin;
+
+    /* Firefox */
     scrollbar-color: transparent transparent;
 }
 
-/* ==========================================================================
-   SCROLLBAR
-   ========================================================================== */
+/* =========================
+   WEBKIT SCROLLBAR BASE
+   ========================= */
+.barra-herramientas-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.barra-herramientas-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* =========================
+   THUMB (BASE INVISIBLE)
+   ========================= */
+.barra-herramientas-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 10px;
+}
+
+/* =========================
+   ESTADO VISIBLE (MENÚ ACTIVO)
+   ========================= */
 .contenedor-barra-herramientas-principal:hover
+.barra-herramientas-scroll {
+    scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+
+.contenedor-barra-herramientas-principal:hover
+.barra-herramientas-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   FIX CRÍTICO: BLOQUEAR ESTADOS NATIVOS
+   ========================= */
+.contenedor-barra-herramientas-principal:hover
+.barra-herramientas-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.contenedor-barra-herramientas-principal:hover
+.barra-herramientas-scroll::-webkit-scrollbar-thumb:active {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   CONTENIDO INTERNO
+   ========================= */
 .contenedor-interno-barra-herramientas {
-    scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
-}
-
-.contenedor-interno-barra-herramientas::-webkit-scrollbar {
-    width: 10px;
-}
-
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-corner {
-    background: transparent;
-}
-
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
-    background: transparent;
-
-    border-radius: 999px;
-
-    transition:
-        background 0.2s ease,
-        opacity 0.2s ease;
-}
-
-/* @galaxiahfast - Mostrar scrollbar al hover del menú completo. */
-.contenedor-barra-herramientas-principal:hover
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.35);
-}
-
-/* @galaxiahfast - Hover thumb. */
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.55);
-}
-
-/* @galaxiahfast - Active thumb. */
-.contenedor-interno-barra-herramientas::-webkit-scrollbar-thumb:active {
-    background: rgba(255, 255, 255, 0.75);
-}
-
-/* ==========================================================================
-   SEPARADORES
-   ========================================================================== */
-.contenedor-separador-seccion-menu-lateral {
-    width: 100%;
-
-    align-self: stretch;
-
     display: flex;
     flex-direction: column;
+    align-items: center;
 
-    padding: 8px 0;
-    margin: 4px 0;
-}
+    gap: var(--gap-menu);
 
-/* @galaxiahfast - Línea divisoria. */
-.contenedor-separador-seccion-menu-lateral::before {
-    content: '';
-
-    display: block;
-
-    width: calc(100% - 8px);
-    height: 1px;
-
-    background: var(--borde-ventana, rgba(255, 255, 255, 0.14));
-
-    border-radius: 2px;
-
-    margin-left: 4px;
-}
-
-/* @galaxiahfast - Título expandido. */
-.contenedor-titulo-separador-menu {
-    display: none;
+    padding: var(--pad-top) 0 var(--pad-bottom) 0;
 
     width: 100%;
-
-    flex-direction: column;
-
-    gap: 6px;
-
-    margin-top: 4px;
 }
 
-.menu-lateral-expandido .contenedor-titulo-separador-menu {
-    display: flex;
-}
-
-.texto-separador-menu {
-    font-size: 11px;
-
-    letter-spacing: 0.08em;
-
-    opacity: 0.55;
-
-    padding-left: 12px;
-}
-
-.linea-separador-menu {
-    height: 1px;
-
-    width: calc(100% - 16px);
-
-    background: var(--borde-ventana, rgba(255, 255, 255, 0.14));
-
-    margin-left: 8px;
-}
-
-/* ==========================================================================
+/* =========================
    BOTONES
-   ========================================================================== */
+   ========================= */
 .boton-menu-herramienta {
-    width: var(--ancho-boton-menu);
-    height: var(--alto-boton-menu);
-
-    min-width: var(--ancho-boton-menu);
-    min-height: var(--alto-boton-menu);
-
-    flex-shrink: 0;
+    width: var(--ancho-boton);
+    height: var(--alto-boton);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
+    flex-shrink: 0;
+
     border: none;
-
     background: transparent;
-
     border-radius: 12px;
 
     cursor: pointer;
 
-    transition:
-        background 0.2s ease,
-        transform 0.1s ease;
+    transform: translateZ(0);
 }
 
+.boton-menu-herramienta svg {
+    width: 22px;
+    height: 22px;
+}
+
+/* =========================
+   SEPARADORES
+   ========================= */
+.contenedor-separador-seccion-menu-lateral {
+    width: var(--ancho-boton);
+    height: 1px;
+
+    background: var(--color-separador);
+    flex-shrink: 0;
+}
+
+/* =========================
+   INTERACCIÓN
+   ========================= */
 .boton-menu-herramienta:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgb(11, 27, 61, 0.5);
 }
 
 .boton-menu-herramienta:active {
     transform: scale(0.96);
 }
 
-.boton-menu-herramienta svg {
-    width: 22px;
-    height: 22px;
-
-    flex-shrink: 0;
-}
-
-/* ==========================================================================
-   EXPANSIÓN MENÚ
-   ========================================================================== */
-.contenedor-barra-herramientas-principal.menu-lateral-expandido {
-    width: var(--ancho-expandido-menu-lateral, 280px);
-}
-
-.menu-lateral-expandido .contenedor-interno-barra-herramientas {
-    align-items: stretch;
-}
-
-.menu-lateral-expandido .boton-menu-herramienta {
-    width: 100%;
-
-    justify-content: flex-start;
-
-    padding-left: 14px;
-}
-
-.menu-lateral-expandido .contenedor-separador-seccion-menu-lateral::before {
-    width: calc(100% - 24px);
-
-    margin-left: 12px;
-}
-
-/* ==========================================================================
-   TEXTO DINÁMICO
-   ========================================================================== */
-.texto-expandido-boton-menu {
-    margin-left: 12px;
-
-    font-size: 14px;
-    font-weight: 450;
-
-    white-space: nowrap;
-
-    opacity: 0.9;
-}
-
-/* ==========================================================================
-   ESTADOS
-   ========================================================================== */
-.estado-menu-eliminacion-activo {
-    background: rgba(255, 80, 80, 0.15);
-}
-
-.estado-menu-edicion-activo {
-    background: rgba(80, 120, 255, 0.15);
-}
-
-.estado-menu-movimiento-activo {
-    background: rgba(255, 180, 80, 0.15);
-}
-
-.estado-menu-visibilidad-activo {
-    background: rgba(120, 255, 120, 0.15);
-}
-
-/* ==========================================================================
-   RESPONSIVE
-   ========================================================================== */
-@media (max-width: 768px) {
-    .contenedor-barra-herramientas-principal {
-        width: 72px;
-    }
-
-    .boton-menu-herramienta {
-        width: 52px;
-        height: 52px;
-
-        min-width: 52px;
-        min-height: 52px;
-    }
-
-    :root {
-        --padding-menu-izquierdo: 10px;
-    }
-}
-
-/* ==========================================================================
-   VENTANAS MUY PEQUEÑAS
-   ========================================================================== */
-@media (max-height: 600px) {
-    .contenedor-interno-barra-herramientas {
-        padding-top: 12px;
-        padding-bottom: 12px;
-
-        gap: 6px;
-    }
-
-    .boton-menu-herramienta {
-        width: 48px;
-        height: 48px;
-
-        min-width: 48px;
-        min-height: 48px;
-    }
-
-    .boton-menu-herramienta svg {
-        width: 20px;
-        height: 20px;
-    }
+/* =========================
+   GLOBAL
+   ========================= */
+* {
+    box-sizing: border-box;
 }
