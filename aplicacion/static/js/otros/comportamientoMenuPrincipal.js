@@ -44,11 +44,15 @@
             
             const texto = textosBotones[boton.id];
             if (texto) {
+                // Buscamos si ya existe el span INSIDE del botón
                 let textoSpan = boton.querySelector('.texto-ayuda-boton');
+                
                 if (!textoSpan) {
                     textoSpan = document.createElement('span');
                     textoSpan.className = 'texto-ayuda-boton';
                     textoSpan.textContent = texto;
+                    
+                    // CAMBIO CLAVE: Se mete ADENTRO del botón, al final (después del SVG)
                     boton.appendChild(textoSpan);
                 }
             }
@@ -64,7 +68,7 @@
         
         menuExpandido = true;
         
-        // Agregar los textos
+        // Agregar los textos afuera de los botones
         agregarTextosBotones();
         
         // Expandir el menú

@@ -1,27 +1,34 @@
-/* =========================
-   VARIABLES
-   ========================= */
+/* ==========================================================================
+   VARIABLES (Control Manual Absoluto)
+   ========================================================================== */
 :root {
-    --ancho-menu: 100px;
-    --ancho-boton: 50px;
-    --alto-boton: 50px;
-
     --pad-top: 25px;
     --pad-bottom: 25px;
+    
+    /* Colchón de la caja verde: 12.5px por lado = 25px de espacio total horizontal */
+    --pad-lateral-inicial: 12.5px; 
+
+    /* Micro-colchón interno del botón */
+    --pad-interno-boton: 12.5px;
+
+    /* Separación exacta entre el SVG y el texto al expandirse */
+    --gap-interno-boton: 12.5px;
 
     --gap-menu: 25px;
     --color-separador: rgb(11, 27, 61);
 }
 
-/* =========================
+/* ==========================================================================
    CONTENEDOR PRINCIPAL
-   ========================= */
+   ========================================================================== */
 .contenedor-barra-herramientas-principal {
     position: fixed;
     left: 0;
     top: 0;
     height: 100dvh;
-    width: var(--ancho-menu);
+    
+    /* SIEMPRE AUTO: Se adapta al tamaño de la caja verde tanto cerrado como abierto */
+    width: auto; 
 
     display: flex;
     flex-direction: column;
@@ -30,228 +37,97 @@
     border-right: 1px solid var(--borde-ventana);
 
     z-index: 9999;
+    overflow-x: visible; 
+    overflow-y: hidden;
 
-    overflow: hidden;
-
-    /* CLAVE: evita overrides de tema del sistema en scrollbar */
     color-scheme: light;
-}
-
-/* =========================
-   SCROLL CONTAINER
-   ========================= */
-.barra-herramientas-scroll {
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    scrollbar-gutter: stable both-edges;
-
-    scrollbar-width: thin;
-
-    /* Firefox */
-    scrollbar-color: transparent transparent;
-}
-
-/* =========================
-   WEBKIT SCROLLBAR BASE
-   ========================= */
-.barra-herramientas-scroll::-webkit-scrollbar {
-    width: 8px;
-}
-
-.barra-herramientas-scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-/* =========================
-   THUMB (BASE INVISIBLE)
-   ========================= */
-.barra-herramientas-scroll::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 10px;
-}
-
-/* =========================
-   ESTADO VISIBLE (MENÚ ACTIVO)
-   ========================= */
-.contenedor-barra-herramientas-principal:hover
-.barra-herramientas-scroll {
-    scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
-}
-
-.contenedor-barra-herramientas-principal:hover
-.barra-herramientas-scroll::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-/* =========================
-   FIX CRÍTICO: BLOQUEAR ESTADOS NATIVOS
-   ========================= */
-.contenedor-barra-herramientas-principal:hover
-.barra-herramientas-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-.contenedor-barra-herramientas-principal:hover
-.barra-herramientas-scroll::-webkit-scrollbar-thumb:active {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-/* =========================
-   CONTENIDO INTERNO
-   ========================= */
-.contenedor-interno-barra-herramientas {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    gap: var(--gap-menu);
-
-    padding: var(--pad-top) 0 var(--pad-bottom) 0;
-
-    width: 100%;
-}
-
-/* =========================
-   BOTONES
-   ========================= */
-.boton-menu-herramienta {
-    width: var(--ancho-boton);
-    height: var(--alto-boton);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-shrink: 0;
-
-    border: none;
-    background: transparent;
-    border-radius: 12px;
-
-    cursor: pointer;
-
-    transform: translateZ(0);
-}
-
-.boton-menu-herramienta svg {
-    width: 22px;
-    height: 22px;
-}
-
-/* =========================
-   SEPARADORES
-   ========================= */
-.contenedor-separador-seccion-menu-lateral {
-    width: var(--ancho-boton);
-    height: 1px;
-
-    background: var(--color-separador);
-    flex-shrink: 0;
-}
-
-/* =========================
-   INTERACCIÓN
-   ========================= */
-.boton-menu-herramienta:hover {
-    background: rgb(11, 27, 61, 0.5);
-}
-
-.boton-menu-herramienta:active {
-    transform: scale(0.96);
-}
-
-/* =========================
-   GLOBAL
-   ========================= */
-* {
-    box-sizing: border-box;
-}
-
-
-
-
-
-/* =========================
-   ESTILOS PARA MENÚ CON TEXTO LATERAL
-   ========================= */
-
-/* Contenedor principal del menú */
-.contenedor-barra-herramientas-principal {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100dvh;
-    width: 100px;
-    display: flex;
-    flex-direction: column;
-    background: var(--fondo-ventana);
-    border-right: 1px solid var(--borde-ventana);
-    z-index: 9999;
-    overflow-x: visible; /* Cambiado para que no corte el texto */
-    overflow-y: auto;
     transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
-/* Scroll personalizado */
+/* ==========================================================================
+   SCROLL CONTAINER
+   ========================================================================== */
 .barra-herramientas-scroll {
     flex: 1;
     min-height: 0;
     width: 100%;
+
     overflow-y: auto;
-    overflow-x: visible; /* Cambiado */
+    overflow-x: visible;
+
     scrollbar-gutter: stable both-edges;
     scrollbar-width: thin;
     scrollbar-color: transparent transparent;
 }
 
-/* Contenedor interno */
+/* Webkit Scrollbar Base */
+.barra-herramientas-scroll::-webkit-scrollbar { width: 8px; }
+.barra-herramientas-scroll::-webkit-scrollbar-track { background: transparent; }
+.barra-herramientas-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 10px; }
+
+/* Scrollbar interactivo */
+.contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll {
+    scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
+}
+.contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   CONTENIDO INTERNO (CAJA VERDE)
+   ========================================================================== */
 .contenedor-interno-barra-herramientas {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    
+    /* REGLA DE ORO: Todo se homogeniza al hermano más ancho */
+    align-items: stretch; 
     gap: var(--gap-menu);
-    padding: var(--pad-top) 0 var(--pad-bottom) 0;
-    width: 100%;
+    
+    padding: var(--pad-top) var(--pad-lateral-inicial) var(--pad-bottom) var(--pad-lateral-inicial);
+    
+    width: auto; 
     position: relative;
 }
 
-/* Botones - SIEMPRE centrados */
-.contenedor-interno-barra-herramientas .boton-menu-herramienta {
-    width: var(--ancho-boton);
-    height: var(--alto-boton);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: static; /* Cambiado de relative a static */
-}
-
-/* ========== ESTADO EXPANDIDO ========== */
-.contenedor-barra-herramientas-principal[data-expandido="true"] {
-    width: auto; /* Ancho automático */
-    min-width: 320px; /* Ancho mínimo */
-    max-width: 400px; /* Ancho máximo */
-}
-
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas {
-    align-items: flex-start;
-    padding-left: 20px;
-}
-
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas .boton-menu-herramienta {
-    justify-content: flex-start;
+/* ==========================================================================
+   BOTONES (ROJO)
+   ========================================================================== */
+.boton-menu-herramienta {
+    /* El tamaño inicial nace de sus paddings + SVG de forma orgánica */
     width: auto;
-    min-width: var(--ancho-boton);
-    gap: 15px; /* Espacio entre icono y texto */
-    padding-right: 20px; /* Padding derecho */
+    height: auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start; 
+    flex-shrink: 0;
+
+    padding: var(--pad-interno-boton);
+
+    border: none;
+    background: #f4f4f6; 
+    border-radius: 12px;
+    cursor: pointer;
+    transform: translateZ(0);
+    
+    transition: background-color 0.2s ease, transform 0.1s ease; 
 }
 
-/* El texto ahora está en el flujo normal, no absoluto */
+/* El SVG de 25px */
+.boton-menu-herramienta svg {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    display: block;
+}
+
+.boton-menu-herramienta:hover { background: #e4e4e9; }
+.boton-menu-herramienta:active { transform: scale(0.96); }
+
+/* ==========================================================================
+   TEXTO GENERADO (HIJO INTERNO DEL BOTÓN)
+   ========================================================================== */
 .texto-ayuda-boton {
     display: none;
     color: #000000;
@@ -260,56 +136,86 @@
     white-space: nowrap;
     font-weight: 500;
     opacity: 0;
+    
+    /* Distancia exacta controlada por tu variable manual */
+    margin-left: var(--gap-interno-boton); 
+    pointer-events: none;
 }
 
-/* Mostrar texto cuando el menú está expandido */
+/* ==========================================================================
+   SEPARADORES (ROSA)
+   ========================================================================== */
+.contenedor-separador-seccion-menu-lateral {
+    /* En modo colapsado mide 50px, al expandirse el stretch lo estira automáticamente */
+    width: 50px;
+    height: 1px;
+    background: var(--color-separador);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   GLOBAL
+   ========================================================================== */
+* { box-sizing: border-box; }
+
+/* ==========================================================================
+   ========== ESTADO EXPANDIDO (100% AUTOMÁTICO Y ADAPTATIVO) ==========
+   ========================================================================== */
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] {
+    width: auto; 
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-interno-barra-herramientas {
+    align-items: stretch; 
+    padding-left: var(--pad-lateral-inicial);
+    padding-right: var(--pad-lateral-inicial); 
+}
+
+/* El texto pasa al flujo visual y ejecuta su animación de entrada */
 .contenedor-barra-herramientas-principal[data-expandido="true"] .texto-ayuda-boton {
     display: inline-block;
-    animation: aparecerTexto 0.2s ease-out 0.1s forwards;
+    animation: aparecerTexto 0.25s ease-out 0.05s forwards;
 }
 
-/* Animación de aparición del texto */
+/* ==========================================================================
+   ANIMACIONES
+   ========================================================================== */
 @keyframes aparecerTexto {
-    0% {
-        opacity: 0;
-        transform: translateX(-5px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    0% { opacity: 0; transform: translateX(-8px); }
+    100% { opacity: 1; transform: translateX(0); }
 }
 
-/* Animación de desaparición */
 @keyframes desaparecerTexto {
-    0% {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-5px);
-    }
+    0% { opacity: 1; transform: translateX(0); }
+    100% { opacity: 0; transform: translateX(-8px); }
 }
 
-/* Overlay para cerrar al hacer clic fuera */
+/* Overlay para cierre externo */
 .overlay-cierre-menu {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: transparent;
     z-index: 9998;
     display: none;
 }
+.overlay-cierre-menu.activo { display: block; }
 
-.overlay-cierre-menu.activo {
-    display: block;
-}
 
-/* Separadores en modo expandido */
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral {
-    width: calc(100% - 40px);
-    margin-left: 20px;
+/* ==========================================================================
+   DEBUG ACTIVO
+   ========================================================================== */
+.contenedor-barra-herramientas-principal { outline: 2px solid rgba(85, 85, 85, 0.8) !important; }
+.barra-herramientas-scroll { outline: 1px solid rgba(0, 119, 255, 0.8) !important; }
+
+.contenedor-interno-barra-herramientas {
+    outline: 3px solid rgba(0, 212, 106, 0.8) !important;
+    outline-offset: -3px;
 }
+.boton-menu-herramienta { outline: 1px solid rgba(255, 0, 0, 0.8) !important; }
+
+/* NUEVA LÍNEA DEBUG: Contorno azul cian sólido de 1px exclusivo para los SVGs */
+.boton-menu-herramienta svg { outline: 1px solid rgba(0, 242, 254, 1) !important; }
+
+.texto-ayuda-boton { outline: 1px dotted rgba(255, 136, 0, 0.9) !important; }
+.contenedor-separador-seccion-menu-lateral { outline: 1px solid rgba(255, 0, 191, 0.7) !important; }
