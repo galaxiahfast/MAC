@@ -1,4 +1,4 @@
-// Sistema para mostrar textos al lado de los botones del menú lateral
+// Sistema para mostrar textos al lado de los botones del menú lateral, manejo de selección exclusiva y autocierre
 (function() {
     'use strict';
     
@@ -8,18 +8,18 @@
     let contenedorMenu = null;
     
     const textosBotones = {
-        'botonRegistrarNuevoDispositivoPlano': 'Agregar dispositivo',
-        'botonActivarModoEliminacionDispositivos': 'Eliminar dispositivo',
-        'botonActivarModoEdicionDispositivos': 'Editar dispositivo',
-        'botonActivarModoReubicacionDispositivos': 'Mover dispositivo',
-        'botonAlternarVisibilidadDispositivosRenderizados': 'Ver dispositivos',
-        'botonRegistrarNuevoApartadoGlobalDispositivos': 'Agregar apartado',
-        'botonEliminarApartadosExistentesDispositivos': 'Eliminar apartado',
+        'botonRegistrarNuevoDispositivoPlano': 'Agregar Dispositivo',
+        'botonActivarModoEliminacionDispositivos': 'Eliminar Dispositivo',
+        'botonActivarModoEdicionDispositivos': 'Editar Dispositivo',
+        'botonActivarModoReubicacionDispositivos': 'Mover Dispositivo',
+        'botonAlternarVisibilidadDispositivosRenderizados': 'Ver Dispositivos',
+        'botonRegistrarNuevoApartadoGlobalDispositivos': 'Agregar Apartado',
+        'botonEliminarApartadosExistentesDispositivos': 'Eliminar Apartado',
         'botonAbrirPanelRestauracionElementosEliminados': 'Papelera',
-        'botonAlternarTemaVisualAplicacion': 'Cambiar tema',
+        'botonAlternarTemaVisualAplicacion': 'Cambiar Tema',
         'botonAbrirConfiguracionGeneralSistema': 'Configuración',
-        'botonCerrarSesionUsuarioActualSistema': 'Cerrar sesión',
-        'botonAbrirPerfilUsuarioAutenticadoSistema': 'Mi perfil'
+        'botonCerrarSesionUsuarioActualSistema': 'Cerrar Sesión',
+        'botonAbrirPerfilUsuarioAutenticadoSistema': 'Mi Perfil'
     };
     
     function crearOverlay() {
@@ -44,15 +44,12 @@
             
             const texto = textosBotones[boton.id];
             if (texto) {
-                // Buscamos si ya existe el span INSIDE del botón
                 let textoSpan = boton.querySelector('.texto-ayuda-boton');
                 
                 if (!textoSpan) {
                     textoSpan = document.createElement('span');
                     textoSpan.className = 'texto-ayuda-boton';
                     textoSpan.textContent = texto;
-                    
-                    // CAMBIO CLAVE: Se mete ADENTRO del botón, al final (después del SVG)
                     boton.appendChild(textoSpan);
                 }
             }
@@ -67,27 +64,11 @@
         if (!contenedorMenu) return;
         
         menuExpandido = true;
-        
-        // Agregar los textos afuera de los botones
         agregarTextosBotones();
-        
-        // Expandir el menú
         contenedorMenu.setAttribute('data-expandido', 'true');
         
         if (overlay) {
             overlay.classList.add('activo');
-        }
-        
-        // Cambiar ícono del botón hamburguesa
-        if (botonHamburguesa) {
-            const svg = botonHamburguesa.querySelector('svg');
-            if (svg && !botonHamburguesa._originalSvg) {
-                botonHamburguesa._originalSvg = svg.innerHTML;
-                svg.innerHTML = `
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                `;
-            }
         }
     }
     
@@ -96,13 +77,11 @@
         
         menuExpandido = false;
         
-        // Hacer desaparecer los textos
         const textos = document.querySelectorAll('.texto-ayuda-boton');
         textos.forEach(texto => {
             texto.style.animation = 'desaparecerTexto 0.15s ease-out forwards';
         });
         
-        // Esperar a que desaparezcan los textos, luego contraer
         setTimeout(() => {
             contenedorMenu.setAttribute('data-expandido', 'false');
             
@@ -110,15 +89,6 @@
                 overlay.classList.remove('activo');
             }
             
-            // Restaurar ícono
-            if (botonHamburguesa && botonHamburguesa._originalSvg) {
-                const svg = botonHamburguesa.querySelector('svg');
-                if (svg) {
-                    svg.innerHTML = botonHamburguesa._originalSvg;
-                }
-            }
-            
-            // Eliminar textos del DOM después de la transición
             setTimeout(() => {
                 if (!menuExpandido) {
                     eliminarTextosBotones();
@@ -138,6 +108,47 @@
         } else {
             expandirMenu();
         }
+    }
+    
+    /**
+     * Maneja la selección EXCLUSIVA de los botones y el autocierre automático.
+     */
+    function configurarManejadorBotones() {
+        contenedorMenu.addEventListener('click', function(e) {
+            const boton = e.target.closest('.boton-menu-herramienta');
+            
+            // Si el clic no fue en un botón, salimos
+            if (!boton) return;
+            
+            // PROTECCIÓN: Si es la hamburguesa O el botón de cambiar tema, NO se marcan de gris
+            if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal' || 
+                boton.id === 'botonAlternarTemaVisualAplicacion') {
+                
+                // Aun así, si el menú está expandido, queremos que se cierre al pulsarlos
+                if (menuExpandido) {
+                    contraerMenu();
+                }
+                return;
+            }
+            
+            // Si el botón presionado YA estaba activo, lo deseleccionamos al volver a hacerle clic
+            if (boton.classList.contains('activo')) {
+                boton.classList.remove('activo');
+            } else {
+                // Primero: Quitamos la clase 'activo' de cualquier otro botón de acción
+                contenedorMenu.querySelectorAll('.boton-menu-herramienta').forEach(btn => {
+                    btn.classList.remove('activo');
+                });
+                
+                // Segundo: Marcamos el botón actual como el único seleccionado
+                boton.classList.add('activo');
+            }
+
+            // Tercero: Si el menú está expandido, lo contraemos automáticamente al seleccionar la acción
+            if (menuExpandido) {
+                contraerMenu();
+            }
+        });
     }
     
     function init() {
@@ -160,6 +171,8 @@
         }
         
         crearOverlay();
+        configurarManejadorBotones(); 
+        
         contenedorMenu.setAttribute('data-expandido', 'false');
         botonHamburguesa.addEventListener('click', alternarMenu);
         
