@@ -8,11 +8,11 @@
     let contenedorMenu = null;
     
     const textosBotones = {
-        'botonRegistrarNuevoDispositivoPlano': 'Agregar Dispositivo',
-        'botonActivarModoEliminacionDispositivos': 'Eliminar Dispositivo',
-        'botonActivarModoEdicionDispositivos': 'Editar Dispositivo',
-        'botonActivarModoReubicacionDispositivos': 'Mover Dispositivo',
-        'botonAlternarVisibilidadDispositivosRenderizados': 'Ver Dispositivos',
+        'botonRegistrarNuevoDispositivoPlano': 'Agregar',
+        'botonActivarModoEliminacionDispositivos': 'Eliminar',
+        'botonActivarModoEdicionDispositivos': 'Editar',
+        'botonActivarModoReubicacionDispositivos': 'Mover',
+        'botonAlternarVisibilidadDispositivosRenderizados': 'Ver todos',
         'botonRegistrarNuevoApartadoGlobalDispositivos': 'Agregar Apartado',
         'botonEliminarApartadosExistentesDispositivos': 'Eliminar Apartado',
         'botonAbrirPanelRestauracionElementosEliminados': 'Papelera',
