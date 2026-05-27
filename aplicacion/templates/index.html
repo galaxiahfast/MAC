@@ -30,7 +30,9 @@
 
 
     <div class="contenedor-barra-herramientas-principal" role="complementary" aria-label="panel lateral">
-        <div class="barra-herramientas-scroll">
+
+    <!-- Scroll REAL -->
+        <div class="barra-herramientas-scroll" id="barraHerramientasScroll">
             <div class="contenedor-interno-barra-herramientas">
 
                 <button class="boton-menu-herramienta boton-menu-herramienta-navegacion" id="botonAlternarExpansionMenuLateralPrincipal" aria-label="menu" type="button">
@@ -138,6 +140,10 @@
                     </svg>
                 </button>
             </div>
+        </div>
+        <!-- Scroll VISUAL personalizado -->
+        <div class="scrollbar-personalizado" id="scrollbarPersonalizado">
+            <div class="scrollbar-thumb" id="scrollbarThumb"></div>
         </div>
     </div>
     

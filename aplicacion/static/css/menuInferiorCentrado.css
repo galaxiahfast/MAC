@@ -4,15 +4,32 @@
 :root {
     --pad-top: 25px;
     --pad-bottom: 25px;
-    --pad-lateral-inicial: 12.5px; 
+    --pad-lateral-inicial: 12.5px;
     --pad-interno-boton: 12.5px;
     --gap-interno-boton: 12.5px;
     --gap-menu: 25px;
+
     --color-separador: rgb(11, 27, 61);
-    --seccion-titulo-size: 16px; 
-    --seccion-titulo-espacio-arriba: 25px; 
-    --seccion-titulo-espacio-abajo: 25px;  
     --color-boton-seleccionado: #cbd5e1;
+
+    --seccion-titulo-size: 16px;
+    --seccion-titulo-espacio-arriba: 25px;
+    --seccion-titulo-espacio-abajo: 25px;
+
+    /* Scrollbar */
+    --scrollbar-width: 5px;
+    --scrollbar-track: transparent;
+
+    /* MISMO COLOR EN TODOS LOS ESTADOS */
+    --scrollbar-thumb: rgba(220, 220, 220, 0.95);
+    --scrollbar-thumb-hover: rgba(220, 220, 220, 0.95);
+}
+
+/* ==========================================================================
+   RESET
+   ========================================================================== */
+* {
+    box-sizing: border-box;
 }
 
 /* ==========================================================================
@@ -20,58 +37,137 @@
    ========================================================================== */
 .contenedor-barra-herramientas-principal {
     position: fixed;
-    left: 0;
     top: 0;
+    left: 0;
+
     height: 100dvh;
     width: auto;
+
     display: flex;
     flex-direction: column;
+
     background: #ffffff;
     border-right: 1px solid var(--borde-ventana);
+
+    overflow: hidden;
+
     z-index: 9999;
-    overflow-x: visible; 
-    overflow-y: hidden;
-    color-scheme: light;
+
     transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
 /* ==========================================================================
-   SCROLL Y CONTENIDO
+   SCROLL REAL (OCULTO)
    ========================================================================== */
 .barra-herramientas-scroll {
     flex: 1;
+
     min-height: 0;
     width: 100%;
-    overflow-y: auto;
-    overflow-x: visible;
-    scrollbar-gutter: stable both-edges;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-}
-.barra-herramientas-scroll::-webkit-scrollbar { width: 8px; }
-.barra-herramientas-scroll::-webkit-scrollbar-track { background: transparent; }
-.barra-herramientas-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 10px; }
-.contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll { scrollbar-color: rgba(0, 0, 0, 0.08) transparent; }
-.contenedor-barra-herramientas-principal:hover .barra-herramientas-scroll::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.08); }
 
+    overflow-y: scroll;
+    overflow-x: visible;
+
+    scrollbar-width: none;
+
+    -ms-overflow-style: none;
+
+    padding-right: 10px;
+}
+
+.barra-herramientas-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* ==========================================================================
+   SCROLL PERSONALIZADO
+   ========================================================================== */
+.scrollbar-personalizado {
+    position: absolute;
+
+    top: 0;
+    right: 2px;
+
+    width: var(--scrollbar-width);
+    height: 100%;
+
+    background: var(--scrollbar-track);
+
+    z-index: 10000;
+
+    pointer-events: none;
+}
+
+.scrollbar-thumb {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 60px;
+
+    border-radius: 999px;
+
+    background: var(--scrollbar-thumb);
+
+    opacity: 0;
+
+    transition:
+        background 0.2s ease,
+        opacity 0.2s ease;
+
+    pointer-events: auto;
+
+    cursor: pointer;
+}
+
+/* Mostrar scrollbar */
+.contenedor-barra-herramientas-principal:hover .scrollbar-thumb {
+    opacity: 1;
+}
+
+/* Hover thumb */
+.scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Drag */
+.scrollbar-thumb.arrastrando {
+    background: var(--scrollbar-thumb-hover);
+    opacity: 1;
+}
+
+/* ==========================================================================
+   CONTENIDO INTERNO
+   ========================================================================== */
 .contenedor-interno-barra-herramientas {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+
     gap: var(--gap-menu);
-    padding: var(--pad-top) var(--pad-lateral-inicial) var(--pad-bottom) var(--pad-lateral-inicial);
-    width: auto; 
+
+    padding:
+        var(--pad-top)
+        var(--pad-lateral-inicial)
+        var(--pad-bottom)
+        var(--pad-lateral-inicial);
+
+    width: auto;
+
     position: relative;
 }
 
 /* ==========================================================================
-   AJUSTE DE LOGO DINÁMICO
+   LOGO
    ========================================================================== */
 .logo-en-boton {
-    display: none; /* Oculto por defecto */
+    display: none;
 }
 
-/* Cuando el menú está expandido, mostramos el logo en el botón */
 .contenedor-barra-herramientas-principal[data-expandido="true"] .logo-en-boton {
     display: inline-block;
 }
@@ -82,86 +178,158 @@
 .boton-menu-herramienta {
     width: auto;
     height: auto;
+
     display: inline-grid;
-    grid-template-columns: 25px auto; 
+    grid-template-columns: 25px auto;
+
     align-items: center;
+
     flex-shrink: 0;
+
     padding: var(--pad-interno-boton);
+
     border: none;
-    background: #e9e9ee; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+
+    background: #e9e9ee;
+
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
     border-radius: 12px;
+
     cursor: pointer;
+
     transform: translateZ(0);
-    transition: all 0.2s ease; 
+
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
 }
 
-.boton-menu-herramienta:hover { background: #dcdce2; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-.boton-menu-herramienta:active { transform: scale(0.97); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-.boton-menu-herramienta.activo { background-color: #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
-.boton-menu-herramienta.activo:hover { filter: brightness(0.95); }
+.boton-menu-herramienta:hover {
+    background: #dcdce2;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.boton-menu-herramienta:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.boton-menu-herramienta.activo {
+    background-color: #cbd5e1;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.boton-menu-herramienta.activo:hover {
+    filter: brightness(0.95);
+}
 
 .boton-menu-herramienta svg {
     width: 25px;
     height: 25px;
+
     flex-shrink: 0;
+
     display: block;
+
     justify-self: center;
 }
 
 /* ==========================================================================
-   TEXTO Y SEPARADORES
+   TEXOS
    ========================================================================== */
 .texto-ayuda-boton {
     display: none;
+
     color: #000000;
+
     font-size: 14px;
     font-family: 'Inter', sans-serif;
+    font-weight: 500;
+
     text-align: left;
     white-space: nowrap;
-    font-weight: 500;
+
     opacity: 0;
-    margin-left: var(--gap-interno-boton); 
+
+    margin-left: var(--gap-interno-boton);
+
     pointer-events: none;
 }
 
+/* ==========================================================================
+   SEPARADORES
+   ========================================================================== */
 .contenedor-separador-seccion-menu-lateral {
     width: 50px;
     height: 0;
-    background: transparent; 
+
+    background: transparent;
+
     border-bottom: 1px solid var(--color-separador);
+
     flex-shrink: 0;
+
     position: relative;
-    margin-bottom: 0px;
-    transition: margin-bottom 0.25s ease, width 0.3s ease;
+
+    margin-bottom: 0;
+
+    transition:
+        margin-bottom 0.25s ease,
+        width 0.3s ease;
 }
 
 /* ==========================================================================
-   TITULOS Y MODO EXPANDIDO
+   MODO EXPANDIDO
    ========================================================================== */
 .contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral {
-    width: 100%; 
-    margin-bottom: calc(var(--seccion-titulo-espacio-arriba) + var(--seccion-titulo-size) + var(--seccion-titulo-espacio-abajo) - var(--gap-menu)); 
+    width: 100%;
+
+    margin-bottom: calc(
+        var(--seccion-titulo-espacio-arriba)
+        + var(--seccion-titulo-size)
+        + var(--seccion-titulo-espacio-abajo)
+        - var(--gap-menu)
+    );
 }
 
 .contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral::after {
     display: block;
+
     position: absolute;
+
     left: 0;
-    top: var(--seccion-titulo-espacio-arriba); 
-    color: #000000; 
+    top: var(--seccion-titulo-espacio-arriba);
+
+    color: #000000;
+
     font-size: var(--seccion-titulo-size);
-    background: #ffffff;
-    font-family: 'Inter', sans-serif; 
+    font-family: 'Inter', sans-serif;
     font-weight: 500;
+
+    background: #ffffff;
+
     white-space: nowrap;
+
     animation: aparecerTexto 0.25s ease-out 0.05s forwards;
 }
 
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="gestion-dispositivos"]::after { content: "Gestión de Dispositivos"; }
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="preferencias-visuales"]::after { content: "Preferencias Visuales"; }
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="configuracion-general"]::after { content: "Sistema"; }
-.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="perfil-usuario"]::after { content: "Cuenta"; }
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="gestion-dispositivos"]::after {
+    content: "Gestión de Dispositivos";
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="preferencias-visuales"]::after {
+    content: "Preferencias Visuales";
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="configuracion-general"]::after {
+    content: "Sistema";
+}
+
+.contenedor-barra-herramientas-principal[data-expandido="true"] .contenedor-separador-seccion-menu-lateral[data-seccion-menu="perfil-usuario"]::after {
+    content: "Cuenta";
+}
 
 .contenedor-barra-herramientas-principal[data-expandido="true"] .texto-ayuda-boton {
     display: inline-block;
@@ -169,15 +337,55 @@
 }
 
 /* ==========================================================================
-   ANIMACIONES Y OVERLAY
+   ANIMACIONES
    ========================================================================== */
-* { box-sizing: border-box; }
-@keyframes aparecerTexto { 0% { opacity: 0; transform: translateX(-8px); } 100% { opacity: 1; transform: translateX(0); } }
-@keyframes desaparecerTexto { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-8px); } }
+@keyframes aparecerTexto {
+    0% {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
 
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes desaparecerTexto {
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+}
+
+/* ==========================================================================
+   OVERLAY
+   ========================================================================== */
 .overlay-cierre-menu {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.4); z-index: 9998; display: none; opacity: 0;
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: rgba(0, 0, 0, 0.4);
+
+    z-index: 9998;
+
+    display: none;
+
+    opacity: 0;
+
     transition: opacity 0.3s ease;
 }
-.overlay-cierre-menu.activo { display: block; opacity: 1; }
+
+.overlay-cierre-menu.activo {
+    display: block;
+    opacity: 1;
+}
