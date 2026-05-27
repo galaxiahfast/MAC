@@ -44,7 +44,6 @@
         img.style.cssText = `
             height: 25px;
             width: auto;
-            margin-left: 10px;
             vertical-align: middle;
             opacity: 0;
             transition: opacity 0.3s ease;

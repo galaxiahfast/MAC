@@ -2,50 +2,74 @@
    @galaxiahfast VARIABLES GLOBALES
    ========================================================================== */
 
-/* @galaxiahfast Variables de modo claro */
-:root {
+/* ==========================================================================
+   MODO CLARO
+   ========================================================================== */
+
+[data-theme="light"] {
     --fondo-mapa: #fefefe;
     --color-acento: #050714;
     --color-acento-suave: #475569;
     --color-acento-hover: #0f172a;
+
     --fondo-scroll: #f1f5f9;
-    --color-scroll: #f97316;        /* ← NARANJA (antes #cbd5e1) */
-    --color-scroll-hover: #ea580c;   /* ← NARANJA MÁS OSCURO (antes #94a3b8) */
+
+    --color-scroll: #f97316;
+    --color-scroll-hover: #ea580c;
+
     --fondo-ventana: rgba(255, 255, 255, 0.95);
+
     --borde-ventana: rgba(71, 85, 105, 0.35);
     --borde-fuerte: rgba(71, 85, 105, 0.5);
+
     --sombra-media: 0 8px 24px rgba(0, 0, 0, 0.08);
+
     --scrollbar-ancho: 6px;
 
-    /* @galaxiahfast Variables de notificaciones */
+    /* Notificaciones */
     --fondo-notificacion: #fafafa;
     --fondo-cabecera-notificacion: #f1f5f9;
     --borde-cabecera-notificacion: #e2e8f0;
+
     --texto-notificacion: #0f172a;
     --color-hora-notificacion: #0f172a;
+
     --borde-notificacion: #e2e8f0;
 }
 
-/* @galaxiahfast Variables de modo oscuro */
+/* ==========================================================================
+   MODO OSCURO
+   ========================================================================== */
+
 [data-theme="dark"] {
     --fondo-mapa: #121212;
+
     --color-acento: #38bdf8;
     --color-acento-suave: #94a3b8;
     --color-acento-hover: #f1f5f9;
+
     --fondo-scroll: #0a0a0a;
-    --color-scroll: #f97316;        /* ← NARANJA (antes #262626) */
-    --color-scroll-hover: #ea580c;   /* ← NARANJA MÁS OSCURO (antes #334155) */
+
+    --color-scroll: #f97316;
+    --color-scroll-hover: #ea580c;
+
     --fondo-ventana: rgba(18, 18, 18, 0.95);
+
     --borde-ventana: rgba(56, 189, 248, 0.4);
     --borde-fuerte: rgba(56, 189, 248, 0.6);
+
     --sombra-media: 0 8px 24px rgba(0, 0, 0, 0.3);
+
     --scrollbar-ancho: 6px;
 
-    /* @galaxiahfast Variables de notificaciones */
+    /* Notificaciones */
     --fondo-notificacion: #0a0f1a;
     --fondo-cabecera-notificacion: #050505;
+
     --borde-cabecera-notificacion: rgba(56, 189, 248, 0.3);
+
     --texto-notificacion: #f1f5f9;
     --color-hora-notificacion: #94a3b8;
+
     --borde-notificacion: rgba(56, 189, 248, 0.3);
 }
