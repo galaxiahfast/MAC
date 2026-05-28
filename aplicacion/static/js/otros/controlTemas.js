@@ -32,16 +32,15 @@ function renderIcono(tema) {
     const boton = document.getElementById('botonAlternarTemaVisualAplicacion');
     if (!boton) return;
 
-    const icono = boton.querySelector('svg');
-    if (!icono) return;
+    const sol = boton.querySelector('.icono-sol');
+    const luna = boton.querySelector('.icono-luna');
 
-    const estado = tema === 'dark' ? 'luna' : 'sol';
+    if (!sol || !luna) return;
 
-    // evita re-render innecesario
-    if (icono.dataset.estado === estado) return;
+    const esDark = tema === 'dark';
 
-    icono.dataset.estado = estado;
-    icono.innerHTML = tema === 'dark' ? iconoLuna() : iconoSol();
+    sol.style.display = esDark ? 'none' : 'block';
+    luna.style.display = esDark ? 'block' : 'none';
 }
 
 /* ========================================================================= */
