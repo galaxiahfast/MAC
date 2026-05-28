@@ -14,7 +14,11 @@
     let dragStartY = 0;
     let initialScrollTop = 0;
 
-    const RUTA_LOGO = "/static/imagenes/logoMenuPrincipal.png";
+    /* @galaxiahfast - Logos según el tema visual activo. */
+    const LOGOS_TEMA = {
+        light: '/static/imagenes/logoMenuPrincipalLight.png',
+        dark: '/static/imagenes/logoMenuPrincipalDark.png'
+    };
 
     const textosBotones = {
         'botonRegistrarNuevoDispositivoPlano': 'Agregar',
@@ -31,14 +35,41 @@
         'botonAbrirPerfilUsuarioAutenticadoSistema': 'Mi Perfil'
     };
 
+    /* @galaxiahfast - Obtener logo correspondiente al tema actual. */
+    function obtenerRutaLogoSegunTema() {
+
+        const temaActual =
+            document.body.getAttribute('data-theme') || 'light';
+
+        return LOGOS_TEMA[temaActual];
+    }
+
+    /* @galaxiahfast - Actualizar logo dinámicamente según el tema. */
+    function actualizarLogoSegunTema() {
+
+        const logo = document.querySelector('.logo-en-boton');
+
+        if (!logo) {
+            return;
+        }
+
+        logo.src = obtenerRutaLogoSegunTema();
+    }
+
+    /* @galaxiahfast - Insertar logo visual dentro del botón hamburguesa. */
     function insertarLogoEnBoton() {
-        if (!botonHamburguesa || botonHamburguesa.querySelector('.logo-en-boton')) {
+
+        if (
+            !botonHamburguesa ||
+            botonHamburguesa.querySelector('.logo-en-boton')
+        ) {
             return;
         }
 
         const img = document.createElement('img');
 
-        img.src = RUTA_LOGO;
+        img.src = obtenerRutaLogoSegunTema();
+
         img.className = 'logo-en-boton';
 
         img.style.cssText = `
@@ -59,7 +90,10 @@
     }
 
     function crearOverlay() {
-        if (overlay) return;
+
+        if (overlay) {
+            return;
+        }
 
         overlay = document.createElement('div');
 
@@ -68,12 +102,18 @@
         document.body.appendChild(overlay);
 
         overlay.addEventListener('click', () => {
-            if (menuExpandido) contraerMenu();
+
+            if (menuExpandido) {
+                contraerMenu();
+            }
         });
     }
 
     function deseleccionarTodos() {
-        if (!contenedorMenu) return;
+
+        if (!contenedorMenu) {
+            return;
+        }
 
         contenedorMenu
             .querySelectorAll('.boton-menu-herramienta')
@@ -81,13 +121,16 @@
     }
 
     function configurarClicFuera() {
+
         document.addEventListener('click', function (e) {
+
             if (
                 contenedorMenu &&
                 !contenedorMenu.contains(e.target) &&
                 e.target !== botonHamburguesa &&
                 !botonHamburguesa.contains(e.target)
             ) {
+
                 if (menuExpandido) {
                     contraerMenu();
                 } else {
@@ -98,16 +141,27 @@
     }
 
     function agregarTextosBotones() {
+
         const botones = document.querySelectorAll(
             '.contenedor-interno-barra-herramientas .boton-menu-herramienta'
         );
 
         botones.forEach(boton => {
-            if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
+
+            if (
+                boton.id ===
+                'botonAlternarExpansionMenuLateralPrincipal'
+            ) {
+                return;
+            }
 
             const texto = textosBotones[boton.id];
 
-            if (texto && !boton.querySelector('.texto-ayuda-boton')) {
+            if (
+                texto &&
+                !boton.querySelector('.texto-ayuda-boton')
+            ) {
+
                 const textoSpan = document.createElement('span');
 
                 textoSpan.className = 'texto-ayuda-boton';
@@ -119,19 +173,25 @@
     }
 
     function eliminarTextosBotones() {
+
         document
             .querySelectorAll('.texto-ayuda-boton')
             .forEach(el => el.remove());
     }
 
     function expandirMenu() {
+
         menuExpandido = true;
 
         agregarTextosBotones();
 
-        contenedorMenu.setAttribute('data-expandido', 'true');
+        contenedorMenu.setAttribute(
+            'data-expandido',
+            'true'
+        );
 
-        const logoImg = document.querySelector('.logo-en-boton');
+        const logoImg =
+            document.querySelector('.logo-en-boton');
 
         if (logoImg) {
             logoImg.style.opacity = '1';
@@ -145,9 +205,11 @@
     }
 
     function contraerMenu() {
+
         menuExpandido = false;
 
-        const logoImg = document.querySelector('.logo-en-boton');
+        const logoImg =
+            document.querySelector('.logo-en-boton');
 
         if (logoImg) {
             logoImg.style.opacity = '0';
@@ -156,20 +218,28 @@
         document
             .querySelectorAll('.texto-ayuda-boton')
             .forEach(t => {
-                t.style.animation = 'desaparecerTexto 0.15s ease-out forwards';
+
+                t.style.animation =
+                    'desaparecerTexto 0.15s ease-out forwards';
             });
 
         setTimeout(() => {
-            contenedorMenu.setAttribute('data-expandido', 'false');
+
+            contenedorMenu.setAttribute(
+                'data-expandido',
+                'false'
+            );
 
             if (overlay) {
                 overlay.classList.remove('activo');
             }
 
             setTimeout(() => {
+
                 if (!menuExpandido) {
                     eliminarTextosBotones();
                 }
+
             }, 300);
 
             actualizarScrollbar();
@@ -178,49 +248,70 @@
     }
 
     function alternarMenu(e) {
+
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
 
-        menuExpandido ? contraerMenu() : expandirMenu();
+        menuExpandido
+            ? contraerMenu()
+            : expandirMenu();
     }
 
     function configurarManejadorBotones() {
-        contenedorMenu.addEventListener('click', function (e) {
 
-            const boton = e.target.closest('.boton-menu-herramienta');
+        contenedorMenu.addEventListener(
+            'click',
+            function (e) {
 
-            if (!boton) {
-                deseleccionarTodos();
+                const boton =
+                    e.target.closest('.boton-menu-herramienta');
+
+                if (!boton) {
+
+                    deseleccionarTodos();
+
+                    if (menuExpandido) {
+                        contraerMenu();
+                    }
+
+                    return;
+                }
+
+                if (
+                    boton.id ===
+                    'botonAlternarExpansionMenuLateralPrincipal'
+                ) {
+                    return;
+                }
+
+                if (
+                    boton.id ===
+                    'botonAlternarTemaVisualAplicacion'
+                ) {
+
+                    alternarTemaVisual();
+
+                    return;
+                }
+
+                if (boton.classList.contains('activo')) {
+
+                    boton.classList.remove('activo');
+
+                } else {
+
+                    deseleccionarTodos();
+
+                    boton.classList.add('activo');
+                }
 
                 if (menuExpandido) {
                     contraerMenu();
                 }
-
-                return;
             }
-
-            if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') {
-                return;
-            }
-
-            if (boton.id === 'botonAlternarTemaVisualAplicacion') {
-                alternarTemaVisual();
-                return;
-            }
-
-            if (boton.classList.contains('activo')) {
-                boton.classList.remove('activo');
-            } else {
-                deseleccionarTodos();
-                boton.classList.add('activo');
-            }
-
-            if (menuExpandido) {
-                contraerMenu();
-            }
-        });
+        );
     }
 
     /* ==========================================================================
@@ -233,24 +324,35 @@
             return;
         }
 
-        const scrollHeight = scrollContainer.scrollHeight;
-        const clientHeight = scrollContainer.clientHeight;
-        const scrollTop = scrollContainer.scrollTop;
+        const scrollHeight =
+            scrollContainer.scrollHeight;
 
-        const ratioVisible = clientHeight / scrollHeight;
+        const clientHeight =
+            scrollContainer.clientHeight;
+
+        const scrollTop =
+            scrollContainer.scrollTop;
+
+        const ratioVisible =
+            clientHeight / scrollHeight;
 
         const thumbHeight = Math.max(
             ratioVisible * clientHeight,
             50
         );
 
-        const maxThumbTop = clientHeight - thumbHeight;
+        const maxThumbTop =
+            clientHeight - thumbHeight;
 
         const thumbTop =
-            (scrollTop / (scrollHeight - clientHeight)) * maxThumbTop;
+            (scrollTop / (scrollHeight - clientHeight))
+            * maxThumbTop;
 
-        scrollbarThumb.style.height = `${thumbHeight}px`;
-        scrollbarThumb.style.transform = `translateY(${thumbTop || 0}px)`;
+        scrollbarThumb.style.height =
+            `${thumbHeight}px`;
+
+        scrollbarThumb.style.transform =
+            `translateY(${thumbTop || 0}px)`;
     }
 
     function iniciarDragScrollbar(e) {
@@ -259,7 +361,8 @@
 
         dragStartY = e.clientY;
 
-        initialScrollTop = scrollContainer.scrollTop;
+        initialScrollTop =
+            scrollContainer.scrollTop;
 
         scrollbarThumb.classList.add('arrastrando');
 
@@ -272,7 +375,8 @@
             return;
         }
 
-        const deltaY = e.clientY - dragStartY;
+        const deltaY =
+            e.clientY - dragStartY;
 
         const scrollRatio =
             scrollContainer.scrollHeight /
@@ -293,8 +397,15 @@
 
     function configurarScrollbarPersonalizado() {
 
-        scrollContainer = document.getElementById('barraHerramientasScroll');
-        scrollbarThumb = document.getElementById('scrollbarThumb');
+        scrollContainer =
+            document.getElementById(
+                'barraHerramientasScroll'
+            );
+
+        scrollbarThumb =
+            document.getElementById(
+                'scrollbarThumb'
+            );
 
         if (!scrollContainer || !scrollbarThumb) {
             return;
@@ -331,13 +442,15 @@
 
     function setup() {
 
-        botonHamburguesa = document.getElementById(
-            'botonAlternarExpansionMenuLateralPrincipal'
-        );
+        botonHamburguesa =
+            document.getElementById(
+                'botonAlternarExpansionMenuLateralPrincipal'
+            );
 
-        contenedorMenu = document.querySelector(
-            '.contenedor-barra-herramientas-principal'
-        );
+        contenedorMenu =
+            document.querySelector(
+                '.contenedor-barra-herramientas-principal'
+            );
 
         if (!botonHamburguesa || !contenedorMenu) {
             return;
@@ -353,7 +466,10 @@
 
         configurarScrollbarPersonalizado();
 
-        contenedorMenu.setAttribute('data-expandido', 'false');
+        contenedorMenu.setAttribute(
+            'data-expandido',
+            'false'
+        );
 
         botonHamburguesa.removeEventListener(
             'click',
@@ -365,18 +481,37 @@
             alternarMenu
         );
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && menuExpandido) {
-                contraerMenu();
-            }
-        });
+        document.addEventListener(
+            'keydown',
+            (e) => {
 
-        requestAnimationFrame(actualizarScrollbar);
+                if (
+                    e.key === 'Escape' &&
+                    menuExpandido
+                ) {
+                    contraerMenu();
+                }
+            }
+        );
+
+        requestAnimationFrame(
+            actualizarScrollbar
+        );
     }
 
+    /* @galaxiahfast - Exponer función global para controlTemas.js */
+    window.actualizarLogoSegunTema =
+        actualizarLogoSegunTema;
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setup);
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            setup
+        );
+
     } else {
+
         setup();
     }
 
