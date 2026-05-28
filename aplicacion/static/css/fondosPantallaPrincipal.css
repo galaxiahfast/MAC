@@ -2,29 +2,29 @@
 :root {
 
     /* @galaxiahfast - Configuración visual del scrollbar principal. */
-    --contenedor-principal-scrollbar-ancho: 6px;
-    --contenedor-principal-scrollbar-fondo: transparent;
-    --contenedor-principal-scrollbar-thumb: #f97316;
-    --contenedor-principal-scrollbar-thumb-hover: #ea580c;
-    --contenedor-principal-scrollbar-thumb-activo: #050714;
+    --contenedor-principal-scrollbar-ancho: 5px;
+    --contenedor-principal-scrollbar-track: transparent;
 
-    /* @galaxiahfast - Configuración visual de sombras del scrollbar. */
-    --contenedor-principal-scrollbar-brillo: rgba(249, 115, 22, 0.6);
+    /* @galaxiahfast - Paleta igual al menú lateral izquierdo. */
+    --contenedor-principal-scrollbar-thumb: #e9e9ee;
+    --contenedor-principal-scrollbar-thumb-hover: #e9e9ee;
+    --contenedor-principal-scrollbar-thumb-activo: #cdced4;
+
+    /* @galaxiahfast - Sombra/brillo del thumb. */
+    --contenedor-principal-scrollbar-brillo: rgba(233, 233, 238, 0.6);
 }
 
-/* @galaxiahfast - Variables del contenedor principal y mapa para modo oscuro. */
+/* @galaxiahfast - Variables modo oscuro. */
 [data-theme="dark"] {
 
-    /* @galaxiahfast - Configuración visual del scrollbar principal. */
-    --contenedor-principal-scrollbar-thumb: #f97316;
-    --contenedor-principal-scrollbar-thumb-hover: #ea580c;
-    --contenedor-principal-scrollbar-thumb-activo: #38bdf8;
+    --contenedor-principal-scrollbar-thumb: #232323;
+    --contenedor-principal-scrollbar-thumb-hover: #2d2d2d;
+    --contenedor-principal-scrollbar-thumb-activo: #3f3f3f;
 
-    /* @galaxiahfast - Configuración visual de sombras del scrollbar. */
-    --contenedor-principal-scrollbar-brillo: rgba(249, 115, 22, 0.6);
+    --contenedor-principal-scrollbar-brillo: rgba(63, 63, 63, 0.55);
 }
 
-/* @galaxiahfast - Reset global y configuración base del documento. */
+/* @galaxiahfast - Reset base. */
 html,
 body {
     width: 100%;
@@ -33,94 +33,140 @@ body {
     padding: 0;
 }
 
-/* @galaxiahfast - Configuración principal del body sin scroll nativo. */
 body {
-    width: 100%;
-    height: 100%;
     overflow: hidden;
-    position: relative;
-    box-sizing: border-box;
 }
 
-/* @galaxiahfast - Contenedor principal con scroll vertical controlado. */
-.contenedor-principal-aplicacion {
+/* =======================================================================
+   CONTENEDOR SCROLL REAL
+   ======================================================================= */
+
+.contenedor-principal-aplicacion-scroll {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
     scroll-behavior: smooth;
     overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color:
-        var(--contenedor-principal-scrollbar-thumb)
-        transparent;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    position: relative;
 }
 
-/* @galaxiahfast - Configuración general del scrollbar WebKit. */
-.contenedor-principal-aplicacion::-webkit-scrollbar {
+/* Ocultar scrollbar nativo */
+.contenedor-principal-aplicacion-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* =======================================================================
+   SCROLLBAR VISUAL (ESTILO MENÚ LATERAL)
+   ======================================================================= */
+
+.scrollbar-principal-personalizado {
+    position: fixed;
+    top: 0;
+    right: 2px;
     width: var(--contenedor-principal-scrollbar-ancho);
-    background: var(--contenedor-principal-scrollbar-fondo);
-}
+    height: 100vh;
 
-/* @galaxiahfast - Track visual del scrollbar principal. */
-.contenedor-principal-aplicacion::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 10px;
-    margin: 4px 0;
+    z-index: 9999;
+
+    pointer-events: none;
 }
 
-/* @galaxiahfast - Thumb principal del scrollbar. */
-.contenedor-principal-aplicacion::-webkit-scrollbar-thumb {
+/* Thumb */
+.scrollbar-principal-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    min-height: 50px;
+
+    border-radius: 999px;
     background: var(--contenedor-principal-scrollbar-thumb);
-    border-radius: 10px;
-    transition: none;
-    min-height: 40px;
+
+    opacity: 0;
+    transition:
+        opacity 0.2s ease,
+        background 0.2s ease,
+        transform 0.1s ease;
+
+    pointer-events: auto;
+    cursor: pointer;
 }
 
-/* @galaxiahfast - Estado hover del thumb del scrollbar. */
-.contenedor-principal-aplicacion::-webkit-scrollbar-thumb:hover {
+/* Hover visual */
+.scrollbar-principal-thumb:hover {
     background: var(--contenedor-principal-scrollbar-thumb-hover);
 }
 
-/* @galaxiahfast - Estado activo del thumb del scrollbar. */
-.contenedor-principal-aplicacion::-webkit-scrollbar-thumb:active {
+/* Active */
+.scrollbar-principal-thumb:active {
     background: var(--contenedor-principal-scrollbar-thumb-activo);
 }
 
-/* @galaxiahfast - Configuración visual de esquina del scrollbar. */
-.contenedor-principal-aplicacion::-webkit-scrollbar-corner {
-    background: transparent;
+/* Mostrar al interactuar con scroll */
+.contenedor-principal-aplicacion-scroll:hover
+~ .scrollbar-principal-personalizado
+.scrollbar-principal-thumb {
+    opacity: 1;
 }
 
-/* @galaxiahfast - Ajuste dinámico del contenido principal. */
+/* También mostrar cuando se usa scroll real */
+.contenedor-principal-aplicacion-scroll:active
+~ .scrollbar-principal-personalizado
+.scrollbar-principal-thumb {
+    opacity: 1;
+}
+
+/* Estado JS (mejor UX que hover puro) */
+.scrollbar-principal-thumb.scrolling {
+    opacity: 1;
+}
+
+/* =======================================================================
+   LAYOUT PRINCIPAL
+   ======================================================================= */
+
+.contenedor-principal-aplicacion {
+    width: 100%;
+    min-height: 100%;
+}
+
 #contenidoPrincipal {
     height: 100%;
     margin-left: var(--ancho-menu-colapsado, 88px);
     width: calc(100% - var(--ancho-menu-colapsado, 88px));
 }
 
-/* @galaxiahfast - Ajuste del contenido cuando el menú está expandido. */
-.menu-lateral-expandido ~ .contenedor-principal-aplicacion #contenidoPrincipal,
+/* Ajuste menú expandido */
+.menu-lateral-expandido
+~ .contenedor-principal-aplicacion-scroll
+.contenedor-principal-aplicacion
+#contenidoPrincipal,
 body:has(.menu-lateral-expandido) #contenidoPrincipal {
     margin-left: var(--ancho-expandido-menu-lateral, 280px);
     width: calc(100% - var(--ancho-expandido-menu-lateral, 280px));
 }
 
-/* @galaxiahfast - Contenedor principal del mapa. */
+/* =======================================================================
+   MAPA
+   ======================================================================= */
+
 .map-container {
     width: 100%;
     min-height: 100%;
     position: relative;
-    display: block;
 }
 
-/* @galaxiahfast - Contenedor interno de imagen centrada. */
 .contenedor-imagen-centrada {
     width: 100%;
-    display: block;
 }
 
-/* @galaxiahfast - Configuración responsive del plano base. */
 .plano-base {
     width: 100%;
     height: auto;
@@ -129,36 +175,25 @@ body:has(.menu-lateral-expandido) #contenidoPrincipal {
     transition: filter 0.3s ease;
 }
 
-/* @galaxiahfast - Invertir colores del mapa en modo oscuro. */
 body[data-theme="dark"] .plano-base {
     filter: invert(1) hue-rotate(180deg);
 }
 
-/* @galaxiahfast - Capa superpuesta para dispositivos interactivos. */
-#capaDispositivos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-/* @galaxiahfast - Cuadrícula overlay posicionada sobre el mapa. */
+#capaDispositivos,
 .grid-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     pointer-events: none;
 }
 
-/* @galaxiahfast - Animación de brillo para scrollbar en modo oscuro. */
+/* =======================================================================
+   ANIMACIÓN (igual lógica visual del menú)
+   ======================================================================= */
+
 @keyframes scrollGlow {
 
     0% {
-        box-shadow: 0 0 0px rgba(249, 115, 22, 0);
+        box-shadow: 0 0 0px rgba(0, 0, 0, 0);
     }
 
     100% {
@@ -166,22 +201,21 @@ body[data-theme="dark"] .plano-base {
     }
 }
 
-/* @galaxiahfast - Efecto visual de brillo durante interacción. */
-body[data-theme="dark"]
-.contenedor-principal-aplicacion:active::-webkit-scrollbar-thumb {
-    animation: scrollGlow 0.3s ease-out;
+.scrollbar-principal-thumb.scrolling {
+    animation: scrollGlow 0.25s ease-out;
 }
 
-/* @galaxiahfast - Ajustes responsivos para dispositivos móviles. */
+/* =======================================================================
+   RESPONSIVE
+   ======================================================================= */
+
 @media (max-width: 768px) {
 
-    /* @galaxiahfast - Reducción de ancho del scrollbar en móviles. */
-    .contenedor-principal-aplicacion::-webkit-scrollbar {
+    .scrollbar-principal-personalizado {
         width: 4px;
     }
 
-    /* @galaxiahfast - Compatibilidad scrollbar Firefox en móviles. */
-    .contenedor-principal-aplicacion {
-        scrollbar-width: thin;
+    .scrollbar-principal-thumb {
+        min-height: 40px;
     }
 }
