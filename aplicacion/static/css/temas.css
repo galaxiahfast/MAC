@@ -1,19 +1,18 @@
 /* ==========================================================================
-   @galaxiahfast VARIABLES GLOBALES
+   @galaxiahfast - SISTEMA DE TEMAS (CSS VARIABLES)
    ========================================================================== */
 
 /* ==========================================================================
-   MODO CLARO
+   BASE / FALLBACK (IMPORTANTE PARA EVITAR FLASH DE ESTILO)
    ========================================================================== */
 
-[data-theme="light"] {
+:root {
     --fondo-mapa: #fefefe;
     --color-acento: #050714;
     --color-acento-suave: #475569;
     --color-acento-hover: #0f172a;
 
     --fondo-scroll: #f1f5f9;
-
     --color-scroll: #f97316;
     --color-scroll-hover: #ea580c;
 
@@ -50,15 +49,16 @@
 
     --fondo-scroll: #0a0a0a;
 
-    --color-scroll: #f97316;
-    --color-scroll-hover: #ea580c;
-
     --fondo-ventana: rgba(18, 18, 18, 0.95);
 
     --borde-ventana: rgba(56, 189, 248, 0.4);
     --borde-fuerte: rgba(56, 189, 248, 0.6);
 
     --sombra-media: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+    /* Scroll */
+    --color-scroll: #f97316;
+    --color-scroll-hover: #ea580c;
 
     --scrollbar-ancho: 6px;
 

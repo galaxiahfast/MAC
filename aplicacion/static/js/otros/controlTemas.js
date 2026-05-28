@@ -1,4 +1,4 @@
-/* @galaxiahfast - Inicializa el sistema de cambio de tema. */
+/* @galaxiahfast - Inicializa el sistema de tema (solo estado inicial). */
 function iniciarControlTema() {
 
     /* @galaxiahfast - Obtener elementos principales. */
@@ -10,11 +10,7 @@ function iniciarControlTema() {
 
     /* @galaxiahfast - Validar botón requerido. */
     if (!botonTema) {
-
-        console.warn(
-            '@galaxiahfast - No se encontró el botón de tema'
-        );
-
+        console.warn('@galaxiahfast - No se encontró el botón de tema');
         return;
     }
 
@@ -22,11 +18,7 @@ function iniciarControlTema() {
     const icono = botonTema.querySelector('svg');
 
     if (!icono) {
-
-        console.warn(
-            '@galaxiahfast - No se encontró el icono SVG del tema'
-        );
-
+        console.warn('@galaxiahfast - No se encontró el icono SVG del tema');
         return;
     }
 
@@ -45,49 +37,53 @@ function iniciarControlTema() {
         icono,
         temaGuardado === 'dark'
     );
-
-    /* @galaxiahfast - Configurar cambio dinámico de tema. */
-    botonTema.addEventListener('click', (evento) => {
-
-        evento.stopPropagation();
-
-        /* @galaxiahfast - Detectar estado actual. */
-        const esModoOscuro =
-            cuerpo.getAttribute('data-theme') === 'dark';
-
-        /* @galaxiahfast - Definir siguiente tema. */
-        const nuevoTema =
-            esModoOscuro
-                ? 'light'
-                : 'dark';
-
-        /* @galaxiahfast - Aplicar nuevo tema. */
-        cuerpo.setAttribute(
-            'data-theme',
-            nuevoTema
-        );
-
-        /* @galaxiahfast - Persistir preferencia. */
-        localStorage.setItem(
-            'tema',
-            nuevoTema
-        );
-
-        /* @galaxiahfast - Actualizar icono visual. */
-        actualizarIconoTema(
-            icono,
-            nuevoTema === 'dark'
-        );
-    });
 }
 
-/* @galaxiahfast - Actualiza el icono visual del tema activo. */
-function actualizarIconoTema(
-    elementoIcono,
-    modoOscuro
-) {
 
-    /* @galaxiahfast - Icono para modo claro. */
+/* ==========================================================================
+   API PÚBLICA DEL MÓDULO (SE USA DESDE EL MENÚ)
+   ========================================================================== */
+
+/* @galaxiahfast - Alterna entre light y dark mode. */
+function alternarTemaVisual() {
+
+    const cuerpo = document.body;
+
+    const temaActual =
+        cuerpo.getAttribute('data-theme') || 'light';
+
+    const nuevoTema =
+        temaActual === 'dark'
+            ? 'light'
+            : 'dark';
+
+    cuerpo.setAttribute(
+        'data-theme',
+        nuevoTema
+    );
+
+    localStorage.setItem(
+        'tema',
+        nuevoTema
+    );
+
+    actualizarIconoTemaGlobal(nuevoTema);
+}
+
+
+/* @galaxiahfast - Actualiza icono del botón de tema. */
+function actualizarIconoTemaGlobal(tema) {
+
+    const botonTema = document.getElementById(
+        'botonAlternarTemaVisualAplicacion'
+    );
+
+    if (!botonTema) return;
+
+    const icono = botonTema.querySelector('svg');
+
+    if (!icono) return;
+
     const iconoSol = `
         <circle cx="12" cy="12" r="5"></circle>
         <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -100,20 +96,20 @@ function actualizarIconoTema(
         <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
     `;
 
-    /* @galaxiahfast - Icono para modo oscuro. */
     const iconoLuna = `
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
     `;
 
-    /* @galaxiahfast - Actualizar SVG dinámicamente. */
-    elementoIcono.innerHTML =
-        modoOscuro
+    icono.innerHTML =
+        tema === 'dark'
             ? iconoLuna
             : iconoSol;
 }
+
 
 /* @galaxiahfast - Inicializar sistema al cargar documento. */
 document.addEventListener(
     'DOMContentLoaded',
     iniciarControlTema
 );
+

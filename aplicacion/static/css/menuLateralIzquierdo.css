@@ -1,0 +1,351 @@
+
+/* @galaxiahfast - Variables globales del menú lateral izquierdo */
+:root {
+
+    /* @galaxiahfast - Espaciado principal del menú lateral izquierdo */
+    --menu-lateral-izquierdo-padding-superior: 25px;
+    --menu-lateral-izquierdo-padding-inferior: 25px;
+    --menu-lateral-izquierdo-padding-lateral: 25px;
+    --menu-lateral-izquierdo-padding-boton-interno: 12.5px;
+    --menu-lateral-izquierdo-gap-boton-icono-texto: 12.5px;
+    --menu-lateral-izquierdo-gap-entre-elementos: 25px;
+
+    /* @galaxiahfast - Tamaño y separación visual de títulos de sección */
+    --menu-lateral-izquierdo-titulo-seccion-tamano: 16px;
+    --menu-lateral-izquierdo-titulo-seccion-margin-superior: 25px;
+    --menu-lateral-izquierdo-titulo-seccion-margin-inferior: 25px;
+
+    /* @galaxiahfast - Configuración visual del scrollbar personalizado */
+    --menu-lateral-izquierdo-scrollbar-ancho: 5px;
+    --menu-lateral-izquierdo-scrollbar-track: transparent;
+    --menu-lateral-izquierdo-scrollbar-thumb: #e9e9ee;
+    --menu-lateral-izquierdo-scrollbar-thumb-hover: #e9e9ee;
+
+    /* @galaxiahfast - Colores principales del menú lateral izquierdo */
+    --menu-lateral-izquierdo-fondo: #ffffff;
+    --menu-lateral-izquierdo-boton-fondo: #e9e9ee;
+    --menu-lateral-izquierdo-boton-hover: #dcdce2;
+    --menu-lateral-izquierdo-boton-activo: #cdced4;
+    --menu-lateral-izquierdo-texto: #000000;
+    --menu-lateral-izquierdo-icono-stroke: #000000;
+    --menu-lateral-izquierdo-separador: rgba(0, 0, 0, 0.18);
+    --menu-lateral-izquierdo-titulo-fondo: #ffffff;
+
+    /* @galaxiahfast - Sombras utilizadas en botones del menú lateral */
+    --menu-lateral-izquierdo-sombra-boton: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --menu-lateral-izquierdo-sombra-boton-hover: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --menu-lateral-izquierdo-sombra-boton-activo: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* @galaxiahfast - Variables del menú lateral izquierdo para modo oscuro */
+[data-theme="dark"] {
+
+    /* @galaxiahfast - Colores principales del menú lateral izquierdo */
+    --menu-lateral-izquierdo-fondo: #121212;
+    --menu-lateral-izquierdo-boton-fondo: #232323;
+    --menu-lateral-izquierdo-boton-hover: #2d2d2d;
+    --menu-lateral-izquierdo-boton-activo: #3f3f3f;
+    --menu-lateral-izquierdo-texto: #f1f5f9;
+    --menu-lateral-izquierdo-icono-stroke: #f1f5f9;
+    --menu-lateral-izquierdo-separador: rgba(255, 255, 255, 0.18);
+    --menu-lateral-izquierdo-titulo-fondo: #121212;
+
+    /* @galaxiahfast - Colores del scrollbar personalizado */
+    --menu-lateral-izquierdo-scrollbar-thumb: #232323;
+    --menu-lateral-izquierdo-scrollbar-thumb-hover: #232323;
+
+    /* @galaxiahfast - Sombras utilizadas en botones del menú lateral */
+    --menu-lateral-izquierdo-sombra-boton: 0 2px 4px rgba(0, 0, 0, 0.25);
+    --menu-lateral-izquierdo-sombra-boton-hover: 0 4px 8px rgba(0, 0, 0, 0.35);
+    --menu-lateral-izquierdo-sombra-boton-activo: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* @galaxiahfast - Reset global de tamaños y modelo de caja */
+* {
+    box-sizing: border-box;
+}
+
+/* @galaxiahfast - Contenedor principal fijo del menú lateral izquierdo */
+.contenedor-barra-herramientas-principal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--menu-lateral-izquierdo-fondo);
+    border-right: 1px solid var(--borde-ventana);
+    overflow: hidden;
+    z-index: 9999;
+    transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+/* @galaxiahfast - Área real con scroll vertical oculto */
+.barra-herramientas-scroll {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: visible;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* @galaxiahfast - Ocultar scrollbar nativo en navegadores WebKit */
+.barra-herramientas-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* @galaxiahfast - Contenedor overlay del scrollbar personalizado */
+.scrollbar-personalizado {
+    position: absolute;
+    inset: 0 2px 0 auto;
+    width: var(--menu-lateral-izquierdo-scrollbar-ancho);
+    background: var(--menu-lateral-izquierdo-scrollbar-track);
+    z-index: 10000;
+    pointer-events: none;
+}
+
+/* @galaxiahfast - Thumb arrastrable del scrollbar personalizado */
+.scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    border-radius: 999px;
+    background: var(--menu-lateral-izquierdo-scrollbar-thumb);
+    opacity: 0;
+    transition:
+        opacity 0.2s ease,
+        background 0.2s ease;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* @galaxiahfast - Mostrar scrollbar al interactuar con el menú */
+.contenedor-barra-herramientas-principal:hover .scrollbar-thumb {
+    opacity: 1;
+}
+
+/* @galaxiahfast - Estado hover del thumb del scrollbar */
+.scrollbar-thumb:hover {
+    background: var(--menu-lateral-izquierdo-scrollbar-thumb-hover);
+}
+
+/* @galaxiahfast - Estado activo durante arrastre del scrollbar */
+.scrollbar-thumb.arrastrando {
+    opacity: 1;
+    background: var(--menu-lateral-izquierdo-scrollbar-thumb-hover);
+}
+
+/* @galaxiahfast - Contenedor interno de elementos del menú */
+.contenedor-interno-barra-herramientas {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--menu-lateral-izquierdo-gap-entre-elementos);
+    padding:
+        var(--menu-lateral-izquierdo-padding-superior)
+        var(--menu-lateral-izquierdo-padding-lateral)
+        var(--menu-lateral-izquierdo-padding-inferior)
+        var(--menu-lateral-izquierdo-padding-lateral);
+}
+
+/* @galaxiahfast - Logo oculto por defecto en modo compacto */
+.logo-en-boton {
+    display: none;
+}
+
+/* @galaxiahfast - Mostrar logo cuando el menú está expandido */
+.contenedor-barra-herramientas-principal[data-expandido="true"] .logo-en-boton {
+    display: inline-block;
+}
+
+/* @galaxiahfast - Estilo base de botones del menú lateral */
+.boton-menu-herramienta {
+    display: flex;
+    align-items: center;
+    gap: var(--menu-lateral-izquierdo-gap-boton-icono-texto);
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+    padding: var(--menu-lateral-izquierdo-padding-boton-interno);
+    border: none;
+    border-radius: 12px;
+    background: var(--menu-lateral-izquierdo-boton-fondo);
+    box-shadow: var(--menu-lateral-izquierdo-sombra-boton);
+    cursor: pointer;
+    transform: translateZ(0);
+    transition:
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* @galaxiahfast - Estado hover de botones del menú */
+.boton-menu-herramienta:hover {
+    background: var(--menu-lateral-izquierdo-boton-hover);
+    box-shadow: var(--menu-lateral-izquierdo-sombra-boton-hover);
+}
+
+/* @galaxiahfast - Estado presionado de botones del menú */
+.boton-menu-herramienta:active {
+    transform: scale(0.97);
+    box-shadow: var(--menu-lateral-izquierdo-sombra-boton-hover);
+}
+
+/* @galaxiahfast - Estado seleccionado de botones del menú */
+.boton-menu-herramienta.activo {
+    background-color: var(--menu-lateral-izquierdo-boton-activo);
+    box-shadow: var(--menu-lateral-izquierdo-sombra-boton-activo);
+}
+
+/* @galaxiahfast - Efecto hover sobre botón seleccionado */
+.boton-menu-herramienta.activo:hover {
+    filter: brightness(0.95);
+}
+
+/* @galaxiahfast - Configuración visual de iconos SVG */
+.boton-menu-herramienta svg {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    display: block;
+    stroke: var(--menu-lateral-izquierdo-icono-stroke);
+}
+
+/* @galaxiahfast - Texto descriptivo de ayuda para botones */
+.texto-ayuda-boton {
+    display: none;
+    opacity: 0;
+    color: var(--menu-lateral-izquierdo-texto);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* @galaxiahfast - Separadores visuales entre secciones */
+.contenedor-separador-seccion-menu-lateral {
+    position: relative;
+    width: 50px;
+    height: 0;
+    flex-shrink: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--menu-lateral-izquierdo-separador);
+    background: transparent;
+    transition:
+        width 0.3s ease,
+        margin-bottom 0.25s ease;
+}
+
+/* @galaxiahfast - Ajustes visuales de separadores en modo expandido */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral {
+    width: 100%;
+    margin-bottom: calc(
+        var(--menu-lateral-izquierdo-titulo-seccion-margin-superior)
+        + var(--menu-lateral-izquierdo-titulo-seccion-tamano)
+        + var(--menu-lateral-izquierdo-titulo-seccion-margin-inferior)
+        - var(--menu-lateral-izquierdo-gap-entre-elementos)
+    );
+}
+
+/* @galaxiahfast - Título visual de cada sección expandida */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral::after {
+    position: absolute;
+    top: var(--menu-lateral-izquierdo-titulo-seccion-margin-superior);
+    left: 0;
+    display: block;
+    color: var(--menu-lateral-izquierdo-texto);
+    font-size: var(--menu-lateral-izquierdo-titulo-seccion-tamano);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    white-space: nowrap;
+    background: var(--menu-lateral-izquierdo-titulo-fondo);
+    animation: aparecerTexto 0.25s ease-out 0.05s forwards;
+}
+
+/* @galaxiahfast - Título de sección de gestión de dispositivos */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral[data-seccion-menu="gestion-dispositivos"]::after {
+    content: "Gestión de Dispositivos";
+}
+
+/* @galaxiahfast - Título de sección de preferencias visuales */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral[data-seccion-menu="preferencias-visuales"]::after {
+    content: "Preferencias Visuales";
+}
+
+/* @galaxiahfast - Título de sección de configuración general */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral[data-seccion-menu="configuracion-general"]::after {
+    content: "Sistema";
+}
+
+/* @galaxiahfast - Título de sección de perfil de usuario */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.contenedor-separador-seccion-menu-lateral[data-seccion-menu="perfil-usuario"]::after {
+    content: "Cuenta";
+}
+
+/* @galaxiahfast - Mostrar textos auxiliares en modo expandido */
+.contenedor-barra-herramientas-principal[data-expandido="true"]
+.texto-ayuda-boton {
+    display: inline-block;
+    animation: aparecerTexto 0.25s ease-out 0.05s forwards;
+}
+
+/* @galaxiahfast - Animación de aparición lateral para textos */
+@keyframes aparecerTexto {
+
+    0% {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* @galaxiahfast - Animación de desaparición lateral para textos */
+@keyframes desaparecerTexto {
+
+    0% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-8px);
+    }
+}
+
+/* @galaxiahfast - Overlay de fondo para cerrar el menú lateral */
+.overlay-cierre-menu {
+    position: fixed;
+    inset: 0;
+    display: none;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9998;
+    transition: opacity 0.3s ease;
+}
+
+/* @galaxiahfast - Estado visible del overlay de cierre */
+.overlay-cierre-menu.activo {
+    display: block;
+    opacity: 1;
+}

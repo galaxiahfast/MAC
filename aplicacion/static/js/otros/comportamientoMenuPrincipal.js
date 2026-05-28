@@ -206,6 +206,7 @@
             }
 
             if (boton.id === 'botonAlternarTemaVisualAplicacion') {
+                alternarTemaVisual();
                 return;
             }
 
