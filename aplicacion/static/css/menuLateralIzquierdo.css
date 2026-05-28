@@ -355,3 +355,37 @@
     display: block;
     opacity: 1;
 }
+
+/* ============================= */
+/* ICONO BASE                    */
+/* ============================= */
+
+.icono-tema {
+    width: 25px;
+    height: 25px;
+    stroke: currentColor;
+}
+
+/* ============================= */
+/* ESTADO LIGHT (SOL visible)   */
+/* ============================= */
+
+[data-theme="light"] .icono-sol {
+    display: block;
+}
+
+[data-theme="light"] .icono-luna {
+    display: none;
+}
+
+/* ============================= */
+/* ESTADO DARK (LUNA visible)   */
+/* ============================= */
+
+[data-theme="dark"] .icono-sol {
+    display: none;
+}
+
+[data-theme="dark"] .icono-luna {
+    display: block;
+}
