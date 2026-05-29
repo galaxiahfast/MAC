@@ -1,58 +1,86 @@
-import os
+from pathlib import Path
 
-def concatenar_archivos(ruta_destino, rutas_origen):
-    """
-    Concatena varios archivos en un documento de destino.
-    Si el documento destino existe, lo sobrescribe.
-    Elimina líneas en blanco de cada archivo.
-    
-    Args:
-        ruta_destino (str): Ruta del archivo de destino
-        rutas_origen (list): Lista con las rutas de los archivos a concatenar
-    """
-    try:
-        # Abrir el archivo de destino en modo escritura (sobrescribe si existe)
-        with open(ruta_destino, 'w', encoding='utf-8') as archivo_destino:
-            
-            for ruta_origen in rutas_origen:
-                # Verificar si el archivo origen existe
-                if not os.path.exists(ruta_origen):
-                    print(f"Advertencia: El archivo {ruta_origen} no existe. Se omite.")
-                    continue
-                
-                # Escribir encabezado con el nombre y ubicación del archivo
-                nombre_archivo = os.path.basename(ruta_origen)
-                ubicacion = os.path.dirname(ruta_origen)
-                
-                archivo_destino.write(f"=== NOMBRE: {nombre_archivo} ===\n")
-                archivo_destino.write(f"=== UBICACIÓN: {ubicacion} ===\n")
-                archivo_destino.write("=== CONTENIDO ===\n")
-                
-                # Leer y escribir el contenido del archivo origen sin líneas en blanco
-                with open(ruta_origen, 'r', encoding='utf-8') as archivo_origen:
-                    for linea in archivo_origen:
-                        # Eliminar espacios en blanco al inicio y final, y saltar si la línea está vacía
-                        linea_limpia = linea.rstrip('\n\r')
-                        if linea_limpia.strip():  # Solo escribir si no es una línea en blanco
-                            archivo_destino.write(linea_limpia + '\n')
-                
-                # Agregar una línea separadora entre archivos (opcional)
-                archivo_destino.write("\n" + "="*50 + "\n\n")
-        
-        print(f"¡Éxito! Los archivos se han concatenado en: {ruta_destino}")
-        
-    except Exception as e:
-        print(f"Error al procesar los archivos: {e}")
+from PIL import Image
+from PIL import ImageOps
 
-# Definir las rutas de los archivos a concatenar
-rutas_archivos = [
-    r"C:\Users\ortiz\Downloads\MAC\aplicacion\static\js\otros\comportamientoMenuPrincipal.js",
-    r"C:\Users\ortiz\Downloads\MAC\aplicacion\templates\index.html",
-    r"C:\Users\ortiz\Downloads\MAC\aplicacion\static\css\menuInferiorCentrado.css"
-]
 
-# Definir la ruta del documento de destino
-documento_destino = r"C:\Users\ortiz\Downloads\documento.txt"
+# @galaxiahfast - Carpeta donde están las imágenes.
+RUTA_IMAGENES = Path(
+    r"C:\Users\MOISES INFORMATICA\Desktop\MAC\aplicacion\static\imagenes"
+)
 
-# Ejecutar la función
-concatenar_archivos(documento_destino, rutas_archivos)
+
+# @galaxiahfast - Relación entre nombres originales y nuevos nombres modo claro.
+MAPA_ARCHIVOS = {
+    "planoMovil2x.webp": "planoPrincipalMovil2xModoClaro.webp",
+    "planoMovil.webp": "planoPrincipalMovilModoClaro.webp",
+    "planoMediaResolucion.webp": "planoPrincipalMediaResolucionModoClaro.webp",
+    "planoBajaResolucion.webp": "planoPrincipalBajaResolucionModoClaro.webp",
+    "planoAltaResolucion.webp": "planoPrincipalAltaResolucionModoClaro.webp",
+}
+
+
+# @galaxiahfast - Genera nombre equivalente modo oscuro.
+def generar_nombre_modo_oscuro(nombre_modo_claro: str) -> str:
+    return nombre_modo_claro.replace("ModoClaro", "ModoOscuro")
+
+
+# @galaxiahfast - Renombra archivos originales y genera versiones dark.
+def procesar_imagenes() -> None:
+
+    for nombre_original, nuevo_nombre_claro in MAPA_ARCHIVOS.items():
+
+        ruta_original = RUTA_IMAGENES / nombre_original
+        ruta_claro = RUTA_IMAGENES / nuevo_nombre_claro
+
+        # ================================================================
+        # VALIDACIÓN
+        # ================================================================
+
+        if not ruta_original.exists():
+            print(f"[ERROR] No existe: {ruta_original.name}")
+            continue
+
+        # ================================================================
+        # RENOMBRAR MODO CLARO
+        # ================================================================
+
+        if not ruta_claro.exists():
+            ruta_original.rename(ruta_claro)
+            print(f"[OK] Renombrado: {ruta_original.name} -> {ruta_claro.name}")
+        else:
+            print(f"[INFO] Ya existe: {ruta_claro.name}")
+
+        # ================================================================
+        # GENERAR MODO OSCURO
+        # ================================================================
+
+        nombre_oscuro = generar_nombre_modo_oscuro(nuevo_nombre_claro)
+        ruta_oscuro = RUTA_IMAGENES / nombre_oscuro
+
+        if ruta_oscuro.exists():
+            print(f"[INFO] Ya existe versión dark: {ruta_oscuro.name}")
+            continue
+
+        with Image.open(ruta_claro) as imagen:
+
+            # @galaxiahfast - Convierte a RGB antes de invertir colores.
+            imagen_rgb = imagen.convert("RGB")
+
+            # @galaxiahfast - Genera versión invertida tipo dark mode.
+            imagen_dark = ImageOps.invert(imagen_rgb)
+
+            # @galaxiahfast - Guarda imagen dark optimizada en WEBP.
+            imagen_dark.save(
+                ruta_oscuro,
+                format="WEBP",
+                quality=95,
+                method=6,
+            )
+
+            print(f"[OK] Generado dark: {ruta_oscuro.name}")
+
+
+# @galaxiahfast - Punto de entrada principal.
+if __name__ == "__main__":
+    procesar_imagenes()

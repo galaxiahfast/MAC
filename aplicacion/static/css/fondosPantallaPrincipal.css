@@ -1,3 +1,4 @@
+
 /* @galaxiahfast - Variables globales del contenedor principal y mapa. */
 :root {
 
@@ -12,6 +13,9 @@
 
     /* @galaxiahfast - Sombra/brillo del thumb. */
     --contenedor-principal-scrollbar-brillo: rgba(233, 233, 238, 0.6);
+
+    /* @galaxiahfast - Fondo global del plano técnico. */
+    --fondo-plano-tecnico: #ffffff;
 }
 
 /* @galaxiahfast - Variables modo oscuro. */
@@ -22,6 +26,9 @@
     --contenedor-principal-scrollbar-thumb-activo: #3f3f3f;
 
     --contenedor-principal-scrollbar-brillo: rgba(63, 63, 63, 0.55);
+
+    /* @galaxiahfast - Fondo oscuro del plano técnico. */
+    --fondo-plano-tecnico: #000000;
 }
 
 /* @galaxiahfast - Reset base. */
@@ -31,6 +38,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    background: var(--fondo-plano-tecnico);
 }
 
 body {
@@ -44,8 +52,10 @@ body {
 .contenedor-principal-aplicacion-scroll {
     width: 100%;
     height: 100vh;
+
     overflow-y: auto;
     overflow-x: hidden;
+
     scroll-behavior: smooth;
     overscroll-behavior: contain;
 
@@ -55,31 +65,35 @@ body {
     position: relative;
 }
 
-/* Ocultar scrollbar nativo */
+/* @galaxiahfast - Ocultar scrollbar nativo. */
 .contenedor-principal-aplicacion-scroll::-webkit-scrollbar {
     display: none;
 }
 
 /* =======================================================================
-   SCROLLBAR VISUAL (ESTILO MENÚ LATERAL)
+   SCROLLBAR VISUAL
    ======================================================================= */
 
 .scrollbar-principal-personalizado {
     position: fixed;
+
     top: 0;
     right: 2px;
+
     width: var(--contenedor-principal-scrollbar-ancho);
     height: 100vh;
 
     background: transparent;
+
     z-index: 9999;
 
     pointer-events: none;
 }
 
-/* Thumb */
+/* @galaxiahfast - Thumb visual personalizado. */
 .scrollbar-principal-thumb {
     position: absolute;
+
     top: 0;
     left: 0;
 
@@ -87,43 +101,46 @@ body {
     min-height: 50px;
 
     border-radius: 999px;
+
     background: var(--contenedor-principal-scrollbar-thumb);
 
     opacity: 0;
+
     transition:
         opacity 0.2s ease,
         background 0.2s ease,
         transform 0.1s ease;
 
     pointer-events: auto;
+
     cursor: pointer;
 }
 
-/* Hover visual */
+/* @galaxiahfast - Hover visual del thumb. */
 .scrollbar-principal-thumb:hover {
     background: var(--contenedor-principal-scrollbar-thumb-hover);
 }
 
-/* Active */
+/* @galaxiahfast - Estado activo del thumb. */
 .scrollbar-principal-thumb:active {
     background: var(--contenedor-principal-scrollbar-thumb-activo);
 }
 
-/* Mostrar al interactuar con scroll */
+/* @galaxiahfast - Mostrar scrollbar al interactuar con el contenedor. */
 .contenedor-principal-aplicacion-scroll:hover
 ~ .scrollbar-principal-personalizado
 .scrollbar-principal-thumb {
     opacity: 1;
 }
 
-/* También mostrar cuando se usa scroll real */
+/* @galaxiahfast - Mostrar scrollbar durante interacción activa. */
 .contenedor-principal-aplicacion-scroll:active
 ~ .scrollbar-principal-personalizado
 .scrollbar-principal-thumb {
     opacity: 1;
 }
 
-/* Estado JS (mejor UX que hover puro) */
+/* @galaxiahfast - Estado controlado vía JS. */
 .scrollbar-principal-thumb.scrolling {
     opacity: 1;
 }
@@ -139,17 +156,21 @@ body {
 
 #contenidoPrincipal {
     height: 100%;
+
     margin-left: var(--ancho-menu-colapsado, 88px);
+
     width: calc(100% - var(--ancho-menu-colapsado, 88px));
 }
 
-/* Ajuste menú expandido */
+/* @galaxiahfast - Ajuste responsive cuando el menú lateral está expandido. */
 .menu-lateral-expandido
 ~ .contenedor-principal-aplicacion-scroll
 .contenedor-principal-aplicacion
 #contenidoPrincipal,
 body:has(.menu-lateral-expandido) #contenidoPrincipal {
+
     margin-left: var(--ancho-expandido-menu-lateral, 280px);
+
     width: calc(100% - var(--ancho-expandido-menu-lateral, 280px));
 }
 
@@ -157,37 +178,54 @@ body:has(.menu-lateral-expandido) #contenidoPrincipal {
    MAPA
    ======================================================================= */
 
+/* @galaxiahfast - Contenedor principal del plano técnico. */
 .map-container {
     width: 100%;
     min-height: 100%;
+
     position: relative;
+
+    background: var(--fondo-plano-tecnico);
 }
 
+/* @galaxiahfast - Contenedor flex para mantener el plano centrado. */
 .contenedor-imagen-centrada {
     width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    background: var(--fondo-plano-tecnico);
 }
 
+/* @galaxiahfast - Imagen base responsiva del plano técnico. */
 .plano-base {
     width: 100%;
     height: auto;
+
     display: block;
+
     object-fit: contain;
+
     transition: filter 0.3s ease;
 }
 
-[data-theme="dark"] .plano-base {
-    filter: invert(1) hue-rotate(180deg);
-}
 
+/* @galaxiahfast - Capas absolutas superpuestas del mapa. */
 #capaDispositivos,
 .grid-overlay {
     position: absolute;
+
     inset: 0;
+
     pointer-events: none;
 }
 
 /* =======================================================================
-   ANIMACIÓN (igual lógica visual del menú)
+   ANIMACIÓN
    ======================================================================= */
 
 @keyframes scrollGlow {
@@ -201,6 +239,7 @@ body:has(.menu-lateral-expandido) #contenidoPrincipal {
     }
 }
 
+/* @galaxiahfast - Glow visual temporal durante scroll. */
 .scrollbar-principal-thumb.scrolling {
     animation: scrollGlow 0.25s ease-out;
 }

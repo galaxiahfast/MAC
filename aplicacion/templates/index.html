@@ -1,11 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <!-- 1. SCRIPT DE TEMA (PRIMERO DE TODO) -->
+    <!-- @galaxiahfast - Aplica el tema guardado antes de renderizar la UI para evitar parpadeos visuales (FOUC). -->
     <script>
     (() => {
-        const tema = localStorage.getItem('tema') || 'light';
-        document.documentElement.setAttribute('data-theme', tema);
+
+        const tema =
+            localStorage.getItem('tema') || 'light';
+
+        document.documentElement.setAttribute(
+            'data-theme',
+            tema
+        );
+
+        const sufijoTema =
+            tema === 'dark'
+                ? 'ModoOscuro'
+                : 'ModoClaro';
+
+        window.planoTema = {
+
+            src:
+                `/static/imagenes/planoPrincipalMovil${sufijoTema}.webp`,
+
+            srcset: `
+                /static/imagenes/planoPrincipalMovil${sufijoTema}.webp 412w,
+                /static/imagenes/planoPrincipalMovil2x${sufijoTema}.webp 824w,
+                /static/imagenes/planoPrincipalBajaResolucion${sufijoTema}.webp 750w,
+                /static/imagenes/planoPrincipalMediaResolucion${sufijoTema}.webp 1200w,
+                /static/imagenes/planoPrincipalAltaResolucion${sufijoTema}.webp 2294w
+            `
+        };
+
+        /* @galaxiahfast - Preload dinámico según tema. */
+        const preload =
+            document.createElement('link');
+
+        preload.rel = 'preload';
+        preload.as = 'image';
+        preload.href =
+            window.planoTema.src;
+
+        document.head.appendChild(preload);
+
     })();
     </script>
     <meta charset="UTF-8">
@@ -15,13 +52,13 @@
 
     <!-- @galaxiahfast - Estilos principales. -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/temas.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fondosPantallaPrincipal.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fondosPantallaPrincipal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menuLateralIzquierdo.css') }}">
 
     <!-- @galaxiahfast - Fuentes. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
 
     <!-- @galaxiahfast - Preload de imágenes para optimizar la carga. -->
     <link rel="preload" href="{{ url_for('static', filename='imagenes/planoMovil.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
@@ -195,25 +232,39 @@
                     <div class="contenedor-imagen-centrada">
 
                         <img
-                            src="{{ url_for('static', filename='imagenes/planoMovil.webp') }}"
-                            srcset="
-                                {{ url_for('static', filename='imagenes/planoMovil.webp') }} 412w,
-                                {{ url_for('static', filename='imagenes/planoMovil2x.webp') }} 824w,
-                                {{ url_for('static', filename='imagenes/planoBajaResolucion.webp') }} 750w,
-                                {{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }} 1200w,
-                                {{ url_for('static', filename='imagenes/planoAltaResolucion.webp') }} 2294w
-                            "
+                            id="imagenPlanoPrincipal"
+
+                            class="plano-base"
+
+                            alt="Plano técnico de distribución de dispositivos"
+
+                            width="2294"
+                            height="2722"
+
+                            fetchpriority="high"
+
+                            src=""
+
                             sizes="
                                 (max-width: 600px) 100vw,
                                 (max-width: 1200px) 800px,
                                 2294px
                             "
-                            width="2294"
-                            height="2722"
-                            fetchpriority="high"
-                            class="plano-base"
-                            alt="Plano técnico de distribución de dispositivos"
                         >
+                        <script>
+
+                            const imagen =
+                                document.getElementById(
+                                    'imagenPlanoPrincipal'
+                                );
+
+                            imagen.src =
+                                window.planoTema.src;
+
+                            imagen.srcset =
+                                window.planoTema.srcset;
+
+                        </script>
                     </div>
 
                     <div class="grid-overlay"></div>
@@ -236,7 +287,6 @@
             id="scrollbarPrincipalThumb"
         ></div>
     </div>
-
     <!-- @galaxiahfast - Scripts para control de temas, sistema de notificaciones y lógica principal. -->
     <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
     <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>

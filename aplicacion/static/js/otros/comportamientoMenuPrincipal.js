@@ -16,8 +16,8 @@
 
     /* @galaxiahfast - Logos según el tema visual activo. */
     const LOGOS_TEMA = {
-        light: '/static/imagenes/logoMenuPrincipalLight.png',
-        dark: '/static/imagenes/logoMenuPrincipalDark.png'
+        light: '/static/imagenes/logoMenuPrincipalModoClaroSinFondo.png',
+        dark: '/static/imagenes/logoMenuPrincipalModoOscuroSinFondo.png'
     };
 
     const textosBotones = {
@@ -516,3 +516,37 @@
     }
 
 })();
+
+/* @galaxiahfast - SVG del icono de sol utilizado para el tema claro */
+function iconoSol() {
+    return `
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="18.36" x2="5.64" y2="16.92"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    `;
+}
+
+/* @galaxiahfast - SVG del icono de luna utilizado para el tema oscuro */
+function iconoLuna() {
+    return `
+        <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+    `;
+}
+
+/* @galaxiahfast - Sincroniza la visibilidad de los iconos según el tema activo */
+function renderIcono(tema) {
+    const boton = document.getElementById('botonAlternarTemaVisualAplicacion');
+    if (!boton) return;
+    const sol = boton.querySelector('.icono-sol');
+    const luna = boton.querySelector('.icono-luna');
+    if (!sol || !luna) return;
+    const esDark = tema === 'dark';
+    sol.style.display = esDark ? 'none' : 'block';
+    luna.style.display = esDark ? 'block' : 'none';
+}
