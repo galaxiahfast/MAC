@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fondosPantallaPrincipal.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/menuLateralIzquierdo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/apartados/apartadosCrear.css') }}">
 
     <!-- @galaxiahfast - Fuentes. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -214,6 +215,39 @@
     
 
 
+
+
+    <div id="contenedorFlotanteRegistroApartadoGlobal" class="panel-flotante-registro-apartado-global estado-panel-oculto">
+        <div class="contenedor-halo-icono-apartado">
+            <div class="halo-externo-apartado"></div>
+            <div class="halo-interno-apartado"></div>
+            <div class="circulo-icono-central-apartado">
+                <svg viewBox="3 0 18 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+            </div>
+        </div>
+        <h3 class="titulo-panel-registro-apartado">Crear Nuevo Apartado Global</h3>
+        <p class="descripcion-panel-registro-apartado">Permite registrar un nuevo parámetro maestro en el sistema para agrupar y categorizar los dispositivos de forma global</p>
+        <form id="formularioRegistroApartadoGlobal">
+            <div class="grupo-campo-formulario-apartado">
+                <label for="inputEspecificoNombreNuevoApartado">Nombre del Apartado:</label>
+                <input type="text" id="inputEspecificoNombreNuevoApartado" name="campoTecnicoNombreApartado" placeholder="Ej. Zona de Almacén" required>
+            </div>
+            <div class="grupo-campo-formulario-apartado">
+                <label for="inputEspecificoValorPredeterminadoNuevoApartado">Valor Predeterminado:</label>
+                <input type="text" id="inputEspecificoValorPredeterminadoNuevoApartado" name="campoTecnicoValorPredeterminado" placeholder="Ej. Principal">
+            </div>
+            <button type="submit" class="boton-accion-confirmar-registro-apartado">Guardar Apartado</button>
+        </form>
+    </div>
+
+
+
+    
+    
     <!-- @galaxiahfast - Contenedor principal con scroll real de la aplicación. -->
     <div
         class="contenedor-principal-aplicacion-scroll"
