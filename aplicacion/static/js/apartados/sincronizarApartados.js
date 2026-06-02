@@ -1,35 +1,38 @@
-
-
-
+/* @galaxiahfast - Lógica de negocio y sincronización de apartados globales. */
 import { ApartadosAPI } from './comunicacionHTTP.js';
-import { setApartados } from './memoriaCache.js';
+import { setApartados, getApartados, actualizarApartadosOptimista } from './memoriaCache.js';
 
-
-
-// @galaxiahfast - Sincroniza estado completo desde backend.
+/* @galaxiahfast - Sincroniza la colección de apartados desde el servidor y actualiza la memoria local. */
 export async function sincronizarApartados() {
-
-    // @galaxiahfast - Consulta el catálogo al servidor y actualiza la caché si la respuesta es exitosa.
     const res = await ApartadosAPI.listar();
     if (res.estado !== 'exito') return;
     setApartados(res.apartados);
 }
 
-
-
-// @galaxiahfast - Crea apartado y refresca estado.
+/* @galaxiahfast - Crea un nuevo apartado global con manejo optimista y rollback en caso de error. */
 export async function crearApartado(nombre, valor) {
-
-    // @galaxiahfast - Transmite los datos de registro y dispara la resincronización local de la caché.
-    const res = await ApartadosAPI.crear({
-        nombreApartado: nombre,
-        valorPredeterminado: valor
-    });
-    if (res.estado !== 'exito') {
-        throw new Error(res.mensaje || 'Error al crear');
+    const nuevoApartado = { nombre, valor };
+    const respaldo = [...getApartados()];
+    actualizarApartadosOptimista(nuevoApartado);
+    try {
+        const res = await ApartadosAPI.crear({
+            nombreApartado: nombre,
+            valorPredeterminado: valor
+        });
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+    } catch (error) {
+        setApartados(respaldo);
+        alert('No se pudo guardar: ' + error.message);
     }
-    await sincronizarApartados();
 }
+
+
+
+
+
+
+
+
 
 
 

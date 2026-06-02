@@ -1,20 +1,11 @@
-
-
-
-// @galaxiahfast - Realiza petición genérica GET.
+// @galaxiahfast - Módulo de comunicación HTTP para operaciones CRUD con el backend de apartados globales.
 export async function get(url) {
-
-    // @galaxiahfast - Ejecuta consulta nativa asíncrona hacia la URL especificada.
     const res = await fetch(url);
     return await res.json();
 }
 
-
-
-// @galaxiahfast - Realiza petición genérica POST.
+// @galaxiahfast - Función genérica para enviar datos al servidor utilizando POST, con manejo de JSON.
 export async function post(url, data) {
-
-    // @galaxiahfast - Envía parámetros de configuración y cuerpo estructurado en JSON.
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,28 +14,24 @@ export async function post(url, data) {
     return await res.json();
 }
 
-
-
-// @galaxiahfast - Contenedor maestro de peticiones crudas para el catálogo de apartados.
+// @galaxiahfast - API específica para operaciones relacionadas con apartados globales, utilizando las funciones genéricas de GET y POST.
 export const ApartadosAPI = {
 
-    // @galaxiahfast - Consulta la colección de registros activos.
+    // @galaxiahfast - Listado completo de apartados globales.
     listar: () => get('/api/apartados/listar'),
 
-    // @galaxiahfast - Transmite los datos para registrar un apartado global.
+    // @galaxiahfast - Creación de un nuevo apartado global con nombre y valor predeterminado.
     crear: (payload) => post('/api/apartados/crear', payload),
 
-    // @galaxiahfast - Solicita la baja lógica del registro seleccionado.
+    // @galaxiahfast - Baja lógica de un apartado global, moviéndolo a papelera.
     eliminar: (nombreApartado) =>
         post('/api/apartados/eliminar', { nombreApartado }),
 
-    // @galaxiahfast - Solicita la reactivación estructural en la base de datos.
+    // @galaxiahfast - Restauración lógica de un apartado global desde la papelera.
     restaurar: (nombreApartado) =>
         post('/api/apartados/restaurar', { nombreApartado }),
 
-    // @galaxiahfast - Dispara la purga física definitiva del elemento.
+    // @galaxiahfast - Eliminación definitiva de un apartado global, removiéndolo completamente del sistema.
     eliminarDefinitivo: (nombreApartado) =>
         post('/api/apartados/eliminar-definitivo', { nombreApartado })
 };
-
-

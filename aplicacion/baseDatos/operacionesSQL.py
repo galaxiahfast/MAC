@@ -1,6 +1,6 @@
 
 
-
+import threading
 from .conectar import obtenerConexion
 
 
@@ -41,70 +41,57 @@ def listarApartados() -> list[dict]:
 
 
 
-# @galaxiahfast - Registra un apartado global y lo vincula automáticamente a todos los dispositivos existentes. Recibe nombreApartado (str), valorPredeterminado (str). Retorna None.
-def crearApartado(nombreApartado: str, valorPredeterminado: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+
+def vincularApartadoADispositivos(idApartado, valorPredeterminado):
+    # Nota: Esta función abre su propia conexión independiente
+    conexion = None
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+        
+        cursor.execute("SELECT id FROM dispositivos")
+        dispositivos = cursor.fetchall()
+        
+        if dispositivos:
+            datos_bulk = [(d[0], idApartado, valorPredeterminado, False) for d in dispositivos]
+            cursor.executemany("""
+                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle, esPersonalizado)
+                VALUES (%s, %s, %s, %s)
+            """, datos_bulk)
+            conexion.commit()
+    except Exception as e:
+        print(f"Error en segundo plano al vincular dispositivos: {e}")
+    finally:
+        if conexion and conexion.is_connected(): conexion.close()
+        
+def crearApartado(nombreApartado: str, valorPredeterminado: str) -> None:
     conexion = None
     cursor = None
-
-    # @galaxiahfast - Ejecuta toda la operación dentro de una transacción SQL controlada.
     try:
         conexion = obtenerConexion()
         cursor = conexion.cursor(dictionary=True)
 
-        # @galaxiahfast - Verifica si el apartado ya existe evitando duplicados lógicos.
-        cursor.execute("""
-            SELECT id
-            FROM apartados
-            WHERE UPPER(nombreApartado) = UPPER(%s)
-            AND estadoEliminado = FALSE
-        """, (nombreApartado,))
-
-        # @galaxiahfast - Interrumpe la operación lanzando una excepción si el apartado ya existe.
+        # 1. Verificación rápida (necesaria para evitar duplicados)
+        cursor.execute("SELECT id FROM apartados WHERE UPPER(nombreApartado) = UPPER(%s) AND estadoEliminado = FALSE", (nombreApartado,))
         if cursor.fetchone():
             raise ValueError("El apartado ya existe.")
 
-        # @galaxiahfast - Inserta el nuevo apartado dentro del catálogo maestro.
-        cursor.execute("""
-            INSERT INTO apartados (nombreApartado, valorPredeterminado)
-            VALUES (%s, %s)
-        """, (nombreApartado, valorPredeterminado))
-
-        # @galaxiahfast - Recupera el identificador autogenerado del nuevo apartado.
+        # 2. Insertar solo el Apartado
+        cursor.execute("INSERT INTO apartados (nombreApartado, valorPredeterminado) VALUES (%s, %s)", (nombreApartado, valorPredeterminado))
         idApartado = cursor.lastrowid
-
-        # @galaxiahfast - Obtiene todos los dispositivos existentes incluyendo ocultos y enviados a papelera.
-        cursor.execute("SELECT id FROM dispositivos")
-        dispositivos = cursor.fetchall()
-
-        # @galaxiahfast - Relaciona automáticamente el apartado con todos los dispositivos registrados en el sistema.
-        for d in dispositivos:
-            cursor.execute("""
-                INSERT INTO detallesDispositivos (
-                    idDispositivo,
-                    idApartado,
-                    valorDetalle,
-                    esPersonalizado
-                )
-                VALUES (%s, %s, %s, FALSE)
-            """, (d["id"], idApartado, valorPredeterminado))
-
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+        
+        conexion.commit() # Confirmamos la creación del apartado
+        
+        # 3. Delegar el trabajo pesado a un hilo (Background Thread)
+        threading.Thread(target=vincularApartadoADispositivos, args=(idApartado, valorPredeterminado)).start()
+        
     except Exception:
-        if conexion:
-            conexion.rollback()
+        if conexion: conexion.rollback()
         raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
     finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
+        if cursor: cursor.close()
+        if conexion and conexion.is_connected(): conexion.close()
 
 
 

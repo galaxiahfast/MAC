@@ -1,47 +1,44 @@
+/* @galaxiahfast - Módulo de memoria caché para apartados globales, implementando un patrón de suscripción para mantener la UI sincronizada. */
+const estado = { apartados: [], suscriptores: [] };
 
+/* @galaxiahfast - Devuelve la colección actual de apartados almacenada en memoria. */
+export function getApartados() {
+    return estado.apartados;
+}
 
+/* @galaxiahfast - Actualiza la colección de apartados en memoria y notifica a los suscriptores para refrescar la UI. */
+export function actualizarApartadosOptimista(nuevoApartado) {
+    estado.apartados = [...estado.apartados, nuevoApartado];
+    notificar();
+}
 
-// @galaxiahfast - Estado central de apartados en memoria.
-const estado = {
-    apartados: [],
-    suscriptores: []
-};
-
-
-
-// @galaxiahfast - Actualiza el estado global.
+/* @galaxiahfast - Reemplaza completamente la colección de apartados en memoria, generalmente después de una sincronización con el servidor. */
 export function setApartados(nuevos) {
-
-    // @galaxiahfast - Asigna la nueva colección y dispara la alerta a los observadores.
     estado.apartados = nuevos;
     notificar();
 }
 
 
 
-// @galaxiahfast - Obtiene snapshot del estado.
-export function getApartados() {
-
-    // @galaxiahfast - Retorna la lista actual almacenada en la memoria caché local.
-    return estado.apartados;
-}
 
 
 
-// @galaxiahfast - Suscripción simple tipo observer.
+
+
+
+
+
+
+
+
+
 export function suscribirse(callback) {
-
-    // @galaxiahfast - Añade una función callback a la lista de ejecución reactiva.
     estado.suscriptores.push(callback);
 }
-
-
-
-// @galaxiahfast - Notifica cambios a UI.
 function notificar() {
-
-    // @galaxiahfast - Itera y ejecuta cada callback pasando el estado actualizado.
     estado.suscriptores.forEach(fn => fn(estado.apartados));
 }
-
-
+export function eliminarApartadoOptimista(nombre) {
+    estado.apartados = estado.apartados.filter(a => a.nombre !== nombre);
+    notificar();
+}

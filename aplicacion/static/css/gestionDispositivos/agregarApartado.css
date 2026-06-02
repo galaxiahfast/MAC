@@ -1,0 +1,204 @@
+/* @galaxiahfast - Variables CSS del sistema. */
+:root {
+    --crear-apartado-ancho-base: 340px;
+    --crear-apartado-borde-radio: 25px;
+    --crear-apartado-espaciado-interno: 25px;
+    --crear-apartado-separacion-bloques: 25px;
+    --crear-apartado-separacion-label-input: 10px;
+    --crear-apartado-fuente-unificada: 13px;
+    --crear-apartado-transicion-suave: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    --crear-apartado-transicion-posicion: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --crear-apartado-fondo-ventana: rgba(255, 255, 255, 0.95);
+    --crear-apartado-borde-ventana: rgba(71, 85, 105, 0.35);
+    --crear-apartado-borde-fuerte: rgba(71, 85, 105, 0.5);
+    --crear-apartado-color-titulo: #000000;
+    --crear-apartado-color-subtitulos: #111111;
+    --crear-apartado-fondo-input: #fefefe;
+    --crear-apartado-color-scroll: #f97316;
+    --crear-apartado-color-scroll-hover: #ea580c;
+    --crear-apartado-color-texto-boton: #ffffff;
+    --crear-apartado-sombra: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* @galaxiahfast - Soporte para tema oscuro. */
+[data-theme="dark"] {
+    --crear-apartado-fondo-ventana: rgba(18, 18, 18, 0.95);
+    --crear-apartado-borde-ventana: rgba(56, 189, 248, 0.4);
+    --crear-apartado-borde-fuerte: rgba(56, 189, 248, 0.6);
+    --crear-apartado-color-titulo: #ffffff;
+    --crear-apartado-color-subtitulos: #ffffff;
+    --crear-apartado-fondo-input: #121212;
+    --crear-apartado-color-scroll: #38bdf8;
+    --crear-apartado-color-scroll-hover: #0ea5e9;
+    --crear-apartado-color-texto-boton: #121212;
+    --crear-apartado-sombra: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* @galaxiahfast - Contenedor estructural principal. */
+.crear-apartado-panel-flotante {
+    position: fixed;
+    top: 50%;
+    left: calc(75px + (100vw - 75px) / 2);
+    width: var(--crear-apartado-ancho-base);
+    height: auto;
+    background: var(--crear-apartado-fondo-ventana);
+    backdrop-filter: blur(15px);
+    border-radius: var(--crear-apartado-borde-radio);
+    border: 1px solid var(--crear-apartado-borde-ventana);
+    box-shadow: var(--crear-apartado-sombra);
+    z-index: 10000;
+    padding: var(--crear-apartado-espaciado-interno);
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transform: translate(-50%, -50%) translateZ(0);
+    transition: var(--crear-apartado-transicion-suave), var(--crear-apartado-transicion-posicion), background-color 0.3s ease, border-color 0.3s ease;
+}
+.crear-apartado-panel-flotante.estado-panel-oculto {
+    display: none;
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.95);
+}
+
+/* @galaxiahfast - Componente concéntrico de iconos. */
+.crear-apartado-contenedor-halo-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--crear-apartado-separacion-bloques) auto;
+    width: 72px;
+    height: 72px;
+}
+.crear-apartado-halo-externo {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--crear-apartado-color-scroll);
+    opacity: 0.12;
+    transition: background-color 0.3s ease;
+}
+.crear-apartado-halo-interno {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--crear-apartado-color-scroll);
+    opacity: 0.24;
+    transition: background-color 0.3s ease;
+}
+.crear-apartado-circulo-icono-central {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--crear-apartado-color-scroll);
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+.crear-apartado-circulo-icono-central svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--crear-apartado-color-texto-boton);
+    transition: stroke 0.3s ease;
+}
+
+/* @galaxiahfast - Estilos de textos e identificadores. */
+.crear-apartado-titulo-panel {
+    display: block;
+    margin: 0 0 var(--crear-apartado-separacion-bloques) 0;
+    color: var(--crear-apartado-color-titulo);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+.crear-apartado-descripcion-panel {
+    display: block;
+    margin: 0 0 var(--crear-apartado-separacion-bloques) 0;
+    color: var(--crear-apartado-color-subtitulos);
+    font-size: var(--crear-apartado-fuente-unificada);
+    line-height: 2;
+    font-weight: 400;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+/* @galaxiahfast - Interfaz interna del formulario. */
+.crear-apartado-grupo-campo-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--crear-apartado-separacion-label-input);
+    margin-bottom: var(--crear-apartado-separacion-bloques);
+    text-align: left;
+}
+.crear-apartado-grupo-campo-formulario label {
+    display: block;
+    color: var(--crear-apartado-color-subtitulos);
+    font-size: var(--crear-apartado-fuente-unificada);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+.crear-apartado-grupo-campo-formulario input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--crear-apartado-borde-ventana);
+    background: var(--crear-apartado-fondo-input);
+    color: var(--crear-apartado-color-titulo);
+    font-size: var(--crear-apartado-fuente-unificada);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+.crear-apartado-grupo-campo-formulario input:focus {
+    border-color: var(--crear-apartado-borde-fuerte);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* @galaxiahfast - Botón de confirmación y estados. */
+.crear-apartado-boton-accion-confirmar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--crear-apartado-color-scroll);
+    color: var(--crear-apartado-color-texto-boton);
+    font-size: var(--crear-apartado-fuente-unificada);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease, color 0.3s ease;
+}
+.crear-apartado-boton-accion-confirmar:hover {
+    background: var(--crear-apartado-color-scroll-hover);
+}
+.crear-apartado-boton-accion-confirmar:active {
+    transform: scale(0.98);
+}
+.crear-apartado-boton-accion-confirmar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* @galaxiahfast - Ajustes de diseño para móviles. */
+@media (max-width: 480px) {
+    .crear-apartado-panel-flotante {
+        top: auto;
+        bottom: 16px;
+        left: 50% !important;
+        width: calc(100% - 32px);
+        transform: translateX(-50%);
+    }
+    .crear-apartado-panel-flotante.estado-panel-oculto {
+        transform: translate(-50%, 20px);
+    }
+}
