@@ -259,60 +259,40 @@
             : expandirMenu();
     }
 
-    function configurarManejadorBotones() {
+/* @galaxiahfast - Ajuste en el manejador de botones para no cerrar el menú si se abre el panel de gestión. */
+function configurarManejadorBotones() {
+    contenedorMenu.addEventListener('click', function (e) {
+        const boton = e.target.closest('.boton-menu-herramienta');
+        if (!boton) {
+            deseleccionarTodos();
+            if (menuExpandido) contraerMenu();
+            return;
+        }
 
-        contenedorMenu.addEventListener(
-            'click',
-            function (e) {
+        // --- NUEVA LÓGICA DE EXCEPCIÓN ---
+        // Si el botón es el de gestión, no contraer el menú inmediatamente
+        if (boton.id === 'botonGestionarApartadosGlobales') {
+            return; 
+        }
+        // ---------------------------------
 
-                const boton =
-                    e.target.closest('.boton-menu-herramienta');
+        if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
 
-                if (!boton) {
+        if (boton.id === 'botonAlternarTemaVisualAplicacion') {
+            alternarTemaVisual();
+            return;
+        }
 
-                    deseleccionarTodos();
+        if (boton.classList.contains('activo')) {
+            boton.classList.remove('activo');
+        } else {
+            deseleccionarTodos();
+            boton.classList.add('activo');
+        }
 
-                    if (menuExpandido) {
-                        contraerMenu();
-                    }
-
-                    return;
-                }
-
-                if (
-                    boton.id ===
-                    'botonAlternarExpansionMenuLateralPrincipal'
-                ) {
-                    return;
-                }
-
-                if (
-                    boton.id ===
-                    'botonAlternarTemaVisualAplicacion'
-                ) {
-
-                    alternarTemaVisual();
-
-                    return;
-                }
-
-                if (boton.classList.contains('activo')) {
-
-                    boton.classList.remove('activo');
-
-                } else {
-
-                    deseleccionarTodos();
-
-                    boton.classList.add('activo');
-                }
-
-                if (menuExpandido) {
-                    contraerMenu();
-                }
-            }
-        );
-    }
+        if (menuExpandido) contraerMenu();
+    });
+}
 
     /* ==========================================================================
        SCROLLBAR PERSONALIZADO

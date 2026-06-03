@@ -26,26 +26,26 @@ export async function crearApartado(nombre, valor) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-// @galaxiahfast - Envía a papelera.
+/* @galaxiahfast - Elimina un apartado global con manejo optimista y rollback en caso de error. */
 export async function eliminarApartado(nombre) {
-
-    // @galaxiahfast - Solicita la baja lógica al servidor y actualiza el estado si se procesa correctamente.
-    const res = await ApartadosAPI.eliminar(nombre);
-    if (res.estado !== 'exito') {
-        throw new Error(res.mensaje || 'Error al eliminar');
+    const respaldo = [...getApartados()];
+    eliminarApartadoOptimista(nombre);
+    try {
+        const res = await ApartadosAPI.eliminar(nombre);
+        if (res.estado !== 'exito') throw new Error('Error al eliminar en servidor');
+    } catch (error) {
+        setApartados(respaldo);
+        alert('No se pudo eliminar: ' + error.message);
     }
-    await sincronizarApartados();
 }
+
+
+
+
+
+
+
+
 
 
 
