@@ -1,5 +1,5 @@
 /* @galaxiahfast - Módulo encargado de manejar la creación de nuevos apartados globales desde el panel flotante. */
-import { crearApartado } from './sincronizarApartados.js';
+import { crearApartado } from '../infraestructura/sincronizarApartados.js';
 let botonAlternarPanel = null;
 
 // @galaxiahfast - Manejo de submit 100% fluido y silencioso.
