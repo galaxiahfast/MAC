@@ -81,6 +81,8 @@
     padding-right: 5px;
     scrollbar-width: thin;
     scrollbar-color: var(--gestionar-apartado-color-scroll) transparent;
+    
+    border: 1px solid red;
 }
 .gestionar-apartado-item-fila {
     display: flex;

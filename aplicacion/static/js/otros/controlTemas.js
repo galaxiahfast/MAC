@@ -1,5 +1,5 @@
 
-
+import { renderIcono } from './comportamientoMenuPrincipal.js';
 
 // @galaxiahfast - Helper que devuelve el elemento raíz del documento (<html>) para manipulación global del DOM.
 function obtenerRoot() {

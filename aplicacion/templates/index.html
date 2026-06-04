@@ -369,11 +369,12 @@
             id="scrollbarPrincipalThumb"
         ></div>
     </div>
-    <!-- @galaxiahfast - Scripts para control de temas, sistema de notificaciones y lógica principal. -->
-    <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/comportamientoMenuPrincipal.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/scrollPrincipal.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/otros/comportamientoMenuPrincipal.js') }}"></script>
+
+    <script type="module" src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/otros/scrollPrincipal.js') }}"></script>
+
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
