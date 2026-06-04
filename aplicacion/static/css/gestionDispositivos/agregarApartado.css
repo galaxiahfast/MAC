@@ -46,7 +46,7 @@
     border-radius: var(--crear-apartado-borde-radio);
     border: 1px solid var(--crear-apartado-borde-ventana);
     box-shadow: var(--crear-apartado-sombra);
-    z-index: 10000;
+    z-index: 9998;
     padding: var(--crear-apartado-espaciado-interno);
     font-family: 'Inter', sans-serif;
     text-align: center;

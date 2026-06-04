@@ -146,14 +146,27 @@ function manejoClicMenu(e) {
     if (menuExpandido && boton.id !== 'botonAlternarTemaVisualAplicacion') contraerMenu();
 }
 
-/* @galaxiahfast - Configura el cierre del menú y paneles al hacer clic fuera. */
+/* @galaxiahfast - Configura el cierre centralizado de forma jerárquica */
 function configurarClicFuera() {
     document.addEventListener('click', function (e) {
-        if (contenedorMenu && !contenedorMenu.contains(e.target) && e.target !== botonHamburguesa && !botonHamburguesa.contains(e.target)) {
-            cerrarTodosLosPaneles();
-            deseleccionarTodos();
-            if (menuExpandido) contraerMenu();
+        const clicEnMenu = contenedorMenu && contenedorMenu.contains(e.target);
+        const clicEnFormulario = e.target.closest('.panel-formulario-activo');
+        if (clicEnMenu) {
+            if (menuExpandido && !e.target.closest('.boton-menu-herramienta')) {
+                contraerMenu();
+            }
+            return;
         }
+        if (clicEnFormulario) {
+            if (menuExpandido) contraerMenu();
+            return;
+        }
+        if (menuExpandido){
+            contraerMenu();
+            return;
+        }
+        cerrarTodosLosPaneles();
+        deseleccionarTodos();
     });
 }
 
@@ -221,9 +234,6 @@ function crearOverlay() {
     overlay = document.createElement('div');
     overlay.className = 'overlay-cierre-menu';
     document.body.appendChild(overlay);
-    overlay.addEventListener('click', () => {
-        if (menuExpandido) contraerMenu();
-    });
 }
 
 /* ==========================================================================
