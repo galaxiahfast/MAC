@@ -9,17 +9,26 @@ export async function sincronizarApartados() {
     setApartados(res.apartados);
 }
 
-/* @galaxiahfast - Crea un nuevo apartado global con manejo optimista y rollback en caso de error. */
+/* @galaxiahfast - Corrección en sincronizarApartados.js */
 export async function crearApartado(nombre, valor) {
-    const nuevoApartado = { nombre, valor };
+    // CORRECCIÓN: Estructura consistente con el servidor
+    const nuevoApartado = { 
+        nombreApartado: nombre, 
+        valorPredeterminado: valor 
+    };
+    
     const respaldo = [...getApartados()];
     actualizarApartadosOptimista(nuevoApartado);
+    
     try {
         const res = await ApartadosAPI.crear({
             nombreApartado: nombre,
             valorPredeterminado: valor
         });
         if (res.estado !== 'exito') throw new Error(res.mensaje);
+        
+        // OPCIONAL: Si el servidor devuelve el objeto completo (con ID y fecha), 
+        // podrías hacer un 'setApartados' con la respuesta real para refrescar.
     } catch (error) {
         setApartados(respaldo);
         alert('No se pudo guardar: ' + error.message);
@@ -42,35 +51,5 @@ export async function eliminarApartado(nombre) {
 
 
 
-
-
-
-
-
-
-
-// @galaxiahfast - Restauración lógica.
-export async function restaurarApartado(nombre) {
-
-    // @galaxiahfast - Solicita reactivar el registro de la papelera y refresca la memoria local.
-    const res = await ApartadosAPI.restaurar(nombre);
-    if (res.estado !== 'exito') {
-        throw new Error(res.mensaje || 'Error al restaurar');
-    }
-    await sincronizarApartados();
-}
-
-
-
-// @galaxiahfast - Eliminación definitiva.
-export async function eliminarApartadoDefinitivo(nombre) {
-
-    // @galaxiahfast - Dispara la purga irreversible en el servidor y sincroniza la interfaz de usuario.
-    const res = await ApartadosAPI.eliminarDefinitivo(nombre);
-    if (res.estado !== 'exito') {
-        throw new Error(res.mensaje || 'Error al eliminar definitivo');
-    }
-    await sincronizarApartados();
-}
 
 
