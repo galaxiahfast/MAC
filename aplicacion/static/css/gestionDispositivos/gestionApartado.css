@@ -27,7 +27,6 @@
     --gestionar-apartado-fondo-input: #262626;
 }
 
-/* @galaxiahfast - Contenedor estructural principal. */
 .gestionar-apartado-panel-flotante {
     position: fixed;
     top: 50%;
@@ -52,7 +51,6 @@
     transform: translate(-50%, -40%) scale(0.95);
 }
 
-/* @galaxiahfast - Halo superior. */
 .gestionar-apartado-contenedor-halo-icono {
     position: relative;
     display: flex;
@@ -67,7 +65,6 @@
 .gestionar-apartado-circulo-icono-central { position: absolute; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: var(--gestionar-apartado-color-scroll); z-index: 2; }
 .gestionar-apartado-circulo-icono-central svg { width: 18px; height: 18px; stroke: var(--gestionar-apartado-color-texto-boton); }
 
-/* @galaxiahfast - Títulos y descripciones. */
 .gestionar-apartado-titulo-panel {
     display: block;
     margin: 0 0 var(--gestionar-apartado-separacion-bloques) 0;
@@ -91,24 +88,26 @@
     margin-inline: auto;
 }
 
-/* @galaxiahfast - Scrollbar Personalizado (Wrapper). */
 .gestionar-apartado-contenedor-scroll-wrapper {
     position: relative;
     overflow: hidden;
 }
 
 .gestionar-apartado-contenedor-lista {
-    overflow-y: auto; /* Cambiamos a auto */
-    scrollbar-width: none;
-    height: 246px; 
+    overflow: hidden; /* IMPORTANTE: Oculta el desborde nativo */
+    height: 240px;
+    position: relative;
     display: flex;
     flex-direction: column;
-    box-sizing: border-box;
-    border: solid 1px red;
-    /* ELIMINA ESTO: scroll-snap-type: y mandatory; */
 }
-.gestionar-apartado-contenedor-lista::-webkit-scrollbar { display: none; }
 
+#contenidoScrollableInterno {
+    /* La duración 0.1s es el punto dulce entre respuesta inmediata y suavidad */
+    transition: transform 0.1s linear; 
+    will-change: transform;
+}
+
+/* Track y Thumb del scroll */
 .gestionar-apartado-track-scroll {
     position: absolute;
     right: 0;
@@ -117,7 +116,7 @@
     height: 100%;
     background: rgba(0,0,0,0.05);
     border-radius: 3px;
-    pointer-events: none;
+    pointer-events: none; /* Permite clicks a través del track */
 }
 
 .gestionar-apartado-thumb-scroll {
@@ -128,25 +127,29 @@
     transition: background 0.2s;
     position: absolute;
     z-index: 10;
+    pointer-events: auto; /* IMPORTANTE: El thumb sí debe responder a eventos */
 }
+
 .gestionar-apartado-thumb-scroll.arrastrando {
     background: var(--gestionar-apartado-color-scroll-hover);
     cursor: grabbing;
 }
 
 .gestionar-apartado-item-fila {
+    box-sizing: border-box; /* IMPORTANTE: Esto evita que el padding se sume a los 70px */
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--gestionar-apartado-fondo-input);
     padding: 15px;
     border-radius: 12px;
-    height: 70px; 
-    margin-bottom: 12px; /* Esta distancia es crucial */
-    border: 1px solid var(--gestionar-apartado-borde-ventana);
-    flex-shrink: 0; /* IMPEDIR QUE SE ACHIQUEN */
-    /* ELIMINA ESTO: scroll-snap-align: start; */
-    /* ELIMINA ESTO: scroll-snap-stop: always; */
+    height: 70px;
+    margin-bottom: 15px; 
+    flex-shrink: 0;
+}
+/* Elimina el margen inferior solo del último elemento */
+.gestionar-apartado-item-fila:last-child {
+    margin-bottom: 0;
 }
 .gestionar-apartado-item-fila:hover { border-color: var(--gestionar-apartado-color-scroll); }
 
