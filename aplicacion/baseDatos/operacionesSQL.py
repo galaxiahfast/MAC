@@ -1,21 +1,16 @@
 
 
+
 import threading
 from .conectar import obtenerConexion
+from .contexto import conexion_lectura, conexion_escritura, buscarApartadoPorNombre
 
 
 
 # @galaxiahfast - Obtiene todos los apartados activos disponibles para renderizado dinámico en frontend. No recibe parámetros. Retorna list[dict] (colección de registros activos).
 def listarApartados() -> list[dict]:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Controla lectura SQL asegurando captura de errores y liberación de recursos.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor(dictionary=True)
+    with conexion_lectura() as cursor:
 
         # @galaxiahfast - Recupera únicamente apartados activos excluyendo elementos enviados a papelera.
         cursor.execute("""
@@ -32,19 +27,11 @@ def listarApartados() -> list[dict]:
         # @galaxiahfast - Retorna directamente la colección estructurada de registros obtenidos.
         return cursor.fetchall()
 
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
 
 
 
 
 def vincularApartadoADispositivos(idApartado, valorPredeterminado):
-    # Nota: Esta función abre su propia conexión independiente
     conexion = None
     try:
         conexion = obtenerConexion()
@@ -66,11 +53,8 @@ def vincularApartadoADispositivos(idApartado, valorPredeterminado):
         if conexion and conexion.is_connected(): conexion.close()
         
 def crearApartado(nombreApartado: str, valorPredeterminado: str) -> None:
-    conexion = None
-    cursor = None
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor(dictionary=True)
+
+    with conexion_escritura() as cursor:
 
         # 1. Verificación rápida (necesaria para evitar duplicados)
         cursor.execute("SELECT id FROM apartados WHERE UPPER(nombreApartado) = UPPER(%s) AND estadoEliminado = FALSE", (nombreApartado,))
@@ -81,40 +65,18 @@ def crearApartado(nombreApartado: str, valorPredeterminado: str) -> None:
         cursor.execute("INSERT INTO apartados (nombreApartado, valorPredeterminado) VALUES (%s, %s)", (nombreApartado, valorPredeterminado))
         idApartado = cursor.lastrowid
         
-        conexion.commit() # Confirmamos la creación del apartado
-        
         # 3. Delegar el trabajo pesado a un hilo (Background Thread)
         threading.Thread(target=vincularApartadoADispositivos, args=(idApartado, valorPredeterminado)).start()
-        
-    except Exception:
-        if conexion: conexion.rollback()
-        raise
-    finally:
-        if cursor: cursor.close()
-        if conexion and conexion.is_connected(): conexion.close()
 
 
 
 # @galaxiahfast - Ejecuta el borrado lógico de un apartado dinámico existente. Recibe nombreApartado (str). Retorna None.
 def eliminarApartado(nombreApartado: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta operación SQL controlando integridad transaccional.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor(dictionary=True)
+    with conexion_escritura() as cursor:
 
         # @galaxiahfast - Verifica que el apartado exista y permanezca activo dentro de la base de datos.
-        cursor.execute("""
-            SELECT id
-            FROM apartados
-            WHERE UPPER(nombreApartado) = UPPER(%s)
-            AND estadoEliminado = FALSE
-        """, (nombreApartado,))
-        apartado = cursor.fetchone()
+        apartado = buscarApartadoPorNombre(cursor, nombreApartado, solo_activos=True)
 
         # @galaxiahfast - Interrumpe el flujo lanzando una excepción si el apartado no existe o ya fue borrado.
         if not apartado:
@@ -128,35 +90,12 @@ def eliminarApartado(nombreApartado: str) -> None:
             WHERE id = %s
         """, (apartado["id"],))
 
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
 
 
 # @galaxiahfast - Actualiza el nombre y valor predeterminado de un apartado propagando cambios únicamente a dispositivos no personalizados. Recibe idApartado (int), nuevoNombre (str), nuevoValorPredeterminado (str). Retorna None.
 def editarApartado(idApartado: int, nuevoNombre: str, nuevoValorPredeterminado: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta la actualización completa dentro de una transacción SQL controlada.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+    with conexion_escritura(diccionario=False) as cursor:
 
         # @galaxiahfast - Actualiza la información estructural base del apartado seleccionado.
         cursor.execute("""
@@ -174,35 +113,12 @@ def editarApartado(idApartado: int, nuevoNombre: str, nuevoValorPredeterminado: 
             AND esPersonalizado = FALSE
         """, (nuevoValorPredeterminado, idApartado))
 
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
 
 
 # @galaxiahfast - Actualiza el valor de un apartado para un dispositivo específico y lo marca como personalizado de forma permanente. Recibe idDispositivo (int), idApartado (int), valor (str). Retorna None.
 def actualizarDetalle(idDispositivo: int, idApartado: int, valor: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta la actualización del detalle controlando la transacción.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
+    with conexion_escritura(diccionario=False) as cursor:
 
         # @galaxiahfast - Modifica el valor rompiendo el vínculo de herencia global al establecer esPersonalizado en verdadero.
         cursor.execute("""
@@ -213,43 +129,15 @@ def actualizarDetalle(idDispositivo: int, idApartado: int, valor: str) -> None:
             AND idApartado = %s
         """, (valor, idDispositivo, idApartado))
 
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
 
 
 # @galaxiahfast - Ejecuta la restauración lógica de un apartado dinámico y restablece el valor predeterminado en dispositivos no personalizados. Recibe nombreApartado (str). Retorna None.
 def restaurarApartado(nombreApartado: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta la restauración completa dentro de una transacción SQL controlada.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor(dictionary=True)
+    with conexion_escritura() as cursor:
 
         # @galaxiahfast - Recupera la información del apartado objetivo ignorando su estado de eliminación actual.
-        cursor.execute("""
-            SELECT id, valorPredeterminado
-            FROM apartados
-            WHERE UPPER(nombreApartado) = UPPER(%s)
-        """, (nombreApartado,))
-        apartado = cursor.fetchone()
+        apartado = buscarApartadoPorNombre(cursor, nombreApartado)
 
         # @galaxiahfast - Interrumpe el flujo lanzando una excepción si el apartado solicitado no existe en el sistema.
         if not apartado:
@@ -274,43 +162,15 @@ def restaurarApartado(nombreApartado: str) -> None:
             apartado["id"]
         ))
 
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados en la transacción.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
 
 
 # @galaxiahfast - Ejecuta el borrado físico y definitivo de un apartado del catálogo y purga todas sus relaciones en cascada manual. Recibe nombreApartado (str). Retorna None.
 def eliminarApartadoDefinitivo(nombreApartado: str) -> None:
 
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta la eliminación física completa dentro de una transacción SQL controlada.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor(dictionary=True)
+    with conexion_escritura() as cursor:
 
         # @galaxiahfast - Recupera la información del apartado objetivo sin importar si contaba con un estado de eliminación previa.
-        cursor.execute("""
-            SELECT id
-            FROM apartados
-            WHERE UPPER(nombreApartado) = UPPER(%s)
-        """, (nombreApartado,))
-        apartado = cursor.fetchone()
+        apartado = buscarApartadoPorNombre(cursor, nombreApartado)
 
         # @galaxiahfast - Interrumpe el flujo lanzando una excepción si el apartado solicitado no existe en el sistema.
         if not apartado:
@@ -329,26 +189,6 @@ def eliminarApartadoDefinitivo(nombreApartado: str) -> None:
             DELETE FROM apartados
             WHERE id = %s
         """, (idApartado,))
-
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados en la transacción.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
-
-
-
 
 
 
@@ -382,10 +222,6 @@ def eliminarDispositivo():
 # ==========================================================================
 # OPERACIONES DE DETALLES
 # ==========================================================================
-
-def actualizarDetalle():
-    pass
-
 
 def obtenerDetallesDispositivo():
     pass

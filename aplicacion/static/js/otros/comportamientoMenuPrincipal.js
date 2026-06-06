@@ -1,6 +1,7 @@
 /* @galaxiahfast - Importaciones corregidas */
 import { inicializarModuloRegistro, abrirPanelRegistro, limpiarYRestaurarFormulario as cerrarPanelRegistro } from '../gestionDispositivos/agregarApartado.js';
 import { inicializarModuloGestion, abrirPanelGestion, cerrarPanelGestion } from '../gestionDispositivos/gestionApartados.js';
+import { inicializarScrollbar, actualizarThumb } from '../infraestructura/scrollbarPersonalizado.js';
 
 /* @galaxiahfast - Variables de estado y referencias a elementos del DOM. */
 let menuExpandido = false;
@@ -9,9 +10,6 @@ let botonHamburguesa = null;
 let contenedorMenu = null;
 let scrollContainer = null;
 let scrollbarThumb = null;
-let thumbDragging = false;
-let dragStartY = 0;
-let initialScrollTop = 0;
 const LOGOS_TEMA = {
     light: '/static/imagenes/logoMenuPrincipalModoClaroSinFondo.png',
     dark: '/static/imagenes/logoMenuPrincipalModoOscuroSinFondo.png'
@@ -242,51 +240,14 @@ function crearOverlay() {
 
 /* @galaxiahfast - Calcula y actualiza la posición del scrollbar. */
 function actualizarScrollbar() {
-    if (!scrollContainer || !scrollbarThumb) return;
-    const { scrollHeight, clientHeight, scrollTop } = scrollContainer;
-    const ratioVisible = clientHeight / scrollHeight;
-    const thumbHeight = Math.max(ratioVisible * clientHeight, 50);
-    const maxThumbTop = clientHeight - thumbHeight;
-    const thumbTop = (scrollTop / (Math.max(scrollHeight - clientHeight, 1))) * maxThumbTop;
-    scrollbarThumb.style.height = `${thumbHeight}px`;
-    scrollbarThumb.style.transform = `translateY(${thumbTop || 0}px)`;
-}
-
-/* @galaxiahfast - Inicia el arrastre del scrollbar. */
-function iniciarDragScrollbar(e) {
-    thumbDragging = true;
-    dragStartY = e.clientY;
-    initialScrollTop = scrollContainer.scrollTop;
-    scrollbarThumb.classList.add('arrastrando');
-    document.body.style.userSelect = 'none';
-}
-
-/* @galaxiahfast - Ejecuta el movimiento durante el arrastre. */
-function moverDragScrollbar(e) {
-    if (!thumbDragging) return;
-    const deltaY = e.clientY - dragStartY;
-    const scrollRatio = scrollContainer.scrollHeight / scrollContainer.clientHeight;
-    scrollContainer.scrollTop = initialScrollTop + (deltaY * scrollRatio);
-}
-
-/* @galaxiahfast - Finaliza el arrastre del scrollbar. */
-function terminarDragScrollbar() {
-    thumbDragging = false;
-    scrollbarThumb.classList.remove('arrastrando');
-    document.body.style.userSelect = '';
+    actualizarThumb(scrollContainer, scrollbarThumb, 50);
 }
 
 /* @galaxiahfast - Inicializa eventos del scrollbar personalizado. */
 function configurarScrollbarPersonalizado() {
     scrollContainer = document.getElementById('barraHerramientasScroll');
     scrollbarThumb = document.getElementById('scrollbarThumb');
-    if (!scrollContainer || !scrollbarThumb) return;
-    scrollContainer.addEventListener('scroll', actualizarScrollbar, { passive: true });
-    window.addEventListener('resize', actualizarScrollbar);
-    scrollbarThumb.addEventListener('mousedown', iniciarDragScrollbar);
-    document.addEventListener('mousemove', moverDragScrollbar);
-    document.addEventListener('mouseup', terminarDragScrollbar);
-    setTimeout(actualizarScrollbar, 300);
+    inicializarScrollbar(scrollContainer, scrollbarThumb, { alturaMinima: 50, escucharResize: true });
 }
 
 /* ==========================================================================

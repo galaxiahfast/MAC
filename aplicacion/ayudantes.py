@@ -3,6 +3,8 @@
 
 import re
 import unicodedata
+from functools import wraps
+from flask import request, jsonify
 
 
 
@@ -26,5 +28,23 @@ def normalizarNombreApartado(nombreApartado: str) -> str:
 
     # @galaxiahfast - Retorna la cadena de texto final completamente limpia y estandarizada.
     return nombreNormalizado
+
+
+def extraerNombreApartado():
+    datos = request.get_json() or {}
+    nombreApartado = datos.get('nombreApartado', '')
+    if not nombreApartado:
+        return None, datos
+    return normalizarNombreApartado(nombreApartado), datos
+
+
+def manejarErroresRuta(funcion):
+    @wraps(funcion)
+    def wrapper(*args, **kwargs):
+        try:
+            return funcion(*args, **kwargs)
+        except Exception as error:
+            return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+    return wrapper
 
 

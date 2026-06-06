@@ -1,6 +1,7 @@
 /* @galaxiahfast - Módulo de gestión de apartados (renderizado, fecha, eliminación y scroll personalizado). */
 import { getApartados, suscribirse } from '../infraestructura/memoriaCache.js';
 import { eliminarApartado } from '../infraestructura/sincronizarApartados.js';
+import { inicializarScrollbar } from '../infraestructura/scrollbarPersonalizado.js';
 
 /* ==========================================================================
    @galaxiahfast - GESTIÓN DEL SCROLL PERSONALIZADO
@@ -9,56 +10,7 @@ import { eliminarApartado } from '../infraestructura/sincronizarApartados.js';
 function configurarScrollbarGestion() {
     const contenedor = document.getElementById('listaScrollGestionApartados');
     const thumb = document.getElementById('scrollbarThumbGestion');
-    
-    if (!contenedor || !thumb) return;
-
-    const actualizar = () => {
-        const { scrollHeight, clientHeight, scrollTop } = contenedor;
-        const ratioVisible = clientHeight / scrollHeight;
-        // Altura mínima del thumb 40px
-        const thumbHeight = Math.max(ratioVisible * clientHeight, 40);
-        const maxThumbTop = clientHeight - thumbHeight;
-        const thumbTop = (scrollTop / (Math.max(scrollHeight - clientHeight, 1))) * maxThumbTop;
-        
-        thumb.style.height = `${thumbHeight}px`;
-        thumb.style.transform = `translateY(${thumbTop || 0}px)`;
-        thumb.style.opacity = (scrollHeight <= clientHeight) ? '0' : '1';
-    };
-
-    contenedor.addEventListener('scroll', actualizar, { passive: true });
-    
-    // Lógica de arrastre
-    let thumbDragging = false;
-    let dragStartY = 0;
-    let initialScrollTop = 0;
-
-    thumb.addEventListener('mousedown', (e) => {
-        thumbDragging = true;
-        dragStartY = e.clientY;
-        initialScrollTop = contenedor.scrollTop;
-        thumb.classList.add('arrastrando');
-        document.body.style.userSelect = 'none';
-    });
-
-    // Asegúrate de que esta lógica en tu JS sea la única que mueve el contenedor
-    document.addEventListener('mousemove', (e) => {
-        if (!thumbDragging) return;
-        
-        const deltaY = e.clientY - dragStartY;
-        // La relación es: qué porcentaje del track movimos * cuánto contenido tenemos oculto
-        const scrollRatio = (contenedor.scrollHeight - contenedor.clientHeight) / (contenedor.clientHeight - thumb.offsetHeight);
-        contenedor.scrollTop = initialScrollTop + (deltaY * scrollRatio);
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (thumbDragging) {
-            thumbDragging = false;
-            thumb.classList.remove('arrastrando');
-            document.body.style.userSelect = '';
-        }
-    });
-
-    actualizar();
+    inicializarScrollbar(contenedor, thumb, { alturaMinima: 40 });
 }
 
 /* @galaxiahfast - Nueva función para scroll por pasos */

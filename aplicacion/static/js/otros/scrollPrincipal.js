@@ -1,3 +1,5 @@
+import { calcularGeometriaThumb } from '../infraestructura/scrollbarPersonalizado.js';
+
 // @galaxiahfast - Actualiza dinámicamente la imagen del plano según el tema activo.
 function actualizarPlanoSegunTema(tema) {
 
@@ -46,6 +48,7 @@ window.actualizarPlanoSegunTema =
 
 
 // @galaxiahfast - Scroll principal de la aplicación (NO menú)
+
 (function () {
 
     let scrollContainer = null;
@@ -54,57 +57,20 @@ window.actualizarPlanoSegunTema =
     let hideTimeout = null;
     let isScrolling = false;
 
-    // =====================================================
-    // SOLO recalcula geometría del thumb
-    // =====================================================
     function actualizar() {
 
         if (!scrollContainer || !thumb) return;
 
-        const scrollTop =
-            scrollContainer.scrollTop;
-
-        const scrollHeight =
-            scrollContainer.scrollHeight;
-
-        const clientHeight =
-            scrollContainer.clientHeight;
-
-        if (scrollHeight <= clientHeight) {
-
+        const geometria = calcularGeometriaThumb(scrollContainer, 50);
+        if (!geometria.visible) {
             thumb.style.opacity = '0';
-
             return;
         }
 
-        const ratio =
-            clientHeight / scrollHeight;
-
-        const thumbHeight =
-            Math.max(
-                ratio * clientHeight,
-                50
-            );
-
-        const maxTop =
-            clientHeight - thumbHeight;
-
-        const top =
-            (
-                scrollTop /
-                (scrollHeight - clientHeight)
-            ) * maxTop;
-
-        thumb.style.height =
-            `${thumbHeight}px`;
-
-        thumb.style.transform =
-            `translateY(${top}px)`;
+        thumb.style.height = `${geometria.thumbHeight}px`;
+        thumb.style.transform = `translateY(${geometria.thumbTop}px)`;
     }
 
-    // =====================================================
-    // SOLO efectos visuales de scroll
-    // =====================================================
     function activarEstadoScroll() {
 
         if (!thumb) return;
@@ -141,9 +107,6 @@ window.actualizarPlanoSegunTema =
             }, 120);
     }
 
-    // =====================================================
-    // Evento real de scroll
-    // =====================================================
     function manejarScroll() {
 
         actualizar();
@@ -211,8 +174,6 @@ window.actualizarPlanoSegunTema =
 
         manejarHover();
 
-        // API pública para recalcular
-        // sin disparar animación.
         window.actualizarScrollbarPrincipal =
             actualizar;
 
