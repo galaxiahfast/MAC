@@ -1,84 +1,47 @@
 
-/* @galaxiahfast - Inicializa el sistema de cambio de tema. */
-function iniciarControlTema() {
+import { renderIcono } from './comportamientoMenuPrincipal.js';
 
-    /* @galaxiahfast - Obtener elementos principales. */
-    const botonTema = document.getElementById('controlAlternarTema');
-    const cuerpo = document.body;
-    const icono = document.getElementById('iconoTemaSistema');
-    
-    /* @galaxiahfast - Validar elementos requeridos. */
-    if (!botonTema || !icono) {
-        console.warn(
-            '@galaxiahfast - No se encontraron los elementos del tema'
-        );
-        return;
+// @galaxiahfast - Helper que devuelve el elemento raíz del documento (<html>) para manipulación global del DOM.
+function obtenerRoot() {
+    return document.documentElement;
+}
+
+// @galaxiahfast - Aplica el tema global de la aplicación (CSS, persistencia y UI sincronizada).
+function aplicarTema(tema) {
+    const root = obtenerRoot();
+    root.setAttribute('data-theme', tema);
+    localStorage.setItem('tema', tema);
+    renderIcono(tema);
+    if (typeof window.actualizarLogoSegunTema === 'function') {
+        window.actualizarLogoSegunTema();
     }
-
-    /* @galaxiahfast - Aplicar tema almacenado. */
-    const temaGuardado =
-        localStorage.getItem('tema') || 'claro';
-    cuerpo.setAttribute(
-        'data-theme',
-        temaGuardado
-    );
-    actualizarIconoTema(
-        icono,
-        temaGuardado === 'dark'
-    );
-
-    /* @galaxiahfast - Configurar cambio dinámico de tema. */
-    botonTema.addEventListener('click', (evento) => {
-        evento.stopPropagation();
-        const esModoOscuro =
-            cuerpo.getAttribute('data-theme') === 'dark';
-        const nuevoTema =
-            esModoOscuro ? 'light' : 'dark';
-        cuerpo.setAttribute(
-            'data-theme',
-            nuevoTema
-        );
-        localStorage.setItem(
-            'tema',
-            nuevoTema
-        );
-        actualizarIconoTema(
-            icono,
-            !esModoOscuro
-        );
-    });
+    if (typeof window.actualizarPlanoSegunTema === 'function') {
+        window.actualizarPlanoSegunTema(tema);
+    }
 }
 
-/* @galaxiahfast - Actualiza el icono visual del tema activo. */
-function actualizarIconoTema(elementoIcono, modoOscuro) {
+// @galaxiahfast - Alterna el estado del tema entre light y dark basado en el estado actual del DOM.
+function alternarTemaVisual() {
+    const root = obtenerRoot();
+    const actual = root.getAttribute('data-theme') || 'light';
+    const nuevo = actual === 'dark' ? 'light' : 'dark';
 
-    /* @galaxiahfast - Icono para modo claro. */
-    const iconoSol = `
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="18.36" x2="5.64" y2="16.92"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-    `;
-
-    /* @galaxiahfast - Icono para modo oscuro. */
-    const iconoLuna = `
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-    `;
-
-    /* @galaxiahfast - Actualizar icono según el tema activo. */
-    elementoIcono.innerHTML =
-        modoOscuro
-            ? iconoLuna
-            : iconoSol;
+    aplicarTema(nuevo);
 }
 
-/* @galaxiahfast - Inicializar control de tema al cargar el documento. */
-document.addEventListener(
-    'DOMContentLoaded',
-    iniciarControlTema
-);
+// @galaxiahfast - API pública para alternar el tema visual desde la UI.
+window.alternarTemaVisual = alternarTemaVisual;
+
+/* @galaxiahfast - Sincroniza el estado inicial del tema desde localStorage.
+   Nota: puede parecer redundante frente al script inline del HTML, pero se mantiene
+   para asegurar sincronización completa del sistema (UI, iconos y lógica JS) en la carga. */
+function iniciarControlTema() {
+    const temaGuardado = localStorage.getItem('tema') || 'light';
+
+    aplicarTema(temaGuardado);
+}
+
+// @galaxiahfast - Inicializa el sistema de tema al cargar completamente el DOM.
+document.addEventListener('DOMContentLoaded', iniciarControlTema);
+
+

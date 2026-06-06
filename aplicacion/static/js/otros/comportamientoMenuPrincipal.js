@@ -1,158 +1,346 @@
-// Sistema para mostrar textos, manejo de selección exclusiva, autocierre y lógica contextual
-(function() {
-    'use strict';
-    
-    let menuExpandido = false;
-    let overlay = null;
-    let botonHamburguesa = null;
-    let contenedorMenu = null;
-    
-    // Ruta relativa al servidor Flask (siempre funciona si la carpeta static está en la raíz)
-    const RUTA_LOGO = "/static/imagenes/logoMenuPrincipal.png";
-    
-    const textosBotones = {
-        'botonRegistrarNuevoDispositivoPlano': 'Agregar',
-        'botonActivarModoEliminacionDispositivos': 'Eliminar',
-        'botonActivarModoEdicionDispositivos': 'Editar',
-        'botonActivarModoReubicacionDispositivos': 'Mover',
-        'botonAlternarVisibilidadDispositivosRenderizados': 'Ver todos',
-        'botonRegistrarNuevoApartadoGlobalDispositivos': 'Agregar Apartado',
-        'botonEliminarApartadosExistentesDispositivos': 'Eliminar Apartado',
-        'botonAbrirPanelRestauracionElementosEliminados': 'Papelera',
-        'botonAlternarTemaVisualAplicacion': 'Cambiar Tema',
-        'botonAbrirConfiguracionGeneralSistema': 'Configuración',
-        'botonCerrarSesionUsuarioActualSistema': 'Cerrar Sesión',
-        'botonAbrirPerfilUsuarioAutenticadoSistema': 'Mi Perfil'
-    };
-    
-    // --- Inserción del logo DENTRO del botón hamburguesa ---
-    function insertarLogoEnBoton() {
-        if (!botonHamburguesa || botonHamburguesa.querySelector('.logo-en-boton')) return;
+/* @galaxiahfast - Importaciones corregidas */
+import { inicializarModuloRegistro, abrirPanelRegistro, limpiarYRestaurarFormulario as cerrarPanelRegistro } from '../gestionDispositivos/agregarApartado.js';
+import { inicializarModuloGestion, abrirPanelGestion, cerrarPanelGestion } from '../gestionDispositivos/gestionApartados.js';
 
-        const img = document.createElement('img');
-        img.src = RUTA_LOGO;
-        img.className = 'logo-en-boton';
-        img.style.cssText = 'height: 25px; width: auto; margin-left: 10px; vertical-align: middle; opacity: 0; transition: opacity 0.3s ease;';
-        
-        const svg = botonHamburguesa.querySelector('svg');
-        if (svg) {
-            svg.after(img);
-        } else {
-            botonHamburguesa.appendChild(img);
-        }
-    }
+/* @galaxiahfast - Variables de estado y referencias a elementos del DOM. */
+let menuExpandido = false;
+let overlay = null;
+let botonHamburguesa = null;
+let contenedorMenu = null;
+let scrollContainer = null;
+let scrollbarThumb = null;
+let thumbDragging = false;
+let dragStartY = 0;
+let initialScrollTop = 0;
+const LOGOS_TEMA = {
+    light: '/static/imagenes/logoMenuPrincipalModoClaroSinFondo.png',
+    dark: '/static/imagenes/logoMenuPrincipalModoOscuroSinFondo.png'
+};
+const textosBotones = {
+    'botonRegistrarNuevoDispositivoPlano': 'Agregar',
+    'botonActivarModoEliminacionDispositivos': 'Eliminar',
+    'botonActivarModoEdicionDispositivos': 'Editar',
+    'botonActivarModoReubicacionDispositivos': 'Mover',
+    'botonAlternarVisibilidadDispositivosRenderizados': 'Ver todos',
+    'botonRegistrarNuevoApartadoGlobalDispositivos': 'Agregar Apartado',
+    'botonEliminarApartadosExistentesDispositivos': 'Eliminar Apartado',
+    'botonAbrirPanelRestauracionElementosEliminados': 'Papelera',
+    'botonAlternarTemaVisualAplicacion': 'Cambiar Tema',
+    'botonAbrirConfiguracionGeneralSistema': 'Configuración',
+    'botonCerrarSesionUsuarioActualSistema': 'Cerrar Sesión',
+    'botonAbrirPerfilUsuarioAutenticadoSistema': 'Mi Perfil'
+};
 
-    function crearOverlay() {
-        if (overlay) return;
-        overlay = document.createElement('div');
-        overlay.className = 'overlay-cierre-menu';
-        document.body.appendChild(overlay);
-        overlay.addEventListener('click', () => { if (menuExpandido) contraerMenu(); });
-    }
+/* ==========================================================================
+    @galaxiahfast - LÓGICA DE GESTIÓN DEL MENÚ (Expandir/Contraer).
+    ========================================================================== */
 
-    function deseleccionarTodos() {
-        if (!contenedorMenu) return;
-        contenedorMenu.querySelectorAll('.boton-menu-herramienta').forEach(btn => btn.classList.remove('activo'));
-    }
+/* @galaxiahfast - Expande el menú lateral principal. */
+function expandirMenu() {
+    menuExpandido = true;
+    agregarTextosBotones();
+    contenedorMenu.setAttribute('data-expandido', 'true');
+    const logoImg = document.querySelector('.logo-en-boton');
+    if (logoImg) logoImg.style.opacity = '1';
+    if (overlay) overlay.classList.add('activo');
+    actualizarScrollbar();
+}
 
-    function configurarClicFuera() {
-        document.addEventListener('click', function(e) {
-            if (contenedorMenu && !contenedorMenu.contains(e.target) && e.target !== botonHamburguesa && !botonHamburguesa.contains(e.target)) {
-                if (menuExpandido) contraerMenu();
-                else deseleccionarTodos();
-            }
-        });
-    }
-    
-    function agregarTextosBotones() {
-        const botones = document.querySelectorAll('.contenedor-interno-barra-herramientas .boton-menu-herramienta');
-        botones.forEach(boton => {
-            if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
-            const texto = textosBotones[boton.id];
-            if (texto && !boton.querySelector('.texto-ayuda-boton')) {
-                let textoSpan = document.createElement('span');
-                textoSpan.className = 'texto-ayuda-boton';
-                textoSpan.textContent = texto;
-                boton.appendChild(textoSpan);
-            }
-        });
-    }
-    
-    function eliminarTextosBotones() {
-        document.querySelectorAll('.texto-ayuda-boton').forEach(el => el.remove());
-    }
-    
-    function expandirMenu() {
-        menuExpandido = true;
-        agregarTextosBotones();
-        contenedorMenu.setAttribute('data-expandido', 'true');
-        
-        const logoImg = document.querySelector('.logo-en-boton');
-        if (logoImg) logoImg.style.opacity = '1';
-        
-        if (overlay) overlay.classList.add('activo');
-    }
-    
-    function contraerMenu() {
-        menuExpandido = false;
-        
-        const logoImg = document.querySelector('.logo-en-boton');
-        if (logoImg) logoImg.style.opacity = '0';
-
-        document.querySelectorAll('.texto-ayuda-boton').forEach(t => t.style.animation = 'desaparecerTexto 0.15s ease-out forwards');
-        setTimeout(() => {
-            contenedorMenu.setAttribute('data-expandido', 'false');
-            if (overlay) overlay.classList.remove('activo');
-            setTimeout(() => { if (!menuExpandido) eliminarTextosBotones(); }, 300);
-        }, 50);
-    }
-    
-    function alternarMenu(e) {
-        if (e) { e.preventDefault(); e.stopPropagation(); }
-        menuExpandido ? contraerMenu() : expandirMenu();
-    }
-    
-    function configurarManejadorBotones() {
-        contenedorMenu.addEventListener('click', function(e) {
-            const boton = e.target.closest('.boton-menu-herramienta');
-            if (!boton) {
-                deseleccionarTodos();
-                if (menuExpandido) contraerMenu();
-                return;
-            }
-            if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
-            
-            // Botón de cambiar tema: no cierra el menú
-            if (boton.id === 'botonAlternarTemaVisualAplicacion') return;
-            
-            if (boton.classList.contains('activo')) {
-                boton.classList.remove('activo');
-            } else {
-                deseleccionarTodos();
-                boton.classList.add('activo');
-            }
-            
-            if (menuExpandido) contraerMenu();
-        });
-    }
-    
-    function setup() {
-        botonHamburguesa = document.getElementById('botonAlternarExpansionMenuLateralPrincipal');
-        contenedorMenu = document.querySelector('.contenedor-barra-herramientas-principal');
-        if (!botonHamburguesa || !contenedorMenu) return;
-        
-        insertarLogoEnBoton();
-        crearOverlay();
-        configurarManejadorBotones(); 
-        configurarClicFuera();
-        
+/* @galaxiahfast - Contrae el menú lateral principal. */
+function contraerMenu() {
+    menuExpandido = false;
+    const logoImg = document.querySelector('.logo-en-boton');
+    if (logoImg) logoImg.style.opacity = '0';
+    document.querySelectorAll('.texto-ayuda-boton').forEach(t => {
+        t.style.animation = 'desaparecerTexto 0.15s ease-out forwards';
+    });
+    setTimeout(() => {
         contenedorMenu.setAttribute('data-expandido', 'false');
-        
-        botonHamburguesa.removeEventListener('click', alternarMenu);
-        botonHamburguesa.addEventListener('click', alternarMenu);
-        
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && menuExpandido) contraerMenu(); });
+        if (overlay) overlay.classList.remove('activo');
+        setTimeout(() => {
+            if (!menuExpandido) eliminarTextosBotones();
+        }, 300);
+        actualizarScrollbar();
+    }, 50);
+}
+
+/* @galaxiahfast - Alterna el estado de expansión del menú. */
+function alternarMenu(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
     }
-    
-    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', setup) : setup();
-})();
+    menuExpandido ? contraerMenu() : expandirMenu();
+}
+
+/* ==========================================================================
+    @galaxiahfast - CONTROLADOR CENTRAL DE ACCIONES.
+    ========================================================================== */
+
+/* @galaxiahfast - Escucha los eventos de clic centralizados y ejecuta la lógica según el ID del botón. */
+function configurarControladorCentral() {
+    window.removeEventListener('app:solicitar-accion', manejarAccion);
+    window.addEventListener('app:solicitar-accion', manejarAccion);
+}
+
+/* @galaxiahfast - Manejador de la lógica centralizada de los botones. */
+function manejarAccion(e) {
+    const { idBoton } = e.detail;
+    if (idBoton === 'botonAlternarTemaVisualAplicacion') {
+        if (typeof window.alternarTemaVisual === 'function') {
+            window.alternarTemaVisual();
+        }
+        return; 
+    }
+    cerrarTodosLosPaneles();
+    switch (idBoton) {
+        case 'botonRegistrarNuevoApartadoGlobalDispositivos':
+            abrirPanelRegistro();
+            break;
+        case 'botonEliminarApartadosExistentesDispositivos':
+            abrirPanelGestion();
+            break;
+    }
+}
+
+/* @galaxiahfast - Función para cerrar todos los paneles de forma centralizada. */
+function cerrarTodosLosPaneles() {
+    cerrarPanelRegistro();
+    cerrarPanelGestion();
+    document.getElementById('botonRegistrarNuevoApartadoGlobalDispositivos')?.classList.remove('activo');
+    document.getElementById('botonEliminarApartadosExistentesDispositivos')?.classList.remove('activo');
+}
+
+/* ==========================================================================
+    @galaxiahfast - GESTIÓN DE EVENTOS Y CLICS.
+    ========================================================================== */
+
+/* @galaxiahfast - Gestiona los clics en los botones del menú y dispara eventos personalizados para que otros módulos escuchen las acciones solicitadas. */
+function configurarManejadorBotones() {
+    contenedorMenu.removeEventListener('click', manejoClicMenu);
+    contenedorMenu.addEventListener('click', manejoClicMenu);
+}
+
+/* @galaxiahfast - Lógica delegada del clic en el menú. */
+function manejoClicMenu(e) {
+    const boton = e.target.closest('.boton-menu-herramienta');
+    if (!boton) {
+        cerrarTodosLosPaneles();
+        deseleccionarTodos();
+        if (menuExpandido) contraerMenu();
+        return;
+    }
+    if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
+    const eventoPersonalizado = new CustomEvent('app:solicitar-accion', {
+        detail: { idBoton: boton.id, elementoBoton: boton }
+    });
+    window.dispatchEvent(eventoPersonalizado);
+    const botonesQueAbrenPaneles = [
+        'botonRegistrarNuevoApartadoGlobalDispositivos',
+        'botonEliminarApartadosExistentesDispositivos'
+    ];
+    if (botonesQueAbrenPaneles.includes(boton.id)) {
+        deseleccionarTodos();
+        boton.classList.add('activo');
+    }
+    if (menuExpandido && boton.id !== 'botonAlternarTemaVisualAplicacion') contraerMenu();
+}
+
+/* @galaxiahfast - Configura el cierre centralizado de forma jerárquica */
+function configurarClicFuera() {
+    document.addEventListener('click', function (e) {
+        const clicEnMenu = contenedorMenu && contenedorMenu.contains(e.target);
+        const clicEnFormulario = e.target.closest('.panel-formulario-activo');
+        if (clicEnMenu) {
+            if (menuExpandido && !e.target.closest('.boton-menu-herramienta')) {
+                contraerMenu();
+            }
+            return;
+        }
+        if (clicEnFormulario) {
+            if (menuExpandido) contraerMenu();
+            return;
+        }
+        if (menuExpandido){
+            contraerMenu();
+            return;
+        }
+        cerrarTodosLosPaneles();
+        deseleccionarTodos();
+    });
+}
+
+/* @galaxiahfast - Quita la clase activo de todos los botones. */
+function deseleccionarTodos() {
+    if (!contenedorMenu) return;
+    contenedorMenu.querySelectorAll('.boton-menu-herramienta').forEach(btn => btn.classList.remove('activo'));
+}
+
+/* ==========================================================================
+    @galaxiahfast - GESTIÓN DEL LOGO Y TEMA.
+    ========================================================================== */
+
+/* @galaxiahfast - Obtiene la ruta del logo según el tema actual. */
+function obtenerRutaLogoSegunTema() {
+    const temaActual = document.body.getAttribute('data-theme') || 'light';
+    return LOGOS_TEMA[temaActual];
+}
+
+/* @galaxiahfast - Actualiza el src del logo dinámicamente. */
+function actualizarLogoSegunTema() {
+    const logo = document.querySelector('.logo-en-boton');
+    if (!logo) return;
+    logo.src = obtenerRutaLogoSegunTema();
+}
+
+/* @galaxiahfast - Inserta el elemento img del logo en el botón. */
+function insertarLogoEnBoton() {
+    if (!botonHamburguesa || botonHamburguesa.querySelector('.logo-en-boton')) return;
+    const img = document.createElement('img');
+    img.src = obtenerRutaLogoSegunTema();
+    img.className = 'logo-en-boton';
+    img.style.cssText = `height: 25px; width: auto; vertical-align: middle; opacity: 0; transition: opacity 0.3s ease;`;
+    const svg = botonHamburguesa.querySelector('svg');
+    svg ? svg.after(img) : botonHamburguesa.appendChild(img);
+}
+
+/* ==========================================================================
+    @galaxiahfast - GESTIÓN DE ETIQUETAS Y OVERLAY.
+    ========================================================================== */
+
+/* @galaxiahfast - Añade las etiquetas de texto a los botones. */
+function agregarTextosBotones() {
+    const botones = document.querySelectorAll('.contenedor-interno-barra-herramientas .boton-menu-herramienta');
+    botones.forEach(boton => {
+        if (boton.id === 'botonAlternarExpansionMenuLateralPrincipal') return;
+        const texto = textosBotones[boton.id];
+        if (texto && !boton.querySelector('.texto-ayuda-boton')) {
+            const textoSpan = document.createElement('span');
+            textoSpan.className = 'texto-ayuda-boton';
+            textoSpan.textContent = texto;
+            boton.appendChild(textoSpan);
+        }
+    });
+}
+
+/* @galaxiahfast - Elimina las etiquetas de texto de los botones. */
+function eliminarTextosBotones() {
+    document.querySelectorAll('.texto-ayuda-boton').forEach(el => el.remove());
+}
+
+/* @galaxiahfast - Crea el elemento overlay para cierre táctil. */
+function crearOverlay() {
+    if (overlay) return;
+    overlay = document.createElement('div');
+    overlay.className = 'overlay-cierre-menu';
+    document.body.appendChild(overlay);
+}
+
+/* ==========================================================================
+    @galaxiahfast - GESTIÓN DE SCROLLBAR PERSONALIZADO.
+    ========================================================================== */
+
+/* @galaxiahfast - Calcula y actualiza la posición del scrollbar. */
+function actualizarScrollbar() {
+    if (!scrollContainer || !scrollbarThumb) return;
+    const { scrollHeight, clientHeight, scrollTop } = scrollContainer;
+    const ratioVisible = clientHeight / scrollHeight;
+    const thumbHeight = Math.max(ratioVisible * clientHeight, 50);
+    const maxThumbTop = clientHeight - thumbHeight;
+    const thumbTop = (scrollTop / (Math.max(scrollHeight - clientHeight, 1))) * maxThumbTop;
+    scrollbarThumb.style.height = `${thumbHeight}px`;
+    scrollbarThumb.style.transform = `translateY(${thumbTop || 0}px)`;
+}
+
+/* @galaxiahfast - Inicia el arrastre del scrollbar. */
+function iniciarDragScrollbar(e) {
+    thumbDragging = true;
+    dragStartY = e.clientY;
+    initialScrollTop = scrollContainer.scrollTop;
+    scrollbarThumb.classList.add('arrastrando');
+    document.body.style.userSelect = 'none';
+}
+
+/* @galaxiahfast - Ejecuta el movimiento durante el arrastre. */
+function moverDragScrollbar(e) {
+    if (!thumbDragging) return;
+    const deltaY = e.clientY - dragStartY;
+    const scrollRatio = scrollContainer.scrollHeight / scrollContainer.clientHeight;
+    scrollContainer.scrollTop = initialScrollTop + (deltaY * scrollRatio);
+}
+
+/* @galaxiahfast - Finaliza el arrastre del scrollbar. */
+function terminarDragScrollbar() {
+    thumbDragging = false;
+    scrollbarThumb.classList.remove('arrastrando');
+    document.body.style.userSelect = '';
+}
+
+/* @galaxiahfast - Inicializa eventos del scrollbar personalizado. */
+function configurarScrollbarPersonalizado() {
+    scrollContainer = document.getElementById('barraHerramientasScroll');
+    scrollbarThumb = document.getElementById('scrollbarThumb');
+    if (!scrollContainer || !scrollbarThumb) return;
+    scrollContainer.addEventListener('scroll', actualizarScrollbar, { passive: true });
+    window.addEventListener('resize', actualizarScrollbar);
+    scrollbarThumb.addEventListener('mousedown', iniciarDragScrollbar);
+    document.addEventListener('mousemove', moverDragScrollbar);
+    document.addEventListener('mouseup', terminarDragScrollbar);
+    setTimeout(actualizarScrollbar, 300);
+}
+
+/* ==========================================================================
+    @galaxiahfast - INICIALIZACIÓN.
+    ========================================================================== */
+
+/* @galaxiahfast - Inicializa todos los componentes del módulo. */
+function setup() {
+    botonHamburguesa = document.getElementById('botonAlternarExpansionMenuLateralPrincipal');
+    contenedorMenu = document.querySelector('.contenedor-barra-herramientas-principal');
+    if (!botonHamburguesa || !contenedorMenu) return;
+    insertarLogoEnBoton();
+    crearOverlay();
+    configurarManejadorBotones();
+    configurarClicFuera();
+    configurarScrollbarPersonalizado();
+    configurarControladorCentral();
+    inicializarModuloRegistro();
+    inicializarModuloGestion();
+    contenedorMenu.setAttribute('data-expandido', 'false');
+    botonHamburguesa.removeEventListener('click', alternarMenu);
+    botonHamburguesa.addEventListener('click', alternarMenu);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menuExpandido) contraerMenu();
+    });
+    requestAnimationFrame(actualizarScrollbar);
+}
+window.actualizarLogoSegunTema = actualizarLogoSegunTema;
+document.readyState === 'loading' 
+    ? document.addEventListener('DOMContentLoaded', setup) 
+    : setup();
+
+/* ==========================================================================
+   @galaxiahfast - UTILIDADES DE ICONOS (GLOBALES).
+   ========================================================================== */
+
+/* @galaxiahfast - Retorna el SVG del icono de sol. */
+function iconoSol() {
+    return `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="18.36" x2="5.64" y2="16.92"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+}
+
+/* @galaxiahfast - Retorna el SVG del icono de luna. */
+function iconoLuna() {
+    return `<path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>`;
+}
+
+/* @galaxiahfast - Función exportada para ser usada en otros archivos */
+export function renderIcono(tema) {
+    const boton = document.getElementById('botonAlternarTemaVisualAplicacion');
+    if (!boton) return;
+    const sol = boton.querySelector('.icono-sol');
+    const luna = boton.querySelector('.icono-luna');
+    if (!sol || !luna) return;
+    const esDark = tema === 'dark';
+    sol.style.display = esDark ? 'none' : 'block';
+    luna.style.display = esDark ? 'block' : 'none';
+}

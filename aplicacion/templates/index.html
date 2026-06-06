@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- @galaxiahfast - Aplica el tema guardado antes de renderizar la UI para evitar parpadeos visuales (FOUC). -->
+    <script>
+    (() => {
+
+        const tema =
+            localStorage.getItem('tema') || 'light';
+
+        document.documentElement.setAttribute(
+            'data-theme',
+            tema
+        );
+
+        const sufijoTema =
+            tema === 'dark'
+                ? 'ModoOscuro'
+                : 'ModoClaro';
+
+        window.planoTema = {
+
+            src:
+                `/static/imagenes/planoPrincipalMovil${sufijoTema}.webp`,
+
+            srcset: `
+                /static/imagenes/planoPrincipalMovil${sufijoTema}.webp 412w,
+                /static/imagenes/planoPrincipalMovil2x${sufijoTema}.webp 824w,
+                /static/imagenes/planoPrincipalBajaResolucion${sufijoTema}.webp 750w,
+                /static/imagenes/planoPrincipalMediaResolucion${sufijoTema}.webp 1200w,
+                /static/imagenes/planoPrincipalAltaResolucion${sufijoTema}.webp 2294w
+            `
+        };
+
+        /* @galaxiahfast - Preload dinámico según tema. */
+        const preload =
+            document.createElement('link');
+
+        preload.rel = 'preload';
+        preload.as = 'image';
+        preload.href =
+            window.planoTema.src;
+
+        document.head.appendChild(preload);
+
+    })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Configuración técnica y administración de parámetros globales para la organización de dispositivos.">
     <title>Monitor de Red - @galaxiahfast</title>
 
     <!-- @galaxiahfast - Estilos principales. -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/temas.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/fondosPantallaPrincipal.css') }}" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/menuInferiorCentrado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/otros/temas.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/otros/fondosPantallaPrincipal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/otros/notificaciones.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/otros/menuLateralIzquierdo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/agregarApartado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/gestionApartado.css') }}">
 
     <!-- @galaxiahfast - Fuentes. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
 
     <!-- @galaxiahfast - Preload de imágenes para optimizar la carga. -->
     <link rel="preload" href="{{ url_for('static', filename='imagenes/planoMovil.webp') }}" as="image" media="(max-width: 600px) and (resolution: 1dppx)">
@@ -23,14 +69,16 @@
 </head>
 
 <!-- @galaxiahfast - El atributo data-theme se utiliza para controlar el tema de color a través de CSS. -->
-<body data-theme="claro">
+<body>
 
 
 
 
-
+        
     <div class="contenedor-barra-herramientas-principal" role="complementary" aria-label="panel lateral">
-        <div class="barra-herramientas-scroll">
+
+    <!-- Scroll REAL -->
+        <div class="barra-herramientas-scroll" id="barraHerramientasScroll">
             <div class="contenedor-interno-barra-herramientas">
 
                 <button class="boton-menu-herramienta boton-menu-herramienta-navegacion" id="botonAlternarExpansionMenuLateralPrincipal" aria-label="menu" type="button">
@@ -108,12 +156,33 @@
 
                 <div class="contenedor-separador-seccion-menu-lateral" data-seccion-menu="preferencias-visuales"></div>
 
-                <button class="boton-menu-herramienta boton-menu-herramienta-tema" id="botonAlternarTemaVisualAplicacion" aria-label="tema" type="button">
-                    <svg viewBox="2 0 20 24" fill="none" stroke="currentColor">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                </button>
+                <!-- BOTÓN TEMA -->
+                <button class="boton-menu-herramienta boton-menu-herramienta-papelera" id="botonAlternarTemaVisualAplicacion" type="button">
+                    
+                    <svg viewBox="0 0 24 24" class="icono-tema" fill="none" stroke="currentColor">
 
+                        <!-- ☀️ SOL -->
+                        <g class="icono-sol">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="18.36" x2="5.64" y2="16.92"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </g>
+
+                        <!-- 🌙 LUNA -->
+                        <g class="icono-luna">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 0 0 21 12.79z"></path>
+                        </g>
+
+                    </svg>
+
+                </button>
+        
                 <div class="contenedor-separador-seccion-menu-lateral" data-seccion-menu="configuracion-general"></div>
 
                 <button class="boton-menu-herramienta boton-menu-herramienta-configuracion" id="botonAbrirConfiguracionGeneralSistema" aria-label="config" type="button">
@@ -139,59 +208,193 @@
                 </button>
             </div>
         </div>
+        <!-- Scroll VISUAL personalizado -->
+        <div class="scrollbar-personalizado" id="scrollbarPersonalizado">
+            <div class="scrollbar-thumb" id="scrollbarThumb"></div>
+        </div>
     </div>
     
 
 
 
 
-    <!-- @galaxiahfast - Contenedor principal con scroll para toda la aplicación. -->
-    <div class="contenedor-principal-aplicacion">
 
-        <!-- @galaxiahfast - Contenedor principal del mapa interactivo. -->
-        <main id="contenidoPrincipal">
 
-            <!-- @galaxiahfast - Contenedor del plano técnico con capas superpuestas. -->
-            <div class="map-container" id="contenedorMapa">
-                
-                <!-- ✅ NUEVO: Contenedor interno para centrar la imagen -->
-                <div class="contenedor-imagen-centrada">
-                    <!-- @galaxiahfast - Imagen del plano base con srcset responsive. -->
-                    <img src="{{ url_for('static', filename='imagenes/planoMovil.webp') }}"
-                        srcset="
-                            {{ url_for('static', filename='imagenes/planoMovil.webp') }} 412w,
-                            {{ url_for('static', filename='imagenes/planoMovil2x.webp') }} 824w,
-                            {{ url_for('static', filename='imagenes/planoBajaResolucion.webp') }} 750w,
-                            {{ url_for('static', filename='imagenes/planoMediaResolucion.webp') }} 1200w,
-                            {{ url_for('static', filename='imagenes/planoAltaResolucion.webp') }} 2294w
-                        "
-                        sizes="
-                            (max-width: 600px) 100vw,
-                            (max-width: 1200px) 800px,
-                            2294px
-                        "
-                        width="2294"
-                        height="2722"
-                        fetchpriority="high"
-                        class="plano-base"
-                        alt="Plano técnico de distribución de dispositivos"
-                    >
-                </div>
-                
-                <!-- @galaxiahfast - Capa de cuadrícula superpuesta al plano (solo visual). -->
-                <div class="grid-overlay"></div>
-                
-                <!-- @galaxiahfast - Capa dinámica donde se renderizan los dispositivos/puntos. -->
-                <div id="capaDispositivos"></div>
+
+
+    <!-- @galaxiahfast - Panel flotante para registro de nuevo apartado global. -->
+    <div id="contenedorFlotanteRegistroApartadoGlobal" class="crear-apartado-panel-flotante estado-panel-oculto">
+        <div class="crear-apartado-contenedor-halo-icono">
+            <div class="crear-apartado-halo-externo"></div>
+            <div class="crear-apartado-halo-interno"></div>
+            <div class="crear-apartado-circulo-icono-central">
+                <svg viewBox="3 0 18 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
             </div>
-        </main>
+        </div>
+        <h3 class="crear-apartado-titulo-panel">Crear Nuevo Apartado Global</h3>
+        <p class="crear-apartado-descripcion-panel">
+            <span>Permite registrar un nuevo parámetro</span>
+            <span>maestro en el sistema para los dispositivos</span>
+            <span>de forma global</span>
+        </p>
+        <form id="formularioRegistroApartadoGlobal">
+            <div class="crear-apartado-grupo-campo-formulario">
+                <label for="inputEspecificoNombreNuevoApartado">Nombre del Apartado:</label>
+                <input type="text" id="inputEspecificoNombreNuevoApartado" name="campoTecnicoNombreApartado" placeholder="Ej. Zona de Almacén" required>
+            </div>
+            <div class="crear-apartado-grupo-campo-formulario">
+                <label for="inputEspecificoValorPredeterminadoNuevoApartado">Valor Predeterminado:</label>
+                <input type="text" id="inputEspecificoValorPredeterminadoNuevoApartado" name="campoTecnicoValorPredeterminado" placeholder="Ej. Principal">
+            </div>
+            <button type="submit" class="crear-apartado-boton-accion-confirmar">Guardar Apartado</button>
+        </form>
+    </div> 
 
+
+
+<div id="contenedorFlotanteGestionApartado" class="gestionar-apartado-panel-flotante estado-panel-oculto">
+    <div class="gestionar-apartado-contenedor-halo-icono">
+        <div class="gestionar-apartado-halo-externo"></div>
+        <div class="gestionar-apartado-halo-interno"></div>
+        <div class="gestionar-apartado-circulo-icono-central">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+        </div>
+    </div>
+    <h3 class="gestionar-apartado-titulo-panel">Gestión de Apartados</h3>
+    <p class="gestionar-apartado-descripcion-panel">
+        <span>Administra el catálogo maestro de</span>
+        <span>apartados, donde puedes eliminar, editar</span>
+        <span>o copiar apartados existentes.</span>
+    </p>
+
+    <div class="gestionar-apartado-contenedor-scroll-wrapper">
+        <div id="listaScrollGestionApartados" class="gestionar-apartado-contenedor-lista">
+            </div>
+        <div class="gestionar-apartado-track-scroll">
+            <div id="scrollbarThumbGestion" class="gestionar-apartado-thumb-scroll"></div>
+        </div>
+    </div>
+</div>
+<template id="templateFilaApartado">
+    <div class="gestionar-apartado-item-fila">
+        <div class="gestionar-apartado-info-bloque">
+            <div class="gestionar-apartado-icono-aleatorio"></div>
+            <div class="gestionar-apartado-detalles-texto">
+                <span class="gestionar-apartado-nombre-texto"></span>
+                <span class="gestionar-apartado-fecha-texto"></span>
+            </div>
+        </div>
+
+        <div class="gestionar-apartado-grupo-botones">
+            <button class="gestionar-apartado-btn-accion btn-copiar" title="Copiar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+            <button class="gestionar-apartado-btn-accion btn-editar" title="Editar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="gestionar-apartado-btn-accion btn-eliminar" title="Eliminar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+    </div>
+</template>
+    
+
+    
+
+    
+
+
+
+
+    <!-- @galaxiahfast - Contenedor principal con scroll real de la aplicación. -->
+    <div
+        class="contenedor-principal-aplicacion-scroll"
+        id="contenedorPrincipalAplicacionScroll"
+    >
+
+        <!-- @galaxiahfast - Contenido completo de la aplicación. -->
+        <div class="contenedor-principal-aplicacion">
+
+            <!-- @galaxiahfast - Contenedor principal del mapa interactivo. -->
+            <main id="contenidoPrincipal">
+
+                <!-- @galaxiahfast - Contenedor del plano técnico con capas superpuestas. -->
+                <div class="map-container" id="contenedorMapa">
+
+                    <div class="contenedor-imagen-centrada">
+
+                        <img
+                            id="imagenPlanoPrincipal"
+
+                            class="plano-base"
+
+                            alt="Plano técnico de distribución de dispositivos"
+
+                            width="2294"
+                            height="2722"
+
+                            fetchpriority="high"
+
+                            src=""
+
+                            sizes="
+                                (max-width: 600px) 100vw,
+                                (max-width: 1200px) 800px,
+                                2294px
+                            "
+                        >
+                        <script>
+
+                            const imagen =
+                                document.getElementById(
+                                    'imagenPlanoPrincipal'
+                                );
+
+                            imagen.src =
+                                window.planoTema.src;
+
+                            imagen.srcset =
+                                window.planoTema.srcset;
+
+                        </script>
+                    </div>
+
+                    <div class="grid-overlay"></div>
+
+                    <div id="capaDispositivos"></div>
+
+                </div>
+            </main>
+
+        </div>
     </div>
 
-    <!-- @galaxiahfast - Scripts para control de temas, sistema de notificaciones y lógica principal. -->
-    <script src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/otros/comportamientoMenuPrincipal.js') }}"></script>
+    <!-- @galaxiahfast - Scrollbar visual personalizado global. -->
+    <div
+        class="scrollbar-principal-personalizado"
+        id="scrollbarPrincipalPersonalizado"
+    >
+        <div
+            class="scrollbar-principal-thumb"
+            id="scrollbarPrincipalThumb"
+        ></div>
+    </div>
+    <script type="module" src="{{ url_for('static', filename='js/otros/comportamientoMenuPrincipal.js') }}"></script>
+
+    <script type="module" src="{{ url_for('static', filename='js/otros/controlTemas.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/otros/sistemaNotificaciones.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/otros/scrollPrincipal.js') }}"></script>
+
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

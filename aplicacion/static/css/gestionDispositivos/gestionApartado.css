@@ -1,0 +1,186 @@
+/* @galaxiahfast - Variables de configuración para Gestión de Apartados */
+:root {
+    --gestionar-apartado-ancho-base: 450px;
+    --gestionar-apartado-borde-radio: 25px;
+    --gestionar-apartado-espaciado-interno: 25px;
+    --gestionar-apartado-separacion-bloques: 25px;
+    --gestionar-apartado-fuente-unificada: 14px;
+    --gestionar-apartado-transicion-suave: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    --gestionar-apartado-fondo-ventana: rgba(255, 255, 255, 0.95);
+    --gestionar-apartado-borde-ventana: rgba(71, 85, 105, 0.35);
+    --gestionar-apartado-color-titulo: #000000;
+    --gestionar-apartado-color-subtitulos: #111111;
+    --gestionar-apartado-color-scroll: #f97316;
+    --gestionar-apartado-color-scroll-hover: #ea580c;
+    --gestionar-apartado-color-texto-boton: #ffffff;
+    --gestionar-apartado-sombra: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --gestionar-apartado-fondo-input: #f1f5f9;
+}
+
+[data-theme="dark"] {
+    --gestionar-apartado-fondo-ventana: rgba(18, 18, 18, 0.98);
+    --gestionar-apartado-borde-ventana: rgba(56, 189, 248, 0.4);
+    --gestionar-apartado-color-titulo: #ffffff;
+    --gestionar-apartado-color-subtitulos: #ffffff;
+    --gestionar-apartado-color-scroll: #38bdf8;
+    --gestionar-apartado-color-scroll-hover: #0ea5e9;
+    --gestionar-apartado-fondo-input: #262626;
+}
+
+/* @galaxiahfast - Contenedor estructural principal. */
+.gestionar-apartado-panel-flotante {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: var(--gestionar-apartado-ancho-base);
+    background: var(--gestionar-apartado-fondo-ventana);
+    backdrop-filter: blur(15px);
+    border-radius: var(--gestionar-apartado-borde-radio);
+    border: 1px solid var(--gestionar-apartado-borde-ventana);
+    box-shadow: var(--gestionar-apartado-sombra);
+    z-index: 9998;
+    padding: var(--gestionar-apartado-espaciado-interno);
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    transition: var(--gestionar-apartado-transicion-suave);
+}
+
+.gestionar-apartado-panel-flotante.estado-panel-oculto {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -40%) scale(0.95);
+}
+
+/* @galaxiahfast - Halo superior. */
+.gestionar-apartado-contenedor-halo-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--gestionar-apartado-separacion-bloques) auto;
+    width: 72px;
+    height: 72px;
+}
+.gestionar-apartado-halo-externo { position: absolute; width: 72px; height: 72px; border-radius: 50%; background: var(--gestionar-apartado-color-scroll); opacity: 0.12; }
+.gestionar-apartado-halo-interno { position: absolute; width: 54px; height: 54px; border-radius: 50%; background: var(--gestionar-apartado-color-scroll); opacity: 0.24; }
+.gestionar-apartado-circulo-icono-central { position: absolute; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: var(--gestionar-apartado-color-scroll); z-index: 2; }
+.gestionar-apartado-circulo-icono-central svg { width: 18px; height: 18px; stroke: var(--gestionar-apartado-color-texto-boton); }
+
+/* @galaxiahfast - Títulos y descripciones. */
+.gestionar-apartado-titulo-panel {
+    display: block;
+    margin: 0 0 var(--gestionar-apartado-separacion-bloques) 0;
+    color: var(--gestionar-apartado-color-titulo);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+}
+.gestionar-apartado-descripcion-panel {
+    color: var(--gestionar-apartado-color-subtitulos);
+    font-size: var(--gestionar-apartado-fuente-unificada);
+    font-weight: 400;
+    text-align: center;
+    margin: 0 0 var(--gestionar-apartado-separacion-bloques) 0;
+    height: 75px;           
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 50ch;
+    margin-inline: auto;
+}
+
+/* @galaxiahfast - Scrollbar Personalizado (Wrapper). */
+.gestionar-apartado-contenedor-scroll-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.gestionar-apartado-contenedor-lista {
+    overflow-y: auto; /* Cambiamos a auto */
+    scrollbar-width: none;
+    height: 246px; 
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: solid 1px red;
+    /* ELIMINA ESTO: scroll-snap-type: y mandatory; */
+}
+.gestionar-apartado-contenedor-lista::-webkit-scrollbar { display: none; }
+
+.gestionar-apartado-track-scroll {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background: rgba(0,0,0,0.05);
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.gestionar-apartado-thumb-scroll {
+    width: 100%;
+    background: var(--gestionar-apartado-color-scroll);
+    border-radius: 3px;
+    cursor: grab;
+    transition: background 0.2s;
+    position: absolute;
+    z-index: 10;
+}
+.gestionar-apartado-thumb-scroll.arrastrando {
+    background: var(--gestionar-apartado-color-scroll-hover);
+    cursor: grabbing;
+}
+
+.gestionar-apartado-item-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gestionar-apartado-fondo-input);
+    padding: 15px;
+    border-radius: 12px;
+    height: 70px; 
+    margin-bottom: 12px; /* Esta distancia es crucial */
+    border: 1px solid var(--gestionar-apartado-borde-ventana);
+    flex-shrink: 0; /* IMPEDIR QUE SE ACHIQUEN */
+    /* ELIMINA ESTO: scroll-snap-align: start; */
+    /* ELIMINA ESTO: scroll-snap-stop: always; */
+}
+.gestionar-apartado-item-fila:hover { border-color: var(--gestionar-apartado-color-scroll); }
+
+.gestionar-apartado-info-bloque { display: flex; align-items: center; gap: 15px; min-width: 0; flex: 1; }
+
+.gestionar-apartado-icono-aleatorio {
+    width: 44px; height: 44px;
+    background: rgba(128, 128, 128, 0.1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gestionar-apartado-color-scroll);
+    flex-shrink: 0;
+}
+.gestionar-apartado-icono-aleatorio svg { width: 22px; height: 22px; }
+
+.gestionar-apartado-detalles-texto { display: flex; flex-direction: column; text-align: left; min-width: 0; overflow: hidden; margin-right: 15px; }
+.gestionar-apartado-nombre-texto { 
+    font-weight: 600; font-size: 15px; color: var(--gestionar-apartado-color-titulo);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+}
+.gestionar-apartado-fecha-texto { font-size: 11px; color: var(--gestionar-apartado-color-subtitulos); margin-top: 2px; }
+
+/* @galaxiahfast - Botones. */
+.gestionar-apartado-grupo-botones { display: flex; gap: 6px; flex-shrink: 0; }
+.gestionar-apartado-btn-accion { 
+    background: none; border: none; cursor: pointer; padding: 6px; 
+    color: var(--gestionar-apartado-color-titulo);
+    transition: transform 0.2s, opacity 0.2s;
+    opacity: 0.6;
+}
+.gestionar-apartado-btn-accion:hover { transform: scale(1.2); opacity: 1; }
+.gestionar-apartado-btn-accion svg { width: 18px; height: 18px; }
+
+/* @galaxiahfast - Responsive. */
+@media (max-width: 480px) {
+    .gestionar-apartado-panel-flotante { bottom: 16px; top: auto; width: 92%; transform: translateX(-50%); }
+}
