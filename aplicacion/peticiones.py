@@ -1,6 +1,7 @@
 
 
 
+
 from flask import request, jsonify, render_template, current_app as aplicacion
 from .ayudantes import normalizarNombreApartado
 from .baseDatos.operacionesSQL import (
@@ -11,6 +12,20 @@ from .baseDatos.operacionesSQL import (
     restaurarApartado,
     eliminarApartadoDefinitivo
 )
+
+LIMITE_NOMBRE = 100
+LIMITE_VALOR = 500
+
+
+def _respuestaErrorInterno(error):
+    if isinstance(error, ValueError):
+        return jsonify({'estado': 'error', 'mensaje': str(error)}), 400
+    aplicacion.logger.exception('Error interno en petición')
+    return jsonify({'estado': 'error', 'mensaje': 'Error interno del servidor.'}), 500
+
+
+def _validarCadena(valor, limite):
+    return isinstance(valor, str) and len(valor) <= limite
 
 
 
@@ -42,6 +57,9 @@ def peticionCrearApartado():
                 'mensaje': 'Nombre obligatorio'
             }), 400
 
+        if not _validarCadena(nombreApartado, LIMITE_NOMBRE) or not _validarCadena(valorPredeterminado, LIMITE_VALOR):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
         # @galaxiahfast - Normaliza el nombre del apartado para asegurar consistencia interna.
         nombreApartado = normalizarNombreApartado(nombreApartado)
 
@@ -55,7 +73,7 @@ def peticionCrearApartado():
 
     # @galaxiahfast - Captura fallos imprevistos y devuelve un código de error interno.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+        return _respuestaErrorInterno(error)
 
 
 
@@ -74,6 +92,9 @@ def peticionEliminarApartado():
         if not nombreApartado:
             return jsonify({'estado': 'error'}), 400
 
+        if not _validarCadena(nombreApartado, LIMITE_NOMBRE):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
         # @galaxiahfast - Procesa el nombre para realizar la coincidencia exacta en base de datos.
         nombreApartado = normalizarNombreApartado(nombreApartado)
 
@@ -85,7 +106,7 @@ def peticionEliminarApartado():
 
     # @galaxiahfast - Devuelve el error capturado estructurado en formato JSON.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+        return _respuestaErrorInterno(error)
 
 
 
@@ -104,7 +125,7 @@ def peticionListarApartados():
 
     # @galaxiahfast - Captura anomalías imprevistas del servidor durante la lectura.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+        return _respuestaErrorInterno(error)
 
 
 
@@ -125,6 +146,17 @@ def peticionEditarApartado():
         if not idApartado:
             return jsonify({'estado': 'error'}), 400
 
+        try:
+            idApartado = int(idApartado)
+        except (TypeError, ValueError):
+            return jsonify({'estado': 'error', 'mensaje': 'ID inválido.'}), 400
+
+        if nombreApartado is not None and not _validarCadena(nombreApartado, LIMITE_NOMBRE):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
+        if valorPredeterminado is not None and not _validarCadena(valorPredeterminado, LIMITE_VALOR):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
         # @galaxiahfast - Modifica los metadatos del apartado y actualiza los dispositivos heredados.
         editarApartado(idApartado, nombreApartado, valorPredeterminado)
 
@@ -133,7 +165,7 @@ def peticionEditarApartado():
 
     # @galaxiahfast - Procesa errores críticos devolviendo la descripción de la falla.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+        return _respuestaErrorInterno(error)
 
 
 
@@ -152,6 +184,9 @@ def peticionRestaurarApartado():
         if not nombreApartado:
             return jsonify({'estado': 'error'}), 400
 
+        if not _validarCadena(nombreApartado, LIMITE_NOMBRE):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
         # @galaxiahfast - Estandariza la cadena antes de consultar la persistencia.
         nombreApartado = normalizarNombreApartado(nombreApartado)
 
@@ -166,7 +201,7 @@ def peticionRestaurarApartado():
 
     # @galaxiahfast - Captura excepciones de base de datos o lógica empresarial.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
+        return _respuestaErrorInterno(error)
 
 
 
@@ -185,6 +220,9 @@ def peticionEliminarApartadoDefinitivo():
         if not nombreApartado:
             return jsonify({'estado': 'error'}), 400
 
+        if not _validarCadena(nombreApartado, LIMITE_NOMBRE):
+            return jsonify({'estado': 'error', 'mensaje': 'Datos de entrada inválidos.'}), 400
+
         # @galaxiahfast - Aplica reglas de formateo técnico sobre el nombre recibido.
         nombreApartado = normalizarNombreApartado(nombreApartado)
 
@@ -199,6 +237,4 @@ def peticionEliminarApartadoDefinitivo():
 
     # @galaxiahfast - Atrapa errores críticos de integridad o infraestructura.
     except Exception as error:
-        return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
-    
-
+        return _respuestaErrorInterno(error)

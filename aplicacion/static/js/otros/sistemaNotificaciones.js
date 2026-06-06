@@ -106,10 +106,19 @@ function obtenerContenedorNotificaciones() {
     return contenedor;
 }
 
+/* @galaxiahfast Escapa caracteres HTML para prevenir XSS. */
+function escaparHTML(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+}
+
 /* @galaxiahfast Creación de notificación. */
 function crearElementoNotificacion(mensaje, tipo) {
     const notificacion = document.createElement('div');
     notificacion.className = `notificacion ${tipo}`;
+
+    const mensajeSeguro = escaparHTML(mensaje.toUpperCase());
 
     notificacion.innerHTML = `
         <div class="notificacion-encabezado">
@@ -119,7 +128,7 @@ function crearElementoNotificacion(mensaje, tipo) {
             </div>
             <span class="notificacion-hora">${obtenerHoraActual()}</span>
         </div>
-        <div class="notificacion-cuerpo">${mensaje.toUpperCase()}</div>
+        <div class="notificacion-cuerpo">${mensajeSeguro}</div>
     `;
 
     return notificacion;

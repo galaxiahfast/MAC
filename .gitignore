@@ -1,5 +1,15 @@
 # Respaldos JSON
 app/static/data/backups/
+aplicacion/static/data/backups/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entorno
+.env
+*.env
 
 # Opcional: ignorar solo los JSON de respaldo
 # app/static/data/backups/*.json

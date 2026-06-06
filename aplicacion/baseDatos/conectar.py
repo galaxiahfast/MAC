@@ -1,17 +1,19 @@
 
 
 
+import os
+
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
 from mysql.connector import Error
 
 # @galaxiahfast - Parámetros de configuración, codificación y tiempo de espera para el motor MySQL.
 configuracionBaseDatos = {
-    'host': 'localhost',
-    'port': 3306,
-    'user': 'root',
-    'password': '',
-    'database': 'mapa_dispositivos',
+    'host': os.environ.get('MYSQL_HOST', 'localhost'),
+    'port': int(os.environ.get('MYSQL_PORT', 3306)),
+    'user': os.environ.get('MYSQL_USER', 'root'),
+    'password': os.environ.get('MYSQL_PASSWORD', ''),
+    'database': os.environ.get('MYSQL_DATABASE', 'mapa_dispositivos'),
     'charset': 'utf8mb4',
     'autocommit': False,
     'connection_timeout': 5
