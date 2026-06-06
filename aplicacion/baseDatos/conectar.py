@@ -1,9 +1,13 @@
 
 
 
+import logging
+
 import mysql.connector
 from mysql.connector.connection import MySQLConnection
 from mysql.connector import Error
+
+logger = logging.getLogger(__name__)
 
 # @galaxiahfast - Parámetros de configuración, codificación y tiempo de espera para el motor MySQL.
 configuracionBaseDatos = {
@@ -31,9 +35,9 @@ def inicializarBaseDatos() -> None:
     try:
         conexion = obtenerConexion()
         if conexion.is_connected():
-            print('[MYSQL] Conexión establecida correctamente.')
+            logger.info('Conexión MySQL establecida correctamente.')
     except Error as error:
-        print(f'[MYSQL] Error de conexión: {error}')
+        logger.error('Error de conexión MySQL: %s', error)
         raise
     finally:
         if conexion and conexion.is_connected():

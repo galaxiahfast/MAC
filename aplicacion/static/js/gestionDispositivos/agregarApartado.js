@@ -11,9 +11,9 @@ async function manejarSubmitRegistroApartado(event) {
     const nombreApartado = document.getElementById('inputEspecificoNombreNuevoApartado').value.trim();
     const valorPredeterminado = document.getElementById('inputEspecificoValorPredeterminadoNuevoApartado').value.trim();
     if (!nombreApartado) return;
-    crearApartado(nombreApartado, valorPredeterminado);
     event.target.reset();
     establecerValoresPredeterminadosCampos();
+    await crearApartado(nombreApartado, valorPredeterminado);
 }
 
 /* @galaxiahfast - Establece valores predeterminados y placeholders. */

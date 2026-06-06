@@ -1,12 +1,16 @@
 /* @galaxiahfast - Lógica de negocio y sincronización de apartados globales. */
 import { ApartadosAPI } from './comunicacionHTTP.js';
-import { setApartados, getApartados, actualizarApartadosOptimista } from './memoriaCache.js';
+import { setApartados, getApartados, actualizarApartadosOptimista, eliminarApartadoOptimista } from './memoriaCache.js';
 
 /* @galaxiahfast - Sincroniza la colección de apartados desde el servidor y actualiza la memoria local. */
 export async function sincronizarApartados() {
-    const res = await ApartadosAPI.listar();
-    if (res.estado !== 'exito') return;
-    setApartados(res.apartados);
+    try {
+        const res = await ApartadosAPI.listar();
+        if (res.estado !== 'exito') return;
+        setApartados(res.apartados);
+    } catch (error) {
+        console.error('Error al sincronizar apartados:', error);
+    }
 }
 
 /* @galaxiahfast - Corrección en sincronizarApartados.js */

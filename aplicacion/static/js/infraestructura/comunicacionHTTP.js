@@ -1,6 +1,10 @@
 // @galaxiahfast - Módulo de comunicación HTTP para operaciones CRUD con el backend de apartados globales.
 export async function get(url) {
     const res = await fetch(url);
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.mensaje || `HTTP ${res.status}`);
+    }
     return await res.json();
 }
 
@@ -11,6 +15,10 @@ export async function post(url, data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data || {})
     });
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.mensaje || `HTTP ${res.status}`);
+    }
     return await res.json();
 }
 

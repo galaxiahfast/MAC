@@ -1,6 +1,8 @@
 
 
 
+import logging
+
 from flask import request, jsonify, render_template, current_app as aplicacion
 from .ayudantes import normalizarNombreApartado
 from .baseDatos.operacionesSQL import (
@@ -12,6 +14,7 @@ from .baseDatos.operacionesSQL import (
     eliminarApartadoDefinitivo
 )
 
+logger = logging.getLogger(__name__)
 
 
 # @galaxiahfast - Renderiza la vista principal del mapa interactivo.
@@ -55,6 +58,7 @@ def peticionCrearApartado():
 
     # @galaxiahfast - Captura fallos imprevistos y devuelve un código de error interno.
     except Exception as error:
+        logger.exception('Error en peticionCrearApartado')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
 
 
@@ -85,6 +89,7 @@ def peticionEliminarApartado():
 
     # @galaxiahfast - Devuelve el error capturado estructurado en formato JSON.
     except Exception as error:
+        logger.exception('Error en peticionEliminarApartado')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
 
 
@@ -104,6 +109,7 @@ def peticionListarApartados():
 
     # @galaxiahfast - Captura anomalías imprevistas del servidor durante la lectura.
     except Exception as error:
+        logger.exception('Error en peticionListarApartados')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
 
 
@@ -133,6 +139,7 @@ def peticionEditarApartado():
 
     # @galaxiahfast - Procesa errores críticos devolviendo la descripción de la falla.
     except Exception as error:
+        logger.exception('Error en peticionEditarApartado')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
 
 
@@ -166,6 +173,7 @@ def peticionRestaurarApartado():
 
     # @galaxiahfast - Captura excepciones de base de datos o lógica empresarial.
     except Exception as error:
+        logger.exception('Error en peticionRestaurarApartado')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
 
 
@@ -199,6 +207,7 @@ def peticionEliminarApartadoDefinitivo():
 
     # @galaxiahfast - Atrapa errores críticos de integridad o infraestructura.
     except Exception as error:
+        logger.exception('Error en peticionEliminarApartadoDefinitivo')
         return jsonify({'estado': 'error', 'mensaje': str(error)}), 500
     
 

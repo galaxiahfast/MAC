@@ -1,7 +1,11 @@
 
 
+import logging
 import threading
+
 from .conectar import obtenerConexion
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -60,8 +64,8 @@ def vincularApartadoADispositivos(idApartado, valorPredeterminado):
                 VALUES (%s, %s, %s, %s)
             """, datos_bulk)
             conexion.commit()
-    except Exception as e:
-        print(f"Error en segundo plano al vincular dispositivos: {e}")
+    except Exception:
+        logger.exception('Error en segundo plano al vincular apartado %s a dispositivos', idApartado)
     finally:
         if conexion and conexion.is_connected(): conexion.close()
         

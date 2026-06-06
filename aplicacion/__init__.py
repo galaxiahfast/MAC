@@ -1,10 +1,14 @@
 
 
 
+import logging
+
 from flask import Flask
 from flask_compress import Compress
 from flask_minify import Minify
 from .baseDatos.conectar import inicializarBaseDatos
+
+logger = logging.getLogger(__name__)
 
 # @galaxiahfast - Inicializa Flask, optimiza recursos y verifica la conexión MySQL. No recibe parámetros. Retorna Flask (servidor configurado).
 def crearAplicacion() -> Flask:
@@ -38,7 +42,7 @@ def crearAplicacion() -> Flask:
     try:
         inicializarBaseDatos()
     except Exception as error:
-        print(f'[MYSQL] Error de conexión: {error}')
+        logger.warning('Base de datos no disponible al iniciar: %s', error)
 
     # @galaxiahfast - Importa y registra los controladores dentro del contexto de Flask.
     with aplicacion.app_context():

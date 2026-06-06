@@ -5,6 +5,11 @@ import './gestionDispositivos/gestionApartados.js';
 
 /* @galaxiahfast - Al cargar el DOM, se sincronizan los apartados globales desde el servidor para asegurar que la interfaz refleje el estado actual de la base de datos. */
 document.addEventListener('DOMContentLoaded', async () => {
-    await sincronizarApartados();
-    window.dispatchEvent(new CustomEvent('app:datos-listos'));
+    try {
+        await sincronizarApartados();
+    } catch (error) {
+        console.error('Error durante la carga inicial:', error);
+    } finally {
+        window.dispatchEvent(new CustomEvent('app:datos-listos'));
+    }
 });
