@@ -1,6 +1,12 @@
 /* @galaxiahfast - Importaciones corregidas */
 import { inicializarModuloRegistro, abrirPanelRegistro, limpiarYRestaurarFormulario as cerrarPanelRegistro } from '../gestionDispositivos/agregarApartado.js';
 import { inicializarModuloGestion, abrirPanelGestion, cerrarPanelGestion } from '../gestionDispositivos/gestionApartados.js';
+import { inicializarModuloColocacion, activarModoColocacion, desactivarModoColocacion } from '../gestionDispositivos/agregarDispositivo.js';
+import { inicializarModuloEliminacion, activarModoEliminacion, desactivarModoEliminacion } from '../gestionDispositivos/eliminarDispositivo.js';
+import { inicializarModuloEdicion, activarModoEdicion, desactivarModoEdicion, cerrarPanelEdicion } from '../gestionDispositivos/editarDispositivo.js';
+import { inicializarModuloReubicacion, activarModoReubicacion, desactivarModoReubicacion } from '../gestionDispositivos/moverDispositivo.js';
+import { inicializarModuloVisibilidad, alternarVisibilidadTodos } from '../gestionDispositivos/visibilidadDispositivos.js';
+import { inicializarModuloPapelera, abrirPanelPapelera, cerrarPanelPapelera } from '../gestionDispositivos/papelera.js';
 
 /* @galaxiahfast - Variables de estado y referencias a elementos del DOM. */
 let menuExpandido = false;
@@ -93,12 +99,31 @@ function manejarAccion(e) {
         return; 
     }
     cerrarTodosLosPaneles();
+    desactivarTodosLosModos();
     switch (idBoton) {
         case 'botonRegistrarNuevoApartadoGlobalDispositivos':
             abrirPanelRegistro();
             break;
         case 'botonEliminarApartadosExistentesDispositivos':
             abrirPanelGestion();
+            break;
+        case 'botonRegistrarNuevoDispositivoPlano':
+            activarModoColocacion();
+            break;
+        case 'botonActivarModoEliminacionDispositivos':
+            activarModoEliminacion();
+            break;
+        case 'botonActivarModoEdicionDispositivos':
+            activarModoEdicion();
+            break;
+        case 'botonActivarModoReubicacionDispositivos':
+            activarModoReubicacion();
+            break;
+        case 'botonAlternarVisibilidadDispositivosRenderizados':
+            alternarVisibilidadTodos();
+            break;
+        case 'botonAbrirPanelRestauracionElementosEliminados':
+            abrirPanelPapelera();
             break;
     }
 }
@@ -107,8 +132,19 @@ function manejarAccion(e) {
 function cerrarTodosLosPaneles() {
     cerrarPanelRegistro();
     cerrarPanelGestion();
+    cerrarPanelEdicion();
+    cerrarPanelPapelera();
     document.getElementById('botonRegistrarNuevoApartadoGlobalDispositivos')?.classList.remove('activo');
     document.getElementById('botonEliminarApartadosExistentesDispositivos')?.classList.remove('activo');
+    document.getElementById('botonAbrirPanelRestauracionElementosEliminados')?.classList.remove('activo');
+}
+
+/* @galaxiahfast - Desactiva todos los modos interactivos del mapa de forma centralizada. */
+function desactivarTodosLosModos() {
+    desactivarModoColocacion();
+    desactivarModoEliminacion();
+    desactivarModoEdicion();
+    desactivarModoReubicacion();
 }
 
 /* ==========================================================================
@@ -137,9 +173,17 @@ function manejoClicMenu(e) {
     window.dispatchEvent(eventoPersonalizado);
     const botonesQueAbrenPaneles = [
         'botonRegistrarNuevoApartadoGlobalDispositivos',
-        'botonEliminarApartadosExistentesDispositivos'
+        'botonEliminarApartadosExistentesDispositivos',
+        'botonAbrirPanelRestauracionElementosEliminados'
     ];
-    if (botonesQueAbrenPaneles.includes(boton.id)) {
+    const botonesQueCambianModo = [
+        'botonRegistrarNuevoDispositivoPlano',
+        'botonActivarModoEliminacionDispositivos',
+        'botonActivarModoEdicionDispositivos',
+        'botonActivarModoReubicacionDispositivos',
+        'botonAlternarVisibilidadDispositivosRenderizados'
+    ];
+    if (botonesQueAbrenPaneles.includes(boton.id) || botonesQueCambianModo.includes(boton.id)) {
         deseleccionarTodos();
         boton.classList.add('activo');
     }
@@ -306,6 +350,12 @@ function setup() {
     configurarControladorCentral();
     inicializarModuloRegistro();
     inicializarModuloGestion();
+    inicializarModuloColocacion();
+    inicializarModuloEliminacion();
+    inicializarModuloEdicion();
+    inicializarModuloReubicacion();
+    inicializarModuloVisibilidad();
+    inicializarModuloPapelera();
     contenedorMenu.setAttribute('data-expandido', 'false');
     botonHamburguesa.removeEventListener('click', alternarMenu);
     botonHamburguesa.addEventListener('click', alternarMenu);

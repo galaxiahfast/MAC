@@ -1,0 +1,271 @@
+/* @galaxiahfast - Estilos CSS para el panel flotante de la papelera de elementos eliminados. */
+:root {
+    --papelera-ancho-base: 380px;
+    --papelera-borde-radio: 25px;
+    --papelera-espaciado-interno: 25px;
+    --papelera-separacion-bloques: 20px;
+    --papelera-fuente-unificada: 14px;
+    --papelera-transicion-suave: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    --papelera-transicion-posicion: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --papelera-fondo-ventana: rgba(255, 255, 255, 0.95);
+    --papelera-borde-ventana: rgba(71, 85, 105, 0.35);
+    --papelera-borde-fuerte: rgba(71, 85, 105, 0.5);
+    --papelera-color-titulo: #000000;
+    --papelera-color-subtitulos: #111111;
+    --papelera-color-scroll: #ef4444;
+    --papelera-color-scroll-hover: #dc2626;
+    --papelera-color-texto-boton: #ffffff;
+    --papelera-color-restaurar: #22c55e;
+    --papelera-color-restaurar-hover: #16a34a;
+    --papelera-sombra: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* @galaxiahfast - Soporte para tema oscuro. */
+[data-theme="dark"] {
+    --papelera-fondo-ventana: rgba(18, 18, 18, 0.95);
+    --papelera-borde-ventana: rgba(56, 189, 248, 0.4);
+    --papelera-borde-fuerte: rgba(56, 189, 248, 0.6);
+    --papelera-color-titulo: #ffffff;
+    --papelera-color-subtitulos: #ffffff;
+    --papelera-color-scroll: #f87171;
+    --papelera-color-scroll-hover: #ef4444;
+    --papelera-color-texto-boton: #121212;
+    --papelera-color-restaurar: #4ade80;
+    --papelera-color-restaurar-hover: #22c55e;
+    --papelera-sombra: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* @galaxiahfast - Contenedor estructural principal del panel de papelera. */
+.papelera-panel-flotante {
+    position: fixed;
+    top: 50%;
+    left: calc(75px + (100vw - 75px) / 2);
+    width: var(--papelera-ancho-base);
+    max-height: 70vh;
+    background: var(--papelera-fondo-ventana);
+    backdrop-filter: blur(15px);
+    border-radius: var(--papelera-borde-radio);
+    border: 1px solid var(--papelera-borde-ventana);
+    box-shadow: var(--papelera-sombra);
+    z-index: 9998;
+    padding: var(--papelera-espaciado-interno);
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transform: translate(-50%, -50%) translateZ(0);
+    transition: var(--papelera-transicion-suave), var(--papelera-transicion-posicion), background-color 0.3s ease, border-color 0.3s ease;
+    overflow-y: auto;
+}
+
+.papelera-panel-flotante.estado-panel-oculto {
+    display: none;
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.95);
+}
+
+/* @galaxiahfast - Componente concéntrico de iconos. */
+.papelera-contenedor-halo-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--papelera-separacion-bloques) auto;
+    width: 72px;
+    height: 72px;
+}
+
+.papelera-halo-externo {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--papelera-color-scroll);
+    opacity: 0.12;
+    transition: background-color 0.3s ease;
+}
+
+.papelera-halo-interno {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--papelera-color-scroll);
+    opacity: 0.24;
+    transition: background-color 0.3s ease;
+}
+
+.papelera-circulo-icono-central {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--papelera-color-scroll);
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+.papelera-circulo-icono-central svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--papelera-color-texto-boton);
+    transition: stroke 0.3s ease;
+}
+
+/* @galaxiahfast - Estilos de textos. */
+.papelera-titulo-panel {
+    display: block;
+    margin: 0 0 10px 0;
+    color: var(--papelera-color-titulo);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+.papelera-descripcion-panel {
+    color: var(--papelera-color-subtitulos);
+    font-size: var(--papelera-fuente-unificada);
+    font-weight: 400;
+    text-align: center;
+    transition: color 0.3s ease;
+    margin: 0 0 var(--papelera-separacion-bloques) 0;
+}
+
+/* @galaxiahfast - Subtítulos de sección. */
+.papelera-seccion-titulo {
+    color: var(--papelera-color-subtitulos);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: left;
+    margin: var(--papelera-separacion-bloques) 0 10px 0;
+    opacity: 0.7;
+}
+
+/* @galaxiahfast - Contenedores de listas. */
+.papelera-lista-contenedor {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+}
+
+/* @galaxiahfast - Cada fila de elemento en la papelera. */
+.papelera-item-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--papelera-borde-ventana);
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.papelera-item-fila:hover {
+    border-color: var(--papelera-borde-fuerte);
+}
+
+/* @galaxiahfast - Bloque de información del elemento. */
+.papelera-info-bloque {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.papelera-icono-tipo {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--papelera-color-scroll);
+    opacity: 0.8;
+}
+
+.papelera-icono-tipo svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--papelera-color-texto-boton);
+}
+
+.papelera-detalles-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.papelera-nombre-texto {
+    color: var(--papelera-color-titulo);
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.papelera-fecha-texto {
+    color: var(--papelera-color-subtitulos);
+    font-size: 11px;
+    opacity: 0.6;
+    transition: color 0.3s ease;
+}
+
+/* @galaxiahfast - Grupo de botones de acción. */
+.papelera-grupo-botones {
+    display: flex;
+    gap: 6px;
+}
+
+.papelera-btn-accion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--papelera-borde-ventana);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--papelera-color-subtitulos);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.papelera-btn-accion.btn-restaurar-dispositivo:hover,
+.papelera-btn-accion.btn-restaurar-apartado:hover {
+    background: var(--papelera-color-restaurar);
+    color: var(--papelera-color-texto-boton);
+    border-color: var(--papelera-color-restaurar);
+}
+
+.papelera-btn-accion.btn-eliminar-definitivo-dispositivo:hover,
+.papelera-btn-accion.btn-eliminar-definitivo-apartado:hover {
+    background: var(--papelera-color-scroll);
+    color: var(--papelera-color-texto-boton);
+    border-color: var(--papelera-color-scroll);
+}
+
+/* @galaxiahfast - Mensaje cuando la lista está vacía. */
+.papelera-mensaje-vacio {
+    text-align: center;
+    padding: 15px;
+    color: var(--papelera-color-subtitulos);
+    font-size: 13px;
+    opacity: 0.6;
+}
+
+/* @galaxiahfast - Ajustes de diseño para móviles. */
+@media (max-width: 480px) {
+    .papelera-panel-flotante {
+        top: auto;
+        bottom: 16px;
+        left: 50% !important;
+        width: calc(100% - 32px);
+        transform: translateX(-50%);
+    }
+    .papelera-panel-flotante.estado-panel-oculto {
+        transform: translate(-50%, 20px);
+    }
+}

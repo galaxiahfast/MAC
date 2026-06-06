@@ -1,17 +1,30 @@
 /* @galaxiahfast - Módulo encargado de gestionar la lógica de creación de nuevos apartados globales. */
 import { crearApartado } from '../infraestructura/sincronizarApartados.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - LÓGICA DE PROCESAMIENTO DE FORMULARIOS
    ========================================================================== */
 
-/* @galaxiahfast - Maneja el envío del formulario de registro de nuevo apartado global. */
+/* @galaxiahfast - Maneja el envío del formulario de registro de nuevo apartado global con validación. */
 async function manejarSubmitRegistroApartado(event) {
     event.preventDefault();
     const nombreApartado = document.getElementById('inputEspecificoNombreNuevoApartado').value.trim();
     const valorPredeterminado = document.getElementById('inputEspecificoValorPredeterminadoNuevoApartado').value.trim();
-    if (!nombreApartado) return;
-    crearApartado(nombreApartado, valorPredeterminado);
+
+    /* @galaxiahfast - Validación: el nombre es obligatorio. */
+    if (!nombreApartado) {
+        mostrarNotificacion('El nombre del apartado es obligatorio', 'advertencia');
+        return;
+    }
+
+    /* @galaxiahfast - Validación: longitud mínima del nombre. */
+    if (nombreApartado.length < 2) {
+        mostrarNotificacion('El nombre debe tener al menos 2 caracteres', 'advertencia');
+        return;
+    }
+
+    await crearApartado(nombreApartado, valorPredeterminado);
     event.target.reset();
     establecerValoresPredeterminadosCampos();
 }
@@ -30,7 +43,7 @@ export function limpiarYRestaurarFormulario() {
     const contenedor = document.getElementById('contenedorFlotanteRegistroApartadoGlobal');
     if (contenedor) {
         contenedor.classList.add('estado-panel-oculto');
-        contenedor.classList.remove('panel-formulario-activo'); // Remueve control de clic
+        contenedor.classList.remove('panel-formulario-activo');
     }
     if (formulario) formulario.reset();
     establecerValoresPredeterminadosCampos();
@@ -52,7 +65,6 @@ export function abrirPanelRegistro() {
 /* @galaxiahfast - Inicialización del módulo. */
 export function inicializarModuloRegistro() {
     const formularioRegistro = document.getElementById('formularioRegistroApartadoGlobal');
-    const contenedorFlotante = document.getElementById('contenedorFlotanteRegistroApartadoGlobal');
     establecerValoresPredeterminadosCampos();
     if (formularioRegistro) {
         formularioRegistro.addEventListener('submit', manejarSubmitRegistroApartado);

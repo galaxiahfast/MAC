@@ -38,7 +38,8 @@ export function suscribirse(callback) {
 function notificar() {
     estado.suscriptores.forEach(fn => fn(estado.apartados));
 }
+/* @galaxiahfast - Elimina un apartado de la caché local de forma optimista filtrando por nombreApartado. */
 export function eliminarApartadoOptimista(nombre) {
-    estado.apartados = estado.apartados.filter(a => a.nombre !== nombre);
+    estado.apartados = estado.apartados.filter(a => a.nombreApartado !== nombre);
     notificar();
 }
