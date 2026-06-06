@@ -1,0 +1,218 @@
+/* @galaxiahfast - Estilos CSS para el panel flotante de edición de detalles de dispositivos. */
+:root {
+    --editar-dispositivo-ancho-base: 360px;
+    --editar-dispositivo-borde-radio: 25px;
+    --editar-dispositivo-espaciado-interno: 25px;
+    --editar-dispositivo-separacion-bloques: 25px;
+    --editar-dispositivo-fuente-unificada: 14px;
+    --editar-dispositivo-transicion-suave: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    --editar-dispositivo-transicion-posicion: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --editar-dispositivo-fondo-ventana: rgba(255, 255, 255, 0.95);
+    --editar-dispositivo-borde-ventana: rgba(71, 85, 105, 0.35);
+    --editar-dispositivo-borde-fuerte: rgba(71, 85, 105, 0.5);
+    --editar-dispositivo-color-titulo: #000000;
+    --editar-dispositivo-color-subtitulos: #111111;
+    --editar-dispositivo-fondo-input: #fefefe;
+    --editar-dispositivo-color-scroll: #3b82f6;
+    --editar-dispositivo-color-scroll-hover: #2563eb;
+    --editar-dispositivo-color-texto-boton: #ffffff;
+    --editar-dispositivo-color-exito: #22c55e;
+    --editar-dispositivo-sombra: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* @galaxiahfast - Soporte para tema oscuro. */
+[data-theme="dark"] {
+    --editar-dispositivo-fondo-ventana: rgba(18, 18, 18, 0.95);
+    --editar-dispositivo-borde-ventana: rgba(56, 189, 248, 0.4);
+    --editar-dispositivo-borde-fuerte: rgba(56, 189, 248, 0.6);
+    --editar-dispositivo-color-titulo: #ffffff;
+    --editar-dispositivo-color-subtitulos: #ffffff;
+    --editar-dispositivo-fondo-input: #121212;
+    --editar-dispositivo-color-scroll: #38bdf8;
+    --editar-dispositivo-color-scroll-hover: #0ea5e9;
+    --editar-dispositivo-color-texto-boton: #121212;
+    --editar-dispositivo-color-exito: #4ade80;
+    --editar-dispositivo-sombra: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* @galaxiahfast - Contenedor estructural principal del panel de edición. */
+.editar-dispositivo-panel-flotante {
+    position: fixed;
+    top: 50%;
+    left: calc(75px + (100vw - 75px) / 2);
+    width: var(--editar-dispositivo-ancho-base);
+    max-height: 70vh;
+    background: var(--editar-dispositivo-fondo-ventana);
+    backdrop-filter: blur(15px);
+    border-radius: var(--editar-dispositivo-borde-radio);
+    border: 1px solid var(--editar-dispositivo-borde-ventana);
+    box-shadow: var(--editar-dispositivo-sombra);
+    z-index: 9998;
+    padding: var(--editar-dispositivo-espaciado-interno);
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    transform: translate(-50%, -50%) translateZ(0);
+    transition: var(--editar-dispositivo-transicion-suave), var(--editar-dispositivo-transicion-posicion), background-color 0.3s ease, border-color 0.3s ease;
+    overflow-y: auto;
+}
+
+.editar-dispositivo-panel-flotante.estado-panel-oculto {
+    display: none;
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.95);
+}
+
+/* @galaxiahfast - Componente concéntrico de iconos. */
+.editar-dispositivo-contenedor-halo-icono {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--editar-dispositivo-separacion-bloques) auto;
+    width: 72px;
+    height: 72px;
+}
+
+.editar-dispositivo-halo-externo {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--editar-dispositivo-color-scroll);
+    opacity: 0.12;
+    transition: background-color 0.3s ease;
+}
+
+.editar-dispositivo-halo-interno {
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: var(--editar-dispositivo-color-scroll);
+    opacity: 0.24;
+    transition: background-color 0.3s ease;
+}
+
+.editar-dispositivo-circulo-icono-central {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--editar-dispositivo-color-scroll);
+    z-index: 2;
+    transition: background-color 0.3s ease;
+}
+
+.editar-dispositivo-circulo-icono-central svg {
+    width: 18px;
+    height: 18px;
+    stroke: var(--editar-dispositivo-color-texto-boton);
+    transition: stroke 0.3s ease;
+}
+
+/* @galaxiahfast - Estilos de textos e identificadores. */
+.editar-dispositivo-titulo-panel {
+    display: block;
+    margin: 0 0 10px 0;
+    color: var(--editar-dispositivo-color-titulo);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: color 0.3s ease;
+}
+
+.editar-dispositivo-descripcion-panel {
+    color: var(--editar-dispositivo-color-subtitulos);
+    font-size: var(--editar-dispositivo-fuente-unificada);
+    font-weight: 400;
+    text-align: center;
+    transition: color 0.3s ease;
+    margin: 0 0 var(--editar-dispositivo-separacion-bloques) 0;
+}
+
+/* @galaxiahfast - Contenedor de la lista de detalles editables. */
+.editar-dispositivo-lista-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+}
+
+/* @galaxiahfast - Cada fila de detalle editable. */
+.editar-dispositivo-item-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.editar-dispositivo-label-detalle {
+    color: var(--editar-dispositivo-color-subtitulos);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+.editar-dispositivo-grupo-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.editar-dispositivo-input-detalle {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--editar-dispositivo-borde-ventana);
+    background: var(--editar-dispositivo-fondo-input);
+    color: var(--editar-dispositivo-color-titulo);
+    font-size: var(--editar-dispositivo-fuente-unificada);
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.editar-dispositivo-input-detalle:focus {
+    border-color: var(--editar-dispositivo-borde-fuerte);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* @galaxiahfast - Botón de guardar individual. */
+.editar-dispositivo-btn-guardar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--editar-dispositivo-borde-ventana);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--editar-dispositivo-color-subtitulos);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.editar-dispositivo-btn-guardar:hover {
+    background: var(--editar-dispositivo-color-scroll);
+    color: var(--editar-dispositivo-color-texto-boton);
+    border-color: var(--editar-dispositivo-color-scroll);
+}
+
+/* @galaxiahfast - Ajustes de diseño para móviles. */
+@media (max-width: 480px) {
+    .editar-dispositivo-panel-flotante {
+        top: auto;
+        bottom: 16px;
+        left: 50% !important;
+        width: calc(100% - 32px);
+        transform: translateX(-50%);
+    }
+    .editar-dispositivo-panel-flotante.estado-panel-oculto {
+        transform: translate(-50%, 20px);
+    }
+}

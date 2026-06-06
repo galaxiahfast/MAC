@@ -57,6 +57,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/otros/menuLateralIzquierdo.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/agregarApartado.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/gestionApartado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/dispositivos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/editarDispositivo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestionDispositivos/papelera.css') }}">
 
     <!-- @galaxiahfast - Fuentes. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -309,6 +312,49 @@
             </div>
         </div>
     </template>
+
+
+
+    <!-- @galaxiahfast - Panel flotante para edición de detalles de un dispositivo seleccionado. -->
+    <div id="contenedorFlotanteEdicionDispositivo" class="editar-dispositivo-panel-flotante estado-panel-oculto">
+        <div class="editar-dispositivo-contenedor-halo-icono">
+            <div class="editar-dispositivo-halo-externo"></div>
+            <div class="editar-dispositivo-halo-interno"></div>
+            <div class="editar-dispositivo-circulo-icono-central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+            </div>
+        </div>
+        <h3 id="tituloEdicionDispositivo" class="editar-dispositivo-titulo-panel">Editar Dispositivo</h3>
+        <p class="editar-dispositivo-descripcion-panel">Modifica los valores de cada apartado para este dispositivo.</p>
+        <div id="listaDetallesEdicion" class="editar-dispositivo-lista-detalles"></div>
+    </div>
+
+
+
+    <!-- @galaxiahfast - Panel flotante de la papelera con elementos eliminados. -->
+    <div id="contenedorFlotantePapelera" class="papelera-panel-flotante estado-panel-oculto">
+        <div class="papelera-contenedor-halo-icono">
+            <div class="papelera-halo-externo"></div>
+            <div class="papelera-halo-interno"></div>
+            <div class="papelera-circulo-icono-central">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </div>
+        </div>
+        <h3 class="papelera-titulo-panel">Papelera</h3>
+        <p class="papelera-descripcion-panel">Restaura o elimina definitivamente los elementos descartados.</p>
+
+        <h4 class="papelera-seccion-titulo">Dispositivos</h4>
+        <div id="listaPapeleraDispositivos" class="papelera-lista-contenedor"></div>
+
+        <h4 class="papelera-seccion-titulo">Apartados</h4>
+        <div id="listaPapeleraApartados" class="papelera-lista-contenedor"></div>
+    </div>
     
 
     

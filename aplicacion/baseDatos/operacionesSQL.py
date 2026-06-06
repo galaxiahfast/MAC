@@ -360,32 +360,488 @@ def eliminarApartadoDefinitivo(nombreApartado: str) -> None:
 # OPERACIONES DE DISPOSITIVOS
 # ==========================================================================
 
-def listarDispositivos():
-    pass
 
 
-def crearDispositivo():
-    pass
+# @galaxiahfast - Obtiene todos los dispositivos activos con sus detalles dinámicos para renderizado en el mapa. No recibe parámetros. Retorna list[dict] (colección de dispositivos con apartados).
+def listarDispositivos() -> list[dict]:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Controla lectura SQL asegurando captura de errores y liberación de recursos.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor(dictionary=True)
+
+        # @galaxiahfast - Recupera únicamente dispositivos activos excluyendo elementos enviados a papelera.
+        cursor.execute("""
+            SELECT
+                id,
+                posicionX,
+                posicionY,
+                estadoVisible,
+                fechaCreacion
+            FROM dispositivos
+            WHERE estadoEliminado = FALSE
+            ORDER BY id ASC
+        """)
+        dispositivos = cursor.fetchall()
+
+        # @galaxiahfast - Para cada dispositivo, obtiene sus detalles dinámicos asociados.
+        for dispositivo in dispositivos:
+            cursor.execute("""
+                SELECT
+                    a.nombreApartado,
+                    dd.valorDetalle,
+                    dd.esPersonalizado
+                FROM detallesDispositivos dd
+                INNER JOIN apartados a ON a.id = dd.idApartado
+                WHERE dd.idDispositivo = %s
+                AND a.estadoEliminado = FALSE
+            """, (dispositivo["id"],))
+            dispositivo["detalles"] = cursor.fetchall()
+
+        # @galaxiahfast - Retorna directamente la colección estructurada de dispositivos obtenidos.
+        return dispositivos
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
 
 
-def moverDispositivo():
-    pass
+
+# @galaxiahfast - Registra un nuevo dispositivo en el mapa y genera sus detalles por defecto desde el catálogo de apartados. Recibe posicionX (str), posicionY (str). Retorna int (ID del nuevo dispositivo).
+def crearDispositivo(posicionX: str, posicionY: str) -> int:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la inserción dentro de una transacción SQL controlada.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor(dictionary=True)
+
+        # @galaxiahfast - Inserta el nuevo dispositivo con sus coordenadas en la tabla maestra.
+        cursor.execute("""
+            INSERT INTO dispositivos (posicionX, posicionY)
+            VALUES (%s, %s)
+        """, (posicionX, posicionY))
+        idDispositivo = cursor.lastrowid
+
+        # @galaxiahfast - Recupera todos los apartados activos para vincularlos automáticamente al nuevo dispositivo.
+        cursor.execute("""
+            SELECT id, valorPredeterminado
+            FROM apartados
+            WHERE estadoEliminado = FALSE
+        """)
+        apartados = cursor.fetchall()
+
+        # @galaxiahfast - Inserta un detalle por cada apartado activo usando el valor predeterminado global.
+        if apartados:
+            datos_bulk = [
+                (idDispositivo, a["id"], a["valorPredeterminado"], False)
+                for a in apartados
+            ]
+            cursor.executemany("""
+                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle, esPersonalizado)
+                VALUES (%s, %s, %s, %s)
+            """, datos_bulk)
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+        # @galaxiahfast - Retorna el identificador del nuevo dispositivo creado.
+        return idDispositivo
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
 
 
-def ocultarDispositivo():
-    pass
+
+# @galaxiahfast - Actualiza las coordenadas de un dispositivo existente en el mapa. Recibe idDispositivo (int), posicionX (str), posicionY (str). Retorna None.
+def moverDispositivo(idDispositivo: int, posicionX: str, posicionY: str) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la actualización de coordenadas dentro de una transacción SQL controlada.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Modifica las coordenadas del dispositivo seleccionado.
+        cursor.execute("""
+            UPDATE dispositivos
+            SET posicionX = %s,
+                posicionY = %s
+            WHERE id = %s
+            AND estadoEliminado = FALSE
+        """, (posicionX, posicionY, idDispositivo))
+
+        # @galaxiahfast - Verifica que el dispositivo exista y se haya actualizado correctamente.
+        if cursor.rowcount == 0:
+            raise ValueError("El dispositivo no existe o ya fue eliminado.")
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
 
 
-def eliminarDispositivo():
-    pass
+
+# @galaxiahfast - Alterna la visibilidad de un dispositivo en el mapa sin eliminarlo. Recibe idDispositivo (int). Retorna None.
+def ocultarDispositivo(idDispositivo: int) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la alternancia de visibilidad dentro de una transacción SQL controlada.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Invierte el estado de visibilidad del dispositivo seleccionado.
+        cursor.execute("""
+            UPDATE dispositivos
+            SET estadoVisible = NOT estadoVisible
+            WHERE id = %s
+            AND estadoEliminado = FALSE
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Verifica que el dispositivo exista y se haya actualizado correctamente.
+        if cursor.rowcount == 0:
+            raise ValueError("El dispositivo no existe o ya fue eliminado.")
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Ejecuta el borrado lógico de un dispositivo existente. Recibe idDispositivo (int). Retorna None.
+def eliminarDispositivo(idDispositivo: int) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta operación SQL controlando integridad transaccional.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Marca el dispositivo como eliminado registrando fecha de baja lógica.
+        cursor.execute("""
+            UPDATE dispositivos
+            SET estadoEliminado = TRUE,
+                fechaEliminacion = NOW()
+            WHERE id = %s
+            AND estadoEliminado = FALSE
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Verifica que el dispositivo exista y se haya eliminado correctamente.
+        if cursor.rowcount == 0:
+            raise ValueError("El dispositivo no existe o ya fue eliminado.")
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Restaura un dispositivo previamente eliminado de forma lógica. Recibe idDispositivo (int). Retorna None.
+def restaurarDispositivo(idDispositivo: int) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la restauración dentro de una transacción SQL controlada.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Revierte la baja lógica del dispositivo restableciendo las banderas de control de eliminación.
+        cursor.execute("""
+            UPDATE dispositivos
+            SET estadoEliminado = FALSE,
+                fechaEliminacion = NULL
+            WHERE id = %s
+            AND estadoEliminado = TRUE
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Verifica que el dispositivo existiera en papelera.
+        if cursor.rowcount == 0:
+            raise ValueError("El dispositivo no existe en la papelera.")
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Ejecuta el borrado físico y definitivo de un dispositivo y purga todas sus relaciones. Recibe idDispositivo (int). Retorna None.
+def eliminarDispositivoDefinitivo(idDispositivo: int) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la eliminación física completa dentro de una transacción SQL controlada.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Remueve en primera instancia los registros dependientes en la tabla de detalles.
+        cursor.execute("""
+            DELETE FROM detallesDispositivos
+            WHERE idDispositivo = %s
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Remueve de forma definitiva el registro maestro del dispositivo.
+        cursor.execute("""
+            DELETE FROM dispositivos
+            WHERE id = %s
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Verifica que el dispositivo existiera.
+        if cursor.rowcount == 0:
+            raise ValueError("El dispositivo no existe.")
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando los cambios y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Lista los dispositivos que han sido eliminados lógicamente para la papelera. No recibe parámetros. Retorna list[dict].
+def listarDispositivosEliminados() -> list[dict]:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Controla lectura SQL asegurando captura de errores y liberación de recursos.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor(dictionary=True)
+
+        # @galaxiahfast - Recupera dispositivos en papelera ordenados por fecha de eliminación.
+        cursor.execute("""
+            SELECT
+                id,
+                posicionX,
+                posicionY,
+                fechaCreacion,
+                fechaEliminacion
+            FROM dispositivos
+            WHERE estadoEliminado = TRUE
+            ORDER BY fechaEliminacion DESC
+        """)
+
+        # @galaxiahfast - Retorna directamente la colección de dispositivos eliminados.
+        return cursor.fetchall()
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Lista los apartados que han sido eliminados lógicamente para la papelera. No recibe parámetros. Retorna list[dict].
+def listarApartadosEliminados() -> list[dict]:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Controla lectura SQL asegurando captura de errores y liberación de recursos.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor(dictionary=True)
+
+        # @galaxiahfast - Recupera apartados en papelera ordenados por fecha de eliminación.
+        cursor.execute("""
+            SELECT
+                id,
+                nombreApartado,
+                valorPredeterminado,
+                fechaCreacion,
+                fechaEliminacion
+            FROM apartados
+            WHERE estadoEliminado = TRUE
+            ORDER BY fechaEliminacion DESC
+        """)
+
+        # @galaxiahfast - Retorna directamente la colección de apartados eliminados.
+        return cursor.fetchall()
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
 
 # ==========================================================================
 # OPERACIONES DE DETALLES
 # ==========================================================================
 
-def actualizarDetalle():
-    pass
 
 
-def obtenerDetallesDispositivo():
-    pass
+# @galaxiahfast - Actualiza el valor de un apartado para un dispositivo específico y lo marca como personalizado. Recibe idDispositivo (int), idApartado (int), valor (str). Retorna None.
+def actualizarDetalle(idDispositivo: int, idApartado: int, valor: str) -> None:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Ejecuta la actualización del detalle controlando la transacción.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor()
+
+        # @galaxiahfast - Modifica el valor rompiendo el vínculo de herencia global al establecer esPersonalizado en verdadero.
+        cursor.execute("""
+            UPDATE detallesDispositivos
+            SET valorDetalle = %s,
+                esPersonalizado = TRUE
+            WHERE idDispositivo = %s
+            AND idApartado = %s
+        """, (valor, idDispositivo, idApartado))
+
+        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
+        conexion.commit()
+
+    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
+    except Exception:
+        if conexion:
+            conexion.rollback()
+        raise
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()
+
+
+
+# @galaxiahfast - Obtiene todos los detalles dinámicos de un dispositivo específico. Recibe idDispositivo (int). Retorna list[dict].
+def obtenerDetallesDispositivo(idDispositivo: int) -> list[dict]:
+
+    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
+    conexion = None
+    cursor = None
+
+    # @galaxiahfast - Controla lectura SQL asegurando captura de errores y liberación de recursos.
+    try:
+        conexion = obtenerConexion()
+        cursor = conexion.cursor(dictionary=True)
+
+        # @galaxiahfast - Recupera todos los detalles vinculados al dispositivo con nombre de apartado.
+        cursor.execute("""
+            SELECT
+                dd.id,
+                dd.idApartado,
+                a.nombreApartado,
+                dd.valorDetalle,
+                dd.esPersonalizado
+            FROM detallesDispositivos dd
+            INNER JOIN apartados a ON a.id = dd.idApartado
+            WHERE dd.idDispositivo = %s
+            AND a.estadoEliminado = FALSE
+            ORDER BY a.nombreApartado ASC
+        """, (idDispositivo,))
+
+        # @galaxiahfast - Retorna la colección de detalles del dispositivo.
+        return cursor.fetchall()
+
+    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
+    finally:
+        if cursor:
+            cursor.close()
+        if conexion and conexion.is_connected():
+            conexion.close()

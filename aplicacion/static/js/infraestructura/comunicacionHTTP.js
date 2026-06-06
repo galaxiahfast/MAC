@@ -35,3 +35,53 @@ export const ApartadosAPI = {
     eliminarDefinitivo: (nombreApartado) =>
         post('/api/apartados/eliminar-definitivo', { nombreApartado })
 };
+
+// @galaxiahfast - API específica para operaciones relacionadas con dispositivos del mapa.
+export const DispositivosAPI = {
+
+    // @galaxiahfast - Listado completo de dispositivos activos con sus detalles.
+    listar: () => get('/api/dispositivos/listar'),
+
+    // @galaxiahfast - Creación de un nuevo dispositivo con coordenadas en el mapa.
+    crear: (posicionX, posicionY) =>
+        post('/api/dispositivos/crear', { posicionX, posicionY }),
+
+    // @galaxiahfast - Actualización de las coordenadas de un dispositivo existente.
+    mover: (idDispositivo, posicionX, posicionY) =>
+        post('/api/dispositivos/mover', { idDispositivo, posicionX, posicionY }),
+
+    // @galaxiahfast - Alternancia de la visibilidad de un dispositivo en el mapa.
+    ocultar: (idDispositivo) =>
+        post('/api/dispositivos/ocultar', { idDispositivo }),
+
+    // @galaxiahfast - Baja lógica de un dispositivo, moviéndolo a papelera.
+    eliminar: (idDispositivo) =>
+        post('/api/dispositivos/eliminar', { idDispositivo }),
+
+    // @galaxiahfast - Restauración lógica de un dispositivo desde la papelera.
+    restaurar: (idDispositivo) =>
+        post('/api/dispositivos/restaurar', { idDispositivo }),
+
+    // @galaxiahfast - Eliminación definitiva de un dispositivo, removiéndolo completamente del sistema.
+    eliminarDefinitivo: (idDispositivo) =>
+        post('/api/dispositivos/eliminar-definitivo', { idDispositivo })
+};
+
+// @galaxiahfast - API específica para operaciones de la papelera (elementos eliminados).
+export const PapeleraAPI = {
+
+    // @galaxiahfast - Listado de todos los elementos eliminados (dispositivos y apartados).
+    listar: () => get('/api/papelera/listar')
+};
+
+// @galaxiahfast - API específica para operaciones de detalles de dispositivos.
+export const DetallesAPI = {
+
+    // @galaxiahfast - Obtención de todos los detalles de un dispositivo específico.
+    obtener: (idDispositivo) =>
+        post('/api/detalles/obtener', { idDispositivo }),
+
+    // @galaxiahfast - Actualización del valor de un detalle específico de un dispositivo.
+    actualizar: (idDispositivo, idApartado, valor) =>
+        post('/api/detalles/actualizar', { idDispositivo, idApartado, valor })
+};
