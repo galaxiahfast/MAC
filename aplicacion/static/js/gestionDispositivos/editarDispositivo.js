@@ -99,7 +99,7 @@ function renderizarPanelEdicion(idDispositivo, detalles) {
                 <label class="editar-dispositivo-label-detalle">${detalle.nombreApartado}</label>
                 <input type="text" class="editar-dispositivo-input-detalle" 
                        data-id-apartado="${detalle.idApartado}" 
-                       value="${detalle.valor || ''}" 
+                       value="${detalle.valorDetalle || ''}" 
                        placeholder="${detalle.valorPredeterminado || 'Sin valor'}">
                 <button class="editar-dispositivo-btn-guardar" data-id-apartado="${detalle.idApartado}" title="Guardar">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>

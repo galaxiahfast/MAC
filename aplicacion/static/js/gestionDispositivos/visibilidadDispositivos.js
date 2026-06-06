@@ -62,7 +62,7 @@ function renderizarDispositivosEnMapa() {
             if (!tooltip) {
                 tooltip = document.createElement('div');
                 tooltip.className = 'dispositivo-tooltip-info';
-                const detallesTexto = (dispositivo.detalles || []).slice(0, 3).map(d => `${d.nombreApartado}: ${d.valor || d.valorPredeterminado || '—'}`).join('\n');
+                const detallesTexto = (dispositivo.detalles || []).slice(0, 3).map(d => `${d.nombreApartado}: ${d.valorDetalle || d.valorPredeterminado || '—'}`).join('\n');
                 tooltip.textContent = `#${dispositivo.id}${detallesTexto ? '\n' + detallesTexto : ''}`;
                 punto.appendChild(tooltip);
             }

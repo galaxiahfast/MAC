@@ -54,10 +54,10 @@ def vincularApartadoADispositivos(idApartado, valorPredeterminado):
         dispositivos = cursor.fetchall()
         
         if dispositivos:
-            datos_bulk = [(d[0], idApartado, valorPredeterminado, False) for d in dispositivos]
+            datos_bulk = [(d[0], idApartado, valorPredeterminado) for d in dispositivos]
             cursor.executemany("""
-                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle, esPersonalizado)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle)
+                VALUES (%s, %s, %s)
             """, datos_bulk)
             conexion.commit()
     except Exception as e:
@@ -166,12 +166,11 @@ def editarApartado(idApartado: int, nuevoNombre: str, nuevoValorPredeterminado: 
             WHERE id = %s
         """, (nuevoNombre, nuevoValorPredeterminado, idApartado))
 
-        # @galaxiahfast - Actualiza los detalles de dispositivos que todavía heredan el comportamiento global y no han sido personalizados.
+        # @galaxiahfast - Actualiza el valor predeterminado en los detalles de dispositivos asociados a este apartado.
         cursor.execute("""
             UPDATE detallesDispositivos
             SET valorDetalle = %s
             WHERE idApartado = %s
-            AND esPersonalizado = FALSE
         """, (nuevoValorPredeterminado, idApartado))
 
         # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
@@ -204,11 +203,10 @@ def actualizarDetalle(idDispositivo: int, idApartado: int, valor: str) -> None:
         conexion = obtenerConexion()
         cursor = conexion.cursor()
 
-        # @galaxiahfast - Modifica el valor rompiendo el vínculo de herencia global al establecer esPersonalizado en verdadero.
+        # @galaxiahfast - Modifica el valor del detalle para el dispositivo y apartado especificados.
         cursor.execute("""
             UPDATE detallesDispositivos
-            SET valorDetalle = %s,
-                esPersonalizado = TRUE
+            SET valorDetalle = %s
             WHERE idDispositivo = %s
             AND idApartado = %s
         """, (valor, idDispositivo, idApartado))
@@ -263,12 +261,11 @@ def restaurarApartado(nombreApartado: str) -> None:
             WHERE id = %s
         """, (apartado["id"],))
 
-        # @galaxiahfast - Restablece el valor predeterminado global en los detalles de dispositivos que no hayan sido personalizados.
+        # @galaxiahfast - Restablece el valor predeterminado global en los detalles de dispositivos asociados.
         cursor.execute("""
             UPDATE detallesDispositivos
             SET valorDetalle = %s
             WHERE idApartado = %s
-            AND esPersonalizado = FALSE
         """, (
             apartado["valorPredeterminado"],
             apartado["id"]
@@ -393,8 +390,8 @@ def listarDispositivos() -> list[dict]:
             cursor.execute("""
                 SELECT
                     a.nombreApartado,
-                    dd.valorDetalle,
-                    dd.esPersonalizado
+                    a.valorPredeterminado,
+                    dd.valorDetalle
                 FROM detallesDispositivos dd
                 INNER JOIN apartados a ON a.id = dd.idApartado
                 WHERE dd.idDispositivo = %s
@@ -444,12 +441,12 @@ def crearDispositivo(posicionX: str, posicionY: str) -> int:
         # @galaxiahfast - Inserta un detalle por cada apartado activo usando el valor predeterminado global.
         if apartados:
             datos_bulk = [
-                (idDispositivo, a["id"], a["valorPredeterminado"], False)
+                (idDispositivo, a["id"], a["valorPredeterminado"])
                 for a in apartados
             ]
             cursor.executemany("""
-                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle, esPersonalizado)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO detallesDispositivos (idDispositivo, idApartado, valorDetalle)
+                VALUES (%s, %s, %s)
             """, datos_bulk)
 
         # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
@@ -770,45 +767,6 @@ def listarApartadosEliminados() -> list[dict]:
 
 
 
-# @galaxiahfast - Actualiza el valor de un apartado para un dispositivo específico y lo marca como personalizado. Recibe idDispositivo (int), idApartado (int), valor (str). Retorna None.
-def actualizarDetalle(idDispositivo: int, idApartado: int, valor: str) -> None:
-
-    # @galaxiahfast - Inicializa variables SQL para manejo seguro de recursos.
-    conexion = None
-    cursor = None
-
-    # @galaxiahfast - Ejecuta la actualización del detalle controlando la transacción.
-    try:
-        conexion = obtenerConexion()
-        cursor = conexion.cursor()
-
-        # @galaxiahfast - Modifica el valor rompiendo el vínculo de herencia global al establecer esPersonalizado en verdadero.
-        cursor.execute("""
-            UPDATE detallesDispositivos
-            SET valorDetalle = %s,
-                esPersonalizado = TRUE
-            WHERE idDispositivo = %s
-            AND idApartado = %s
-        """, (valor, idDispositivo, idApartado))
-
-        # @galaxiahfast - Confirma permanentemente todos los cambios realizados.
-        conexion.commit()
-
-    # @galaxiahfast - Revierte la transacción completa ante cualquier fallo abortando cambios inconsistentes y propagando el error original.
-    except Exception:
-        if conexion:
-            conexion.rollback()
-        raise
-
-    # @galaxiahfast - Libera recursos SQL cerrando el cursor si existe y la conexión si continúa activa.
-    finally:
-        if cursor:
-            cursor.close()
-        if conexion and conexion.is_connected():
-            conexion.close()
-
-
-
 # @galaxiahfast - Obtiene todos los detalles dinámicos de un dispositivo específico. Recibe idDispositivo (int). Retorna list[dict].
 def obtenerDetallesDispositivo(idDispositivo: int) -> list[dict]:
 
@@ -821,14 +779,14 @@ def obtenerDetallesDispositivo(idDispositivo: int) -> list[dict]:
         conexion = obtenerConexion()
         cursor = conexion.cursor(dictionary=True)
 
-        # @galaxiahfast - Recupera todos los detalles vinculados al dispositivo con nombre de apartado.
+        # @galaxiahfast - Recupera todos los detalles vinculados al dispositivo con nombre de apartado y valor predeterminado.
         cursor.execute("""
             SELECT
                 dd.id,
                 dd.idApartado,
                 a.nombreApartado,
-                dd.valorDetalle,
-                dd.esPersonalizado
+                a.valorPredeterminado,
+                dd.valorDetalle
             FROM detallesDispositivos dd
             INNER JOIN apartados a ON a.id = dd.idApartado
             WHERE dd.idDispositivo = %s
