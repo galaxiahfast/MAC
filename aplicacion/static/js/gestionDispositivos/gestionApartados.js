@@ -1,12 +1,14 @@
-/* @galaxiahfast - Módulo de gestión de apartados (renderizado, fecha, eliminación y scroll absoluto). */
+/* @galaxiahfast - Módulo de gestión de apartados (renderizado, fecha, eliminación, edición, copia y scroll absoluto). */
 import { getApartados, suscribirse } from '../infraestructura/memoriaCache.js';
-import { eliminarApartado } from '../infraestructura/sincronizarApartados.js';
+import { eliminarApartado, editarApartadoGlobal } from '../infraestructura/sincronizarApartados.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - GESTIÓN DEL SCROLL ABSOLUTO
   ========================================================================== */
 
-let scrollPos = 0; // Posición de control absoluto
+let scrollPos = 0;
+let actualizarScrollFn = null;
 
 function configurarScrollbarGestion() {
     const contenedor = document.getElementById('listaScrollGestionApartados');
@@ -15,7 +17,6 @@ function configurarScrollbarGestion() {
     
     if (!contenedor || !contenido || !thumb) return;
 
-    // Resetear posición al abrir
     scrollPos = 0;
     contenido.style.transform = `translateY(0px)`;
 
@@ -27,7 +28,6 @@ function configurarScrollbarGestion() {
         const thumbHeight = Math.max(ratioVisible * clientHeight, 40);
         const maxScroll = Math.max(0, scrollHeight - clientHeight);
         
-        // Sincronizar Thumb
         const maxThumbTop = clientHeight - thumbHeight;
         const thumbTop = (scrollPos / maxScroll) * maxThumbTop;
         
@@ -36,25 +36,23 @@ function configurarScrollbarGestion() {
         thumb.style.opacity = (scrollHeight <= clientHeight) ? '0' : '1';
     };
 
-    // Control de Rueda (Wheel)
-    // Control de Rueda (Wheel) - CORREGIDO
+    /* @galaxiahfast - Expone la función actualizar para uso externo. */
+    actualizarScrollFn = actualizar;
+
     contenedor.addEventListener('wheel', (e) => {
         e.preventDefault();
         
-        // 1. Definimos una velocidad fija, ignorando la aceleración del SO
         const factorVelocidad = 50; 
         const direccion = e.deltaY > 0 ? 1 : -1;
         
         const maxScroll = Math.max(0, contenido.scrollHeight - contenedor.clientHeight);
         
-        // 2. Aplicamos un movimiento lineal fijo
         scrollPos = Math.max(0, Math.min(scrollPos + (direccion * factorVelocidad), maxScroll));
         
         contenido.style.transform = `translateY(-${scrollPos}px)`;
         actualizar();
     }, { passive: false });
     
-    // Lógica de arrastre
     let thumbDragging = false;
     let dragStartY = 0;
     let initialScrollPos = 0;
@@ -71,10 +69,8 @@ function configurarScrollbarGestion() {
         if (!thumbDragging) return;
         
         const deltaY = e.clientY - dragStartY;
-        // Calculamos el ratio real de desplazamiento
         const scrollRatio = contenido.scrollHeight / contenedor.clientHeight;
         
-        // Movemos la posición basándonos en el desplazamiento del ratón
         scrollPos = Math.max(0, Math.min(initialScrollPos + (deltaY * scrollRatio), contenido.scrollHeight - contenedor.clientHeight));
         
         contenido.style.transform = `translateY(-${scrollPos}px)`;
@@ -92,27 +88,25 @@ function configurarScrollbarGestion() {
     actualizar();
 }
 
+/* @galaxiahfast - Desplaza la lista de apartados en la dirección indicada. */
 export function desplazarApartados(direccion) {
     const contenedor = document.getElementById('listaScrollGestionApartados');
     const contenido = document.getElementById('contenidoScrollableInterno');
     if (!contenedor || !contenido) return;
 
-    // Altura exacta de cada fila (altura 70 + margen 15)
     const paso = 85; 
     const maxScroll = Math.max(0, contenido.scrollHeight - contenedor.clientHeight);
     
-    // Calculamos el nuevo scrollPos forzando que sea un múltiplo de 85
     let nuevoScroll = scrollPos + (direccion === 'down' ? paso : -paso);
     
-    // Ajustar para que siempre sea múltiplo de 85 (evita los 90/95px)
     nuevoScroll = Math.round(nuevoScroll / paso) * paso;
     
     scrollPos = Math.max(0, Math.min(nuevoScroll, maxScroll));
     
     contenido.style.transform = `translateY(-${scrollPos}px)`;
     
-    // Opcional: Actualizar el thumb si existe una función global para ello
-    actualizar(); 
+    /* @galaxiahfast - Actualiza el thumb si la función está disponible. */
+    if (actualizarScrollFn) actualizarScrollFn();
 }
 
 /* ==========================================================================
@@ -124,7 +118,6 @@ function renderizarListaApartados() {
     const template = document.getElementById('templateFilaApartado');
     const apartados = getApartados();
     
-    // Inyectar el contenedor interno si no existe
     let contenido = document.getElementById('contenidoScrollableInterno');
     if (!contenido) {
         contenido = document.createElement('div');
@@ -155,11 +148,84 @@ function renderizarListaApartados() {
             fechaEl.textContent = `${p.day}, ${mes}. ${p.year} ${p.hour}:${p.minute} ${p.dayPeriod.toUpperCase()}`;
         }
         
-        clon.querySelector('.btn-eliminar').addEventListener('click', () => eliminarApartado(apartado.nombreApartado));
+        /* @galaxiahfast - Botón copiar: copia el nombre del apartado al portapapeles. */
+        clon.querySelector('.btn-copiar').addEventListener('click', () => {
+            navigator.clipboard.writeText(apartado.nombreApartado).then(() => {
+                mostrarNotificacion('Nombre copiado al portapapeles', 'exito');
+            }).catch(() => {
+                mostrarNotificacion('No se pudo copiar', 'error');
+            });
+        });
+
+        /* @galaxiahfast - Botón editar: transforma la fila en campos editables inline. */
+        const filaElement = clon.querySelector('.gestionar-apartado-item-fila');
+        clon.querySelector('.btn-editar').addEventListener('click', () => {
+            activarEdicionInline(filaElement, apartado);
+        });
+
+        /* @galaxiahfast - Botón eliminar: solicita confirmación antes de ejecutar la eliminación. */
+        clon.querySelector('.btn-eliminar').addEventListener('click', () => {
+            if (confirm(`¿Eliminar el apartado "${apartado.nombreApartado}"? Se moverá a la papelera.`)) {
+                eliminarApartado(apartado.nombreApartado);
+            }
+        });
+
         contenido.appendChild(clon);
     });
 
     setTimeout(configurarScrollbarGestion, 0);
+}
+
+/* @galaxiahfast - Transforma una fila de apartado en modo edición inline con campos de nombre y valor. */
+function activarEdicionInline(filaElement, apartado) {
+    const infoBloque = filaElement.querySelector('.gestionar-apartado-info-bloque');
+    const grupoBotones = filaElement.querySelector('.gestionar-apartado-grupo-botones');
+    if (!infoBloque || !grupoBotones) return;
+
+    /* @galaxiahfast - Guarda el HTML original para restaurar si se cancela. */
+    const htmlOriginalInfo = infoBloque.innerHTML;
+    const htmlOriginalBotones = grupoBotones.innerHTML;
+
+    /* @galaxiahfast - Reemplaza el contenido con campos de edición. */
+    infoBloque.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:6px; width:100%;">
+            <input type="text" class="editar-inline-nombre" value="${apartado.nombreApartado}" 
+                   style="background:var(--gestionar-apartado-fondo-item); color:var(--gestionar-apartado-color-nombre); border:1px solid var(--gestionar-apartado-color-borde); border-radius:6px; padding:4px 8px; font-size:12px; outline:none;">
+            <input type="text" class="editar-inline-valor" value="${apartado.valorPredeterminado || ''}" placeholder="Valor predeterminado"
+                   style="background:var(--gestionar-apartado-fondo-item); color:var(--gestionar-apartado-color-subtitulos); border:1px solid var(--gestionar-apartado-color-borde); border-radius:6px; padding:4px 8px; font-size:11px; outline:none;">
+        </div>
+    `;
+
+    /* @galaxiahfast - Reemplaza botones con guardar/cancelar. */
+    grupoBotones.innerHTML = `
+        <button class="gestionar-apartado-btn-accion btn-guardar-edicion" title="Guardar" style="color: var(--gestionar-apartado-color-nombre);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </button>
+        <button class="gestionar-apartado-btn-accion btn-cancelar-edicion" title="Cancelar" style="color: var(--gestionar-apartado-color-subtitulos);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    `;
+
+    /* @galaxiahfast - Manejador de guardar edición. */
+    grupoBotones.querySelector('.btn-guardar-edicion').addEventListener('click', async () => {
+        const nuevoNombre = infoBloque.querySelector('.editar-inline-nombre').value.trim();
+        const nuevoValor = infoBloque.querySelector('.editar-inline-valor').value.trim();
+
+        if (!nuevoNombre) {
+            mostrarNotificacion('El nombre no puede estar vacío', 'advertencia');
+            return;
+        }
+
+        await editarApartadoGlobal(apartado.id, nuevoNombre, nuevoValor);
+    });
+
+    /* @galaxiahfast - Manejador de cancelar edición. */
+    grupoBotones.querySelector('.btn-cancelar-edicion').addEventListener('click', () => {
+        infoBloque.innerHTML = htmlOriginalInfo;
+        grupoBotones.innerHTML = htmlOriginalBotones;
+        /* @galaxiahfast - Re-renderiza para restaurar los event listeners. */
+        renderizarListaApartados();
+    });
 }
 
 export function abrirPanelGestion() {

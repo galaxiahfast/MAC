@@ -1,14 +1,19 @@
 /* @galaxiahfast - Lógica de negocio y sincronización de dispositivos del mapa. */
 import { DispositivosAPI } from './comunicacionHTTP.js';
 import { setDispositivos, getDispositivos } from './memoriaCacheDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 
 
 /* @galaxiahfast - Sincroniza la colección de dispositivos desde el servidor y actualiza la memoria local. */
 export async function sincronizarDispositivos() {
-    const res = await DispositivosAPI.listar();
-    if (res.estado !== 'exito') return;
-    setDispositivos(res.dispositivos);
+    try {
+        const res = await DispositivosAPI.listar();
+        if (res.estado !== 'exito') return;
+        setDispositivos(res.dispositivos);
+    } catch (error) {
+        console.error('@galaxiahfast - Error al sincronizar dispositivos:', error);
+    }
 }
 
 
@@ -17,7 +22,7 @@ export async function sincronizarDispositivos() {
 export async function crearDispositivoEnMapa(posicionX, posicionY) {
     const respaldo = [...getDispositivos()];
 
-    // @galaxiahfast - Añade un placeholder temporal en la memoria para renderizado inmediato.
+    /* @galaxiahfast - Añade un placeholder temporal en la memoria para renderizado inmediato. */
     const temporal = {
         id: Date.now(),
         posicionX,
@@ -32,11 +37,12 @@ export async function crearDispositivoEnMapa(posicionX, posicionY) {
         const res = await DispositivosAPI.crear(posicionX, posicionY);
         if (res.estado !== 'exito') throw new Error(res.mensaje);
 
-        // @galaxiahfast - Resincroniza para obtener el ID real y los detalles generados.
+        /* @galaxiahfast - Resincroniza para obtener el ID real y los detalles generados. */
         await sincronizarDispositivos();
+        mostrarNotificacion('Dispositivo creado correctamente', 'exito');
     } catch (error) {
         setDispositivos(respaldo);
-        alert('No se pudo crear el dispositivo: ' + error.message);
+        mostrarNotificacion('No se pudo crear el dispositivo: ' + error.message, 'error');
     }
 }
 
@@ -46,7 +52,7 @@ export async function crearDispositivoEnMapa(posicionX, posicionY) {
 export async function moverDispositivoEnMapa(idDispositivo, posicionX, posicionY) {
     const respaldo = [...getDispositivos()];
 
-    // @galaxiahfast - Actualiza la posición en memoria de forma optimista.
+    /* @galaxiahfast - Actualiza la posición en memoria de forma optimista. */
     setDispositivos(getDispositivos().map(d =>
         d.id === idDispositivo ? { ...d, posicionX, posicionY } : d
     ));
@@ -54,9 +60,10 @@ export async function moverDispositivoEnMapa(idDispositivo, posicionX, posicionY
     try {
         const res = await DispositivosAPI.mover(idDispositivo, posicionX, posicionY);
         if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Dispositivo reubicado', 'exito');
     } catch (error) {
         setDispositivos(respaldo);
-        alert('No se pudo mover el dispositivo: ' + error.message);
+        mostrarNotificacion('No se pudo mover el dispositivo: ' + error.message, 'error');
     }
 }
 
@@ -66,15 +73,16 @@ export async function moverDispositivoEnMapa(idDispositivo, posicionX, posicionY
 export async function eliminarDispositivoDelMapa(idDispositivo) {
     const respaldo = [...getDispositivos()];
 
-    // @galaxiahfast - Remueve el dispositivo de la memoria de forma optimista.
+    /* @galaxiahfast - Remueve el dispositivo de la memoria de forma optimista. */
     setDispositivos(getDispositivos().filter(d => d.id !== idDispositivo));
 
     try {
         const res = await DispositivosAPI.eliminar(idDispositivo);
         if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Dispositivo enviado a papelera', 'exito');
     } catch (error) {
         setDispositivos(respaldo);
-        alert('No se pudo eliminar el dispositivo: ' + error.message);
+        mostrarNotificacion('No se pudo eliminar el dispositivo: ' + error.message, 'error');
     }
 }
 
@@ -84,7 +92,7 @@ export async function eliminarDispositivoDelMapa(idDispositivo) {
 export async function ocultarDispositivoEnMapa(idDispositivo) {
     const respaldo = [...getDispositivos()];
 
-    // @galaxiahfast - Invierte el estado de visibilidad en memoria de forma optimista.
+    /* @galaxiahfast - Invierte el estado de visibilidad en memoria de forma optimista. */
     setDispositivos(getDispositivos().map(d =>
         d.id === idDispositivo ? { ...d, estadoVisible: d.estadoVisible ? 0 : 1 } : d
     ));
@@ -94,6 +102,6 @@ export async function ocultarDispositivoEnMapa(idDispositivo) {
         if (res.estado !== 'exito') throw new Error(res.mensaje);
     } catch (error) {
         setDispositivos(respaldo);
-        alert('No se pudo cambiar la visibilidad: ' + error.message);
+        mostrarNotificacion('No se pudo cambiar la visibilidad: ' + error.message, 'error');
     }
 }

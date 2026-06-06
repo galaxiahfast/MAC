@@ -1,105 +1,201 @@
-/* @galaxiahfast - Estilos CSS para los puntos de dispositivos renderizados en el mapa y sus estados visuales. */
+/* @galaxiahfast - Variables CSS para dispositivos del mapa (modo claro). */
 :root {
-    --dispositivo-color-punto: #f97316;
-    --dispositivo-color-punto-hover: #ea580c;
-    --dispositivo-color-punto-oculto: #94a3b8;
-    --dispositivo-color-punto-seleccionado: #3b82f6;
-    --dispositivo-tamanio-punto: 16px;
-    --dispositivo-transicion-suave: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    --dispositivo-punto-color: #4a90d9;
+    --dispositivo-punto-borde: #2c5f8a;
+    --dispositivo-punto-sombra: rgba(74, 144, 217, 0.4);
+    --dispositivo-oculto-opacidad: 0.35;
+    --dispositivo-tooltip-fondo: rgba(20, 20, 30, 0.92);
+    --dispositivo-tooltip-color: #e0e0e0;
+    --dispositivo-tooltip-borde: rgba(74, 144, 217, 0.3);
+    --dispositivo-icono-eliminar-fondo: rgba(220, 53, 69, 0.85);
+    --dispositivo-icono-eliminar-color: #fff;
 }
 
-/* @galaxiahfast - Soporte para tema oscuro. */
+/* @galaxiahfast - Variables CSS para dispositivos del mapa (modo oscuro). */
 [data-theme="dark"] {
-    --dispositivo-color-punto: #38bdf8;
-    --dispositivo-color-punto-hover: #0ea5e9;
-    --dispositivo-color-punto-oculto: #475569;
-    --dispositivo-color-punto-seleccionado: #818cf8;
-}
-
-/* @galaxiahfast - Punto base de dispositivo en el mapa. */
-.punto-dispositivo {
-    position: absolute;
-    width: var(--dispositivo-tamanio-punto);
-    height: var(--dispositivo-tamanio-punto);
-    background: var(--dispositivo-color-punto);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    transition: var(--dispositivo-transicion-suave);
-    z-index: 10;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.25);
-}
-
-[data-theme="dark"] .punto-dispositivo {
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
-}
-
-.punto-dispositivo:hover {
-    background: var(--dispositivo-color-punto-hover);
-    transform: translate(-50%, -50%) scale(1.3);
-    box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.3);
-}
-
-[data-theme="dark"] .punto-dispositivo:hover {
-    box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.3);
-}
-
-/* @galaxiahfast - Estado visual para dispositivos ocultos cuando se muestran todos. */
-.punto-dispositivo-oculto {
-    background: var(--dispositivo-color-punto-oculto);
-    opacity: 0.5;
-    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
-}
-
-.punto-dispositivo-oculto:hover {
-    background: var(--dispositivo-color-punto-oculto);
-    opacity: 0.8;
-}
-
-/* @galaxiahfast - Estado visual durante el arrastre de reubicación. */
-.punto-arrastrando {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 0.7;
-    z-index: 100;
-    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.4);
+    --dispositivo-punto-color: #5ea3e6;
+    --dispositivo-punto-borde: #3d7ab8;
+    --dispositivo-punto-sombra: rgba(94, 163, 230, 0.35);
+    --dispositivo-oculto-opacidad: 0.3;
+    --dispositivo-tooltip-fondo: rgba(10, 10, 20, 0.95);
+    --dispositivo-tooltip-color: #ccc;
+    --dispositivo-tooltip-borde: rgba(94, 163, 230, 0.25);
+    --dispositivo-icono-eliminar-fondo: rgba(200, 40, 55, 0.9);
+    --dispositivo-icono-eliminar-color: #fff;
 }
 
 /* ==========================================================================
-   @galaxiahfast - CURSORES POR MODO ACTIVO
+   @galaxiahfast - ESTILOS BASE DE PUNTOS DE DISPOSITIVOS
    ========================================================================== */
 
-/* @galaxiahfast - Cursor de mira para modo de colocación. */
-.modo-colocacion-activo {
-    cursor: crosshair;
-}
-
-/* @galaxiahfast - Cursor de prohibición para modo de eliminación. */
-.modo-eliminacion-activo .punto-dispositivo {
-    cursor: not-allowed;
-    animation: pulsoEliminacion 1s infinite;
-}
-
-@keyframes pulsoEliminacion {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3); }
-    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.5); }
-}
-
-/* @galaxiahfast - Cursor de edición para modo de edición. */
-.modo-edicion-activo .punto-dispositivo {
+/* @galaxiahfast - Punto de dispositivo en el mapa. */
+.dispositivo-punto {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
     cursor: pointer;
-    animation: pulsoEdicion 1.5s infinite;
+    z-index: 10;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
-@keyframes pulsoEdicion {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
-    50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.5); }
+.dispositivo-punto:hover {
+    transform: translate(-50%, -50%) scale(1.3);
+    z-index: 15;
 }
 
-/* @galaxiahfast - Cursor de movimiento para modo de reubicación. */
-.modo-reubicacion-activo .punto-dispositivo {
+/* @galaxiahfast - Estilo para dispositivos ocultos (semitransparentes). */
+.dispositivo-punto.dispositivo-oculto {
+    opacity: var(--dispositivo-oculto-opacidad);
+}
+
+.dispositivo-punto.dispositivo-oculto:hover {
+    opacity: 0.7;
+}
+
+/* @galaxiahfast - SVG del punto del dispositivo. */
+.dispositivo-punto-svg {
+    filter: drop-shadow(0 0 4px var(--dispositivo-punto-sombra));
+    transition: filter 0.2s ease;
+}
+
+.dispositivo-punto:hover .dispositivo-punto-svg {
+    filter: drop-shadow(0 0 8px var(--dispositivo-punto-sombra));
+}
+
+/* ==========================================================================
+   @galaxiahfast - MODOS DE INTERACCIÓN DEL MAPA
+   ========================================================================== */
+
+/* @galaxiahfast - Cursor crosshair para modo colocación. */
+.modo-colocacion-activo {
+    cursor: crosshair !important;
+}
+
+/* @galaxiahfast - Cursor especial para modo eliminación. */
+.modo-eliminacion-activo .dispositivo-punto {
+    cursor: not-allowed;
+}
+
+/* @galaxiahfast - Cursor pointer para modo edición. */
+.modo-edicion-activo .dispositivo-punto {
+    cursor: pointer;
+}
+
+/* @galaxiahfast - Cursor grab para modo reubicación. */
+.modo-reubicacion-activo .dispositivo-punto {
     cursor: grab;
 }
 
-.modo-reubicacion-activo .punto-dispositivo:active {
+.modo-reubicacion-activo .dispositivo-punto.dispositivo-arrastrando {
     cursor: grabbing;
+    z-index: 100;
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0.8;
+}
+
+/* @galaxiahfast - Clase de arrastrable visual. */
+.dispositivo-arrastrable {
+    cursor: grab !important;
+}
+
+.dispositivo-arrastrable:active {
+    cursor: grabbing !important;
+}
+
+/* ==========================================================================
+   @galaxiahfast - ICONO DE ELIMINACIÓN (X)
+   ========================================================================== */
+
+/* @galaxiahfast - Icono de X superpuesto en modo eliminación. */
+.dispositivo-icono-eliminar {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background: var(--dispositivo-icono-eliminar-fondo);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+    animation: aparecerIconoEliminar 0.2s ease-out;
+}
+
+.dispositivo-icono-eliminar svg {
+    stroke: var(--dispositivo-icono-eliminar-color);
+}
+
+@keyframes aparecerIconoEliminar {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   @galaxiahfast - TOOLTIPS DE DISPOSITIVOS
+   ========================================================================== */
+
+/* @galaxiahfast - Tooltip de información al hacer hover en modo edición. */
+.dispositivo-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dispositivo-tooltip-fondo);
+    color: var(--dispositivo-tooltip-color);
+    border: 1px solid var(--dispositivo-tooltip-borde);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 100;
+    animation: aparecerTooltip 0.15s ease-out;
+}
+
+/* @galaxiahfast - Tooltip con información detallada del dispositivo. */
+.dispositivo-tooltip-info {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dispositivo-tooltip-fondo);
+    color: var(--dispositivo-tooltip-color);
+    border: 1px solid var(--dispositivo-tooltip-borde);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: pre-line;
+    pointer-events: none;
+    z-index: 100;
+    max-width: 200px;
+    line-height: 1.4;
+    animation: aparecerTooltip 0.15s ease-out;
+    backdrop-filter: blur(4px);
+}
+
+@keyframes aparecerTooltip {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ==========================================================================
+   @galaxiahfast - CAPA DE DISPOSITIVOS
+   ========================================================================== */
+
+/* @galaxiahfast - Contenedor de la capa de dispositivos superpuesta al mapa. */
+#capaDispositivos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#capaDispositivos .dispositivo-punto {
+    pointer-events: auto;
 }

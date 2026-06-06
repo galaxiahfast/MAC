@@ -1,5 +1,6 @@
-/* @galaxiahfast - Módulo encargado de gestionar la lógica de reubicación de dispositivos en el mapa mediante arrastre. */
+/* @galaxiahfast - Módulo encargado de gestionar la reubicación interactiva de dispositivos en el mapa mediante drag. */
 import { moverDispositivoEnMapa } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - ESTADO DEL MODO DE REUBICACIÓN
@@ -17,6 +18,13 @@ export function activarModoReubicacion() {
     modoReubicacionActivo = true;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.add('modo-reubicacion-activo');
+
+    /* @galaxiahfast - Añade clase de arrastrable a todos los puntos. */
+    document.querySelectorAll('.dispositivo-punto').forEach(punto => {
+        punto.classList.add('dispositivo-arrastrable');
+    });
+
+    mostrarNotificacion('Arrastra un dispositivo para reubicarlo', 'advertencia');
 }
 
 
@@ -27,6 +35,11 @@ export function desactivarModoReubicacion() {
     puntoArrastrado = null;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.remove('modo-reubicacion-activo');
+
+    /* @galaxiahfast - Remueve clase de arrastrable de todos los puntos. */
+    document.querySelectorAll('.dispositivo-punto').forEach(punto => {
+        punto.classList.remove('dispositivo-arrastrable');
+    });
 }
 
 
@@ -38,70 +51,66 @@ export function esModoReubicacionActivo() {
 
 
 
-/* @galaxiahfast - Maneja el inicio del arrastre de un punto de dispositivo. */
+/* @galaxiahfast - Inicia el arrastre de un dispositivo del mapa. */
 function manejarMouseDown(event) {
     if (!modoReubicacionActivo) return;
 
-    const punto = event.target.closest('.punto-dispositivo');
+    const punto = event.target.closest('.dispositivo-punto');
     if (!punto) return;
 
     event.preventDefault();
-    event.stopPropagation();
-
     puntoArrastrado = punto;
 
-    // @galaxiahfast - Calcula el offset del clic respecto al centro del punto.
-    const rect = punto.getBoundingClientRect();
-    offsetX = event.clientX - rect.left - rect.width / 2;
-    offsetY = event.clientY - rect.top - rect.height / 2;
+    const mapa = document.getElementById('contenedorMapa');
+    const rect = mapa.getBoundingClientRect();
 
-    punto.classList.add('punto-arrastrando');
+    offsetX = event.clientX - punto.getBoundingClientRect().left;
+    offsetY = event.clientY - punto.getBoundingClientRect().top;
+
+    punto.classList.add('dispositivo-arrastrando');
     document.body.style.userSelect = 'none';
 }
 
 
 
-/* @galaxiahfast - Maneja el movimiento durante el arrastre del punto de dispositivo. */
+/* @galaxiahfast - Mueve el dispositivo arrastrado siguiendo el cursor. */
 function manejarMouseMove(event) {
-    if (!puntoArrastrado || !modoReubicacionActivo) return;
+    if (!puntoArrastrado) return;
 
     const mapa = document.getElementById('contenedorMapa');
-    if (!mapa) return;
-
-    // @galaxiahfast - Calcula la nueva posición relativa al mapa en porcentaje.
     const rect = mapa.getBoundingClientRect();
-    const nuevaX = ((event.clientX - rect.left - offsetX) / rect.width * 100).toFixed(2);
-    const nuevaY = ((event.clientY - rect.top - offsetY) / rect.height * 100).toFixed(2);
 
-    // @galaxiahfast - Actualiza la posición visual del punto durante el arrastre.
-    puntoArrastrado.style.left = `${nuevaX}%`;
-    puntoArrastrado.style.top = `${nuevaY}%`;
+    const posX = ((event.clientX - rect.left - offsetX + puntoArrastrado.offsetWidth / 2) / rect.width * 100);
+    const posY = ((event.clientY - rect.top - offsetY + puntoArrastrado.offsetHeight / 2) / rect.height * 100);
+
+    /* @galaxiahfast - Limita las coordenadas al rango válido del mapa. */
+    const clampX = Math.max(0, Math.min(100, posX));
+    const clampY = Math.max(0, Math.min(100, posY));
+
+    puntoArrastrado.style.left = `${clampX}%`;
+    puntoArrastrado.style.top = `${clampY}%`;
 }
 
 
 
-/* @galaxiahfast - Maneja la finalización del arrastre y persiste la nueva posición. */
+/* @galaxiahfast - Finaliza el arrastre y persiste la nueva posición en el backend. */
 function manejarMouseUp(event) {
-    if (!puntoArrastrado || !modoReubicacionActivo) return;
+    if (!puntoArrastrado) return;
 
     const mapa = document.getElementById('contenedorMapa');
-    if (!mapa) return;
-
-    // @galaxiahfast - Calcula la posición final en porcentaje.
     const rect = mapa.getBoundingClientRect();
-    const posicionX = ((event.clientX - rect.left - offsetX) / rect.width * 100).toFixed(2) + '%';
-    const posicionY = ((event.clientY - rect.top - offsetY) / rect.height * 100).toFixed(2) + '%';
 
-    // @galaxiahfast - Obtiene el identificador del dispositivo desde el atributo data.
-    const idDispositivo = parseInt(puntoArrastrado.dataset.idDispositivo);
+    const posX = ((event.clientX - rect.left) / rect.width * 100).toFixed(2) + '%';
+    const posY = ((event.clientY - rect.top) / rect.height * 100).toFixed(2) + '%';
 
-    puntoArrastrado.classList.remove('punto-arrastrando');
+    const idDispositivo = parseInt(puntoArrastrado.dataset.id);
+
+    puntoArrastrado.classList.remove('dispositivo-arrastrando');
     document.body.style.userSelect = '';
     puntoArrastrado = null;
 
-    // @galaxiahfast - Persiste la nueva posición en el servidor.
     if (idDispositivo) {
-        moverDispositivoEnMapa(idDispositivo, posicionX, posicionY);
+        moverDispositivoEnMapa(idDispositivo, posX, posY);
     }
 }
 
@@ -109,10 +118,10 @@ function manejarMouseUp(event) {
 
 /* @galaxiahfast - Inicialización del módulo de reubicación de dispositivos. */
 export function inicializarModuloReubicacion() {
-    const capaDispositivos = document.getElementById('capaDispositivos');
-    if (capaDispositivos) {
-        capaDispositivos.addEventListener('mousedown', manejarMouseDown);
+    const mapa = document.getElementById('contenedorMapa');
+    if (mapa) {
+        mapa.addEventListener('mousedown', manejarMouseDown);
+        document.addEventListener('mousemove', manejarMouseMove);
+        document.addEventListener('mouseup', manejarMouseUp);
     }
-    document.addEventListener('mousemove', manejarMouseMove);
-    document.addEventListener('mouseup', manejarMouseUp);
 }

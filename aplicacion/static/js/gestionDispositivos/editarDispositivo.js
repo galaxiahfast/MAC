@@ -1,6 +1,7 @@
-/* @galaxiahfast - Módulo encargado de gestionar la lógica de edición de detalles de un dispositivo seleccionado. */
+/* @galaxiahfast - Módulo encargado de gestionar la edición interactiva de detalles de dispositivos del mapa. */
 import { DetallesAPI } from '../infraestructura/comunicacionHTTP.js';
 import { sincronizarDispositivos } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - ESTADO DEL MODO DE EDICIÓN
@@ -16,6 +17,7 @@ export function activarModoEdicion() {
     modoEdicionActivo = true;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.add('modo-edicion-activo');
+    mostrarNotificacion('Haz clic en un dispositivo para editar sus detalles', 'advertencia');
 }
 
 
@@ -26,7 +28,6 @@ export function desactivarModoEdicion() {
     dispositivoSeleccionado = null;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.remove('modo-edicion-activo');
-    cerrarPanelEdicion();
 }
 
 
@@ -38,139 +39,131 @@ export function esModoEdicionActivo() {
 
 
 
-/* @galaxiahfast - Abre el panel flotante de edición de detalles del dispositivo. */
-export function abrirPanelEdicion() {
-    const contenedor = document.getElementById('contenedorFlotanteEdicionDispositivo');
-    if (contenedor) {
-        contenedor.classList.remove('estado-panel-oculto');
-        contenedor.classList.add('panel-formulario-activo');
-    }
-}
-
-
-
-/* @galaxiahfast - Cierra el panel flotante de edición de detalles del dispositivo. */
+/* @galaxiahfast - Cierra el panel de edición y limpia la selección. */
 export function cerrarPanelEdicion() {
-    const contenedor = document.getElementById('contenedorFlotanteEdicionDispositivo');
-    if (contenedor) {
-        contenedor.classList.add('estado-panel-oculto');
-        contenedor.classList.remove('panel-formulario-activo');
+    const panel = document.getElementById('contenedorFlotanteEdicionDispositivo');
+    if (panel) {
+        panel.classList.add('estado-panel-oculto');
+        panel.classList.remove('panel-formulario-activo');
     }
+    dispositivoSeleccionado = null;
 }
 
 
 
-/* @galaxiahfast - Carga y renderiza los detalles del dispositivo seleccionado en el panel de edición. */
-async function cargarDetallesDispositivo(idDispositivo) {
+/* @galaxiahfast - Maneja el clic en un dispositivo del mapa para abrir el panel de edición. */
+async function manejarClicDispositivo(event) {
+    if (!modoEdicionActivo) return;
+
+    const punto = event.target.closest('.dispositivo-punto');
+    if (!punto) return;
+
+    event.stopPropagation();
+
+    const idDispositivo = parseInt(punto.dataset.id);
+    if (!idDispositivo) return;
+
     dispositivoSeleccionado = idDispositivo;
-
-    const contenedorLista = document.getElementById('listaDetallesEdicion');
-    if (!contenedorLista) return;
-
-    // @galaxiahfast - Muestra estado de carga.
-    contenedorLista.innerHTML = '<p style="text-align:center; padding:20px; color:var(--editar-dispositivo-color-subtitulos);">Cargando...</p>';
 
     try {
         const res = await DetallesAPI.obtener(idDispositivo);
         if (res.estado !== 'exito') throw new Error(res.mensaje);
 
-        contenedorLista.innerHTML = '';
+        renderizarPanelEdicion(idDispositivo, res.detalles);
+    } catch (error) {
+        mostrarNotificacion('No se pudieron cargar los detalles: ' + error.message, 'error');
+    }
+}
 
-        if (!res.detalles || res.detalles.length === 0) {
-            contenedorLista.innerHTML = '<p style="text-align:center; padding:20px; color:var(--editar-dispositivo-color-subtitulos);">Sin apartados configurados.</p>';
-            return;
-        }
 
-        // @galaxiahfast - Renderiza cada detalle como un campo editable.
-        res.detalles.forEach(detalle => {
+
+/* @galaxiahfast - Renderiza el panel de edición con los detalles del dispositivo seleccionado. */
+function renderizarPanelEdicion(idDispositivo, detalles) {
+    const panel = document.getElementById('contenedorFlotanteEdicionDispositivo');
+    const titulo = document.getElementById('tituloEdicionDispositivo');
+    const listaDetalles = document.getElementById('listaDetallesEdicion');
+
+    if (!panel || !listaDetalles) return;
+
+    titulo.textContent = `Editar Dispositivo #${idDispositivo}`;
+    listaDetalles.innerHTML = '';
+
+    if (!detalles || detalles.length === 0) {
+        listaDetalles.innerHTML = '<p class="editar-dispositivo-sin-detalles">Este dispositivo no tiene apartados asignados.</p>';
+    } else {
+        detalles.forEach(detalle => {
             const fila = document.createElement('div');
-            fila.className = 'editar-dispositivo-item-detalle';
+            fila.className = 'editar-dispositivo-fila-detalle';
+
             fila.innerHTML = `
                 <label class="editar-dispositivo-label-detalle">${detalle.nombreApartado}</label>
-                <div class="editar-dispositivo-grupo-input">
-                    <input type="text" class="editar-dispositivo-input-detalle" 
-                           data-id-apartado="${detalle.idApartado}" 
-                           value="${detalle.valorDetalle || ''}" 
-                           placeholder="Sin valor">
-                    <button class="editar-dispositivo-btn-guardar" data-id-apartado="${detalle.idApartado}" title="Guardar">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </button>
-                </div>
+                <input type="text" class="editar-dispositivo-input-detalle" 
+                       data-id-apartado="${detalle.idApartado}" 
+                       value="${detalle.valor || ''}" 
+                       placeholder="${detalle.valorPredeterminado || 'Sin valor'}">
+                <button class="editar-dispositivo-btn-guardar" data-id-apartado="${detalle.idApartado}" title="Guardar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
             `;
-            contenedorLista.appendChild(fila);
+
+            /* @galaxiahfast - Manejador de guardado de detalle individual. */
+            fila.querySelector('.editar-dispositivo-btn-guardar').addEventListener('click', async () => {
+                const input = fila.querySelector('.editar-dispositivo-input-detalle');
+                const nuevoValor = input.value.trim();
+                const idApartado = parseInt(input.dataset.idApartado);
+
+                try {
+                    const res = await DetallesAPI.actualizar(idDispositivo, idApartado, nuevoValor);
+                    if (res.estado !== 'exito') throw new Error(res.mensaje);
+                    mostrarNotificacion('Detalle actualizado correctamente', 'exito');
+                    await sincronizarDispositivos();
+                } catch (error) {
+                    mostrarNotificacion('No se pudo guardar: ' + error.message, 'error');
+                }
+            });
+
+            listaDetalles.appendChild(fila);
         });
-
-    } catch (error) {
-        contenedorLista.innerHTML = `<p style="text-align:center; padding:20px; color:var(--editar-dispositivo-color-subtitulos);">Error: ${error.message}</p>`;
     }
+
+    panel.classList.remove('estado-panel-oculto');
+    panel.classList.add('panel-formulario-activo');
 }
 
 
 
-/* @galaxiahfast - Maneja el clic en un punto de dispositivo para abrir su panel de edición. */
-function manejarClicDispositivo(event) {
-    if (!modoEdicionActivo) return;
+/* @galaxiahfast - Muestra un tooltip con información del dispositivo al hacer hover. */
+function manejarHoverDispositivo(event) {
+    const punto = event.target.closest('.dispositivo-punto');
+    
+    /* @galaxiahfast - Remueve tooltips anteriores al mover el cursor. */
+    document.querySelectorAll('.dispositivo-tooltip').forEach(t => t.remove());
 
-    // @galaxiahfast - Busca el elemento del dispositivo más cercano al clic.
-    const punto = event.target.closest('.punto-dispositivo');
+    if (!punto || !modoEdicionActivo) return;
+
+    const idDispositivo = punto.dataset.id;
+    const tooltip = document.createElement('div');
+    tooltip.className = 'dispositivo-tooltip';
+    tooltip.textContent = `Dispositivo #${idDispositivo} — clic para editar`;
+    punto.appendChild(tooltip);
+}
+
+/* @galaxiahfast - Remueve los tooltips cuando el cursor sale del punto. */
+function manejarMouseOut(event) {
+    const punto = event.target.closest('.dispositivo-punto');
     if (!punto) return;
-
-    event.stopPropagation();
-
-    // @galaxiahfast - Obtiene el identificador del dispositivo desde el atributo data.
-    const idDispositivo = parseInt(punto.dataset.idDispositivo);
-    if (!idDispositivo) return;
-
-    // @galaxiahfast - Actualiza el título del panel con el ID del dispositivo.
-    const titulo = document.getElementById('tituloEdicionDispositivo');
-    if (titulo) titulo.textContent = `Dispositivo #${idDispositivo}`;
-
-    // @galaxiahfast - Carga los detalles y abre el panel.
-    cargarDetallesDispositivo(idDispositivo);
-    abrirPanelEdicion();
-}
-
-
-
-/* @galaxiahfast - Maneja el guardado de un detalle individual al hacer clic en el botón guardar. */
-async function manejarGuardarDetalle(event) {
-    const boton = event.target.closest('.editar-dispositivo-btn-guardar');
-    if (!boton || !dispositivoSeleccionado) return;
-
-    const idApartado = parseInt(boton.dataset.idApartado);
-    const input = boton.parentElement.querySelector('.editar-dispositivo-input-detalle');
-    if (!input) return;
-
-    const valor = input.value.trim();
-
-    try {
-        const res = await DetallesAPI.actualizar(dispositivoSeleccionado, idApartado, valor);
-        if (res.estado !== 'exito') throw new Error(res.mensaje);
-
-        // @galaxiahfast - Feedback visual de éxito.
-        boton.style.color = 'var(--editar-dispositivo-color-exito)';
-        setTimeout(() => { boton.style.color = ''; }, 1000);
-
-        // @galaxiahfast - Resincroniza los dispositivos para reflejar el cambio.
-        await sincronizarDispositivos();
-
-    } catch (error) {
-        alert('Error al guardar: ' + error.message);
-    }
+    const tooltip = punto.querySelector('.dispositivo-tooltip');
+    if (tooltip) tooltip.remove();
 }
 
 
 
 /* @galaxiahfast - Inicialización del módulo de edición de dispositivos. */
 export function inicializarModuloEdicion() {
-    const capaDispositivos = document.getElementById('capaDispositivos');
-    if (capaDispositivos) {
-        capaDispositivos.addEventListener('click', manejarClicDispositivo);
-    }
-
-    // @galaxiahfast - Delegación de eventos para los botones de guardar dentro del panel.
-    const panelEdicion = document.getElementById('contenedorFlotanteEdicionDispositivo');
-    if (panelEdicion) {
-        panelEdicion.addEventListener('click', manejarGuardarDetalle);
+    const mapa = document.getElementById('contenedorMapa');
+    if (mapa) {
+        mapa.addEventListener('click', manejarClicDispositivo);
+        mapa.addEventListener('mouseover', manejarHoverDispositivo);
+        mapa.addEventListener('mouseout', manejarMouseOut);
     }
 }

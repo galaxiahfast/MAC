@@ -230,4 +230,6 @@ function limpiarTodasLasNotificaciones() {
     esPrimeraDelLote = true;
 }
 
+/* @galaxiahfast - Exportación de la API pública para uso en otros módulos ES. */
+export { mostrarNotificacion, limpiarTodasLasNotificaciones, TIPOS_NOTIFICACION };
 

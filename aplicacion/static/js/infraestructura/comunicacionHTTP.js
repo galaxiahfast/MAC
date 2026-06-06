@@ -23,6 +23,10 @@ export const ApartadosAPI = {
     // @galaxiahfast - Creación de un nuevo apartado global con nombre y valor predeterminado.
     crear: (payload) => post('/api/apartados/crear', payload),
 
+    // @galaxiahfast - Modificación de un apartado global existente con propagación a dispositivos.
+    editar: (idApartado, nombreApartado, valorPredeterminado) =>
+        post('/api/apartados/editar', { idApartado, nombreApartado, valorPredeterminado }),
+
     // @galaxiahfast - Baja lógica de un apartado global, moviéndolo a papelera.
     eliminar: (nombreApartado) =>
         post('/api/apartados/eliminar', { nombreApartado }),

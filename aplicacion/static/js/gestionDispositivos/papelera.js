@@ -1,201 +1,183 @@
-/* @galaxiahfast - Módulo encargado de gestionar la papelera de elementos eliminados (dispositivos y apartados). */
-import { PapeleraAPI, DispositivosAPI, ApartadosAPI } from '../infraestructura/comunicacionHTTP.js';
-import { sincronizarDispositivos } from '../infraestructura/sincronizarDispositivos.js';
+/* @galaxiahfast - Módulo encargado de gestionar la papelera de reciclaje del sistema (restaurar, purgar). */
+import { PapeleraAPI, ApartadosAPI, DispositivosAPI } from '../infraestructura/comunicacionHTTP.js';
 import { sincronizarApartados } from '../infraestructura/sincronizarApartados.js';
+import { sincronizarDispositivos } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
-   @galaxiahfast - LÓGICA DE RENDERIZADO DE LA PAPELERA
+   @galaxiahfast - LÓGICA DEL PANEL DE PAPELERA
    ========================================================================== */
 
 
 
-/* @galaxiahfast - Carga y renderiza los elementos eliminados en el panel de la papelera. */
-async function cargarElementosPapelera() {
-    const contenedorDispositivos = document.getElementById('listaPapeleraDispositivos');
-    const contenedorApartados = document.getElementById('listaPapeleraApartados');
-
-    if (!contenedorDispositivos || !contenedorApartados) return;
-
-    // @galaxiahfast - Muestra estado de carga.
-    contenedorDispositivos.innerHTML = '<p class="papelera-mensaje-vacio">Cargando...</p>';
-    contenedorApartados.innerHTML = '<p class="papelera-mensaje-vacio">Cargando...</p>';
-
-    try {
-        const res = await PapeleraAPI.listar();
-        if (res.estado !== 'exito') throw new Error(res.mensaje);
-
-        // @galaxiahfast - Renderiza dispositivos eliminados.
-        renderizarDispositivosEliminados(contenedorDispositivos, res.dispositivos || []);
-
-        // @galaxiahfast - Renderiza apartados eliminados.
-        renderizarApartadosEliminados(contenedorApartados, res.apartados || []);
-
-    } catch (error) {
-        contenedorDispositivos.innerHTML = `<p class="papelera-mensaje-vacio">Error: ${error.message}</p>`;
-        contenedorApartados.innerHTML = '';
-    }
-}
-
-
-
-/* @galaxiahfast - Renderiza la lista de dispositivos eliminados con botones de restaurar y eliminar definitivo. */
-function renderizarDispositivosEliminados(contenedor, dispositivos) {
-    contenedor.innerHTML = '';
-
-    if (dispositivos.length === 0) {
-        contenedor.innerHTML = '<p class="papelera-mensaje-vacio">Sin dispositivos eliminados.</p>';
-        return;
-    }
-
-    dispositivos.forEach(dispositivo => {
-        const fila = document.createElement('div');
-        fila.className = 'papelera-item-fila';
-        fila.innerHTML = `
-            <div class="papelera-info-bloque">
-                <div class="papelera-icono-tipo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
-                </div>
-                <div class="papelera-detalles-texto">
-                    <span class="papelera-nombre-texto">Dispositivo #${dispositivo.id}</span>
-                    <span class="papelera-fecha-texto">${formatearFecha(dispositivo.fechaEliminacion)}</span>
-                </div>
-            </div>
-            <div class="papelera-grupo-botones">
-                <button class="papelera-btn-accion btn-restaurar-dispositivo" data-id="${dispositivo.id}" title="Restaurar">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                </button>
-                <button class="papelera-btn-accion btn-eliminar-definitivo-dispositivo" data-id="${dispositivo.id}" title="Eliminar definitivamente">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-        `;
-        contenedor.appendChild(fila);
-    });
-}
-
-
-
-/* @galaxiahfast - Renderiza la lista de apartados eliminados con botones de restaurar y eliminar definitivo. */
-function renderizarApartadosEliminados(contenedor, apartados) {
-    contenedor.innerHTML = '';
-
-    if (apartados.length === 0) {
-        contenedor.innerHTML = '<p class="papelera-mensaje-vacio">Sin apartados eliminados.</p>';
-        return;
-    }
-
-    apartados.forEach(apartado => {
-        const fila = document.createElement('div');
-        fila.className = 'papelera-item-fila';
-        fila.innerHTML = `
-            <div class="papelera-info-bloque">
-                <div class="papelera-icono-tipo">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                </div>
-                <div class="papelera-detalles-texto">
-                    <span class="papelera-nombre-texto">${apartado.nombreApartado}</span>
-                    <span class="papelera-fecha-texto">${formatearFecha(apartado.fechaEliminacion)}</span>
-                </div>
-            </div>
-            <div class="papelera-grupo-botones">
-                <button class="papelera-btn-accion btn-restaurar-apartado" data-nombre="${apartado.nombreApartado}" title="Restaurar">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-                </button>
-                <button class="papelera-btn-accion btn-eliminar-definitivo-apartado" data-nombre="${apartado.nombreApartado}" title="Eliminar definitivamente">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-        `;
-        contenedor.appendChild(fila);
-    });
-}
-
-
-
-/* @galaxiahfast - Formatea una fecha ISO a un formato legible en español. */
-function formatearFecha(fechaISO) {
-    if (!fechaISO) return 'Sin fecha';
-    const fecha = new Date(fechaISO);
-    const formato = new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit', month: 'short', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', hour12: true
-    }).formatToParts(fecha);
-    const p = {};
-    formato.forEach(({ type, value }) => { p[type] = value; });
-    const mes = p.month.charAt(0).toUpperCase() + p.month.slice(1).replace('.', '');
-    return `${p.day}, ${mes}. ${p.year} ${p.hour}:${p.minute} ${p.dayPeriod.toUpperCase()}`;
-}
-
-
-
-/* ==========================================================================
-   @galaxiahfast - CONTROLADORES DE ACCIONES
-   ========================================================================== */
-
-
-
-/* @galaxiahfast - Maneja los clics en los botones de acción de la papelera. */
-async function manejarAccionPapelera(event) {
-    const botonRestaurarDispositivo = event.target.closest('.btn-restaurar-dispositivo');
-    const botonEliminarDispositivo = event.target.closest('.btn-eliminar-definitivo-dispositivo');
-    const botonRestaurarApartado = event.target.closest('.btn-restaurar-apartado');
-    const botonEliminarApartado = event.target.closest('.btn-eliminar-definitivo-apartado');
-
-    try {
-        if (botonRestaurarDispositivo) {
-            const id = parseInt(botonRestaurarDispositivo.dataset.id);
-            const res = await DispositivosAPI.restaurar(id);
-            if (res.estado !== 'exito') throw new Error(res.mensaje);
-            await sincronizarDispositivos();
-            await cargarElementosPapelera();
-        }
-
-        if (botonEliminarDispositivo) {
-            const id = parseInt(botonEliminarDispositivo.dataset.id);
-            const res = await DispositivosAPI.eliminarDefinitivo(id);
-            if (res.estado !== 'exito') throw new Error(res.mensaje);
-            await cargarElementosPapelera();
-        }
-
-        if (botonRestaurarApartado) {
-            const nombre = botonRestaurarApartado.dataset.nombre;
-            const res = await ApartadosAPI.restaurar(nombre);
-            if (res.estado !== 'exito') throw new Error(res.mensaje);
-            await sincronizarApartados();
-            await cargarElementosPapelera();
-        }
-
-        if (botonEliminarApartado) {
-            const nombre = botonEliminarApartado.dataset.nombre;
-            const res = await ApartadosAPI.eliminarDefinitivo(nombre);
-            if (res.estado !== 'exito') throw new Error(res.mensaje);
-            await cargarElementosPapelera();
-        }
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
-}
-
-
-
-/* @galaxiahfast - Abre el panel de la papelera y carga los elementos. */
+/* @galaxiahfast - Abre el panel de papelera y carga los elementos eliminados. */
 export function abrirPanelPapelera() {
-    const contenedor = document.getElementById('contenedorFlotantePapelera');
-    if (contenedor) {
-        contenedor.classList.remove('estado-panel-oculto');
-        contenedor.classList.add('panel-formulario-activo');
+    const panel = document.getElementById('contenedorFlotantePapelera');
+    if (panel) {
+        panel.classList.remove('estado-panel-oculto');
+        panel.classList.add('panel-formulario-activo');
         cargarElementosPapelera();
     }
 }
 
 
 
-/* @galaxiahfast - Cierra el panel de la papelera. */
+/* @galaxiahfast - Cierra el panel de papelera. */
 export function cerrarPanelPapelera() {
-    const contenedor = document.getElementById('contenedorFlotantePapelera');
-    if (contenedor) {
-        contenedor.classList.add('estado-panel-oculto');
-        contenedor.classList.remove('panel-formulario-activo');
+    const panel = document.getElementById('contenedorFlotantePapelera');
+    if (panel) {
+        panel.classList.add('estado-panel-oculto');
+        panel.classList.remove('panel-formulario-activo');
+    }
+}
+
+
+
+/* @galaxiahfast - Carga y renderiza los elementos eliminados desde el servidor. */
+async function cargarElementosPapelera() {
+    try {
+        const res = await PapeleraAPI.listar();
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+
+        renderizarListaPapelera(res.dispositivos || [], res.apartados || []);
+    } catch (error) {
+        mostrarNotificacion('No se pudo cargar la papelera: ' + error.message, 'error');
+    }
+}
+
+
+
+/* @galaxiahfast - Renderiza las listas de dispositivos y apartados eliminados en el panel. */
+function renderizarListaPapelera(dispositivos, apartados) {
+    const listaDispositivos = document.getElementById('listaPapeleraDispositivos');
+    const listaApartados = document.getElementById('listaPapeleraApartados');
+
+    if (listaDispositivos) {
+        listaDispositivos.innerHTML = '';
+        if (dispositivos.length === 0) {
+            listaDispositivos.innerHTML = '<p class="papelera-lista-vacia">No hay dispositivos eliminados.</p>';
+        } else {
+            dispositivos.forEach(d => {
+                const fila = crearFilaPapelera(
+                    `Dispositivo #${d.id}`,
+                    d.fechaEliminacion,
+                    () => restaurarDispositivo(d.id),
+                    () => purgarDispositivo(d.id)
+                );
+                listaDispositivos.appendChild(fila);
+            });
+        }
+    }
+
+    if (listaApartados) {
+        listaApartados.innerHTML = '';
+        if (apartados.length === 0) {
+            listaApartados.innerHTML = '<p class="papelera-lista-vacia">No hay apartados eliminados.</p>';
+        } else {
+            apartados.forEach(a => {
+                const fila = crearFilaPapelera(
+                    a.nombreApartado,
+                    a.fechaEliminacion,
+                    () => restaurarApartado(a.nombreApartado),
+                    () => purgarApartado(a.nombreApartado)
+                );
+                listaApartados.appendChild(fila);
+            });
+        }
+    }
+}
+
+
+
+/* @galaxiahfast - Crea una fila de elemento de papelera con botones de restaurar y purgar. */
+function crearFilaPapelera(nombre, fecha, onRestaurar, onPurgar) {
+    const fila = document.createElement('div');
+    fila.className = 'papelera-item-fila';
+
+    const fechaFormateada = fecha ? new Date(fecha).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+
+    fila.innerHTML = `
+        <div class="papelera-item-info">
+            <span class="papelera-item-nombre">${nombre}</span>
+            <span class="papelera-item-fecha">${fechaFormateada}</span>
+        </div>
+        <div class="papelera-item-acciones">
+            <button class="papelera-btn-restaurar" title="Restaurar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+            </button>
+            <button class="papelera-btn-purgar" title="Eliminar definitivamente">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+        </div>
+    `;
+
+    fila.querySelector('.papelera-btn-restaurar').addEventListener('click', onRestaurar);
+
+    /* @galaxiahfast - Confirmación de seguridad antes de purgar definitivamente. */
+    fila.querySelector('.papelera-btn-purgar').addEventListener('click', () => {
+        if (confirm(`¿Eliminar "${nombre}" definitivamente? Esta acción no se puede deshacer.`)) {
+            onPurgar();
+        }
+    });
+
+    return fila;
+}
+
+
+
+/* @galaxiahfast - Restaura un dispositivo desde la papelera. */
+async function restaurarDispositivo(idDispositivo) {
+    try {
+        const res = await DispositivosAPI.restaurar(idDispositivo);
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Dispositivo restaurado correctamente', 'exito');
+        await sincronizarDispositivos();
+        await cargarElementosPapelera();
+    } catch (error) {
+        mostrarNotificacion('No se pudo restaurar: ' + error.message, 'error');
+    }
+}
+
+
+
+/* @galaxiahfast - Purga definitivamente un dispositivo. */
+async function purgarDispositivo(idDispositivo) {
+    try {
+        const res = await DispositivosAPI.eliminarDefinitivo(idDispositivo);
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Dispositivo eliminado definitivamente', 'exito');
+        await cargarElementosPapelera();
+    } catch (error) {
+        mostrarNotificacion('No se pudo eliminar: ' + error.message, 'error');
+    }
+}
+
+
+
+/* @galaxiahfast - Restaura un apartado desde la papelera. */
+async function restaurarApartado(nombreApartado) {
+    try {
+        const res = await ApartadosAPI.restaurar(nombreApartado);
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Apartado restaurado correctamente', 'exito');
+        await sincronizarApartados();
+        await cargarElementosPapelera();
+    } catch (error) {
+        mostrarNotificacion('No se pudo restaurar: ' + error.message, 'error');
+    }
+}
+
+
+
+/* @galaxiahfast - Purga definitivamente un apartado. */
+async function purgarApartado(nombreApartado) {
+    try {
+        const res = await ApartadosAPI.eliminarDefinitivo(nombreApartado);
+        if (res.estado !== 'exito') throw new Error(res.mensaje);
+        mostrarNotificacion('Apartado eliminado definitivamente', 'exito');
+        await cargarElementosPapelera();
+    } catch (error) {
+        mostrarNotificacion('No se pudo eliminar: ' + error.message, 'error');
     }
 }
 
@@ -203,8 +185,5 @@ export function cerrarPanelPapelera() {
 
 /* @galaxiahfast - Inicialización del módulo de papelera. */
 export function inicializarModuloPapelera() {
-    const panelPapelera = document.getElementById('contenedorFlotantePapelera');
-    if (panelPapelera) {
-        panelPapelera.addEventListener('click', manejarAccionPapelera);
-    }
+    /* @galaxiahfast - No se requiere inicialización adicional; la carga se ejecuta al abrir el panel. */
 }

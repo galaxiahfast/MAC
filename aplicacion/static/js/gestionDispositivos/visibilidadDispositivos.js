@@ -1,75 +1,91 @@
-/* @galaxiahfast - Módulo encargado de gestionar la visibilidad de dispositivos ocultos en el mapa. */
+/* @galaxiahfast - Módulo encargado de gestionar la visibilidad de dispositivos en el mapa y su renderizado reactivo. */
 import { getDispositivos, suscribirseDispositivos } from '../infraestructura/memoriaCacheDispositivos.js';
 import { ocultarDispositivoEnMapa } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
-   @galaxiahfast - ESTADO DEL MODO DE VISIBILIDAD
+   @galaxiahfast - ESTADO DE VISIBILIDAD
    ========================================================================== */
 
 let mostrandoTodos = false;
 
 
 
-/* @galaxiahfast - Alterna la visualización de todos los dispositivos incluyendo los ocultos. */
+/* @galaxiahfast - Alterna el estado global de visibilidad de dispositivos ocultos. */
 export function alternarVisibilidadTodos() {
     mostrandoTodos = !mostrandoTodos;
-    renderizarDispositivos();
+
+    if (mostrandoTodos) {
+        mostrarNotificacion('Mostrando todos los dispositivos (incluyendo ocultos)', 'advertencia');
+    }
+
+    renderizarDispositivosEnMapa();
 }
 
 
 
-/* @galaxiahfast - Retorna si se están mostrando todos los dispositivos (incluyendo ocultos). */
-export function estaMostrandoTodos() {
-    return mostrandoTodos;
-}
+/* @galaxiahfast - Renderiza los dispositivos como puntos SVG en la capa del mapa según su estado. */
+function renderizarDispositivosEnMapa() {
+    const capa = document.getElementById('capaDispositivos');
+    if (!capa) return;
 
-
-
-/* @galaxiahfast - Oculta o muestra un dispositivo individual al hacer clic en su punto. */
-export function toggleVisibilidadIndividual(idDispositivo) {
-    ocultarDispositivoEnMapa(idDispositivo);
-}
-
-
-
-/* @galaxiahfast - Renderiza los puntos de dispositivos en la capa del mapa respetando la visibilidad. */
-export function renderizarDispositivos() {
-    const capaDispositivos = document.getElementById('capaDispositivos');
-    if (!capaDispositivos) return;
+    capa.innerHTML = '';
 
     const dispositivos = getDispositivos();
-    capaDispositivos.innerHTML = '';
 
     dispositivos.forEach(dispositivo => {
-        // @galaxiahfast - Si no se muestran todos, oculta los dispositivos no visibles.
+        /* @galaxiahfast - Filtra dispositivos ocultos si no se está mostrando todo. */
         if (!mostrandoTodos && !dispositivo.estadoVisible) return;
 
         const punto = document.createElement('div');
-        punto.className = 'punto-dispositivo';
-        punto.dataset.idDispositivo = dispositivo.id;
-
-        // @galaxiahfast - Posiciona el punto según las coordenadas almacenadas.
+        punto.className = 'dispositivo-punto';
+        punto.dataset.id = dispositivo.id;
         punto.style.left = dispositivo.posicionX;
         punto.style.top = dispositivo.posicionY;
+        punto.style.position = 'absolute';
 
-        // @galaxiahfast - Añade clase visual para dispositivos ocultos cuando se muestran todos.
+        /* @galaxiahfast - Estilo semitransparente para dispositivos ocultos cuando se muestran todos. */
         if (!dispositivo.estadoVisible) {
-            punto.classList.add('punto-dispositivo-oculto');
+            punto.classList.add('dispositivo-oculto');
         }
 
-        // @galaxiahfast - Añade indicador visual con el ID del dispositivo.
-        punto.title = `Dispositivo #${dispositivo.id}`;
+        /* @galaxiahfast - Icono SVG del punto del dispositivo. */
+        punto.innerHTML = `
+            <svg class="dispositivo-punto-svg" width="20" height="20" viewBox="0 0 24 24" fill="var(--dispositivo-punto-color, #4a90d9)" stroke="var(--dispositivo-punto-borde, #2c5f8a)" stroke-width="2">
+                <circle cx="12" cy="12" r="8"></circle>
+            </svg>
+        `;
 
-        capaDispositivos.appendChild(punto);
+        /* @galaxiahfast - Tooltip con información básica del dispositivo al hacer hover. */
+        punto.addEventListener('mouseenter', () => {
+            let tooltip = punto.querySelector('.dispositivo-tooltip-info');
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.className = 'dispositivo-tooltip-info';
+                const detallesTexto = (dispositivo.detalles || []).slice(0, 3).map(d => `${d.nombreApartado}: ${d.valor || d.valorPredeterminado || '—'}`).join('\n');
+                tooltip.textContent = `#${dispositivo.id}${detallesTexto ? '\n' + detallesTexto : ''}`;
+                punto.appendChild(tooltip);
+            }
+        });
+
+        punto.addEventListener('mouseleave', () => {
+            const tooltip = punto.querySelector('.dispositivo-tooltip-info');
+            if (tooltip) tooltip.remove();
+        });
+
+        capa.appendChild(punto);
     });
 }
 
 
 
-/* @galaxiahfast - Inicialización del módulo de visibilidad y renderizado de dispositivos. */
+/* @galaxiahfast - Inicialización del módulo de visibilidad de dispositivos. */
 export function inicializarModuloVisibilidad() {
-    // @galaxiahfast - Se suscribe a los cambios de dispositivos para re-renderizar automáticamente.
+    /* @galaxiahfast - Suscripción reactiva: re-renderiza el mapa cada vez que cambian los dispositivos en la caché. */
     suscribirseDispositivos(() => {
-        renderizarDispositivos();
+        renderizarDispositivosEnMapa();
     });
+
+    /* @galaxiahfast - Renderiza una vez cuando los datos están listos. */
+    window.addEventListener('app:datos-listos', renderizarDispositivosEnMapa);
 }

@@ -1,5 +1,6 @@
-/* @galaxiahfast - Módulo encargado de gestionar la lógica de eliminación de dispositivos mediante clic en el mapa. */
+/* @galaxiahfast - Módulo encargado de gestionar la eliminación interactiva de dispositivos en el mapa. */
 import { eliminarDispositivoDelMapa } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - ESTADO DEL MODO DE ELIMINACIÓN
@@ -14,6 +15,18 @@ export function activarModoEliminacion() {
     modoEliminacionActivo = true;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.add('modo-eliminacion-activo');
+
+    /* @galaxiahfast - Añade iconos de X a todos los dispositivos del mapa. */
+    document.querySelectorAll('.dispositivo-punto').forEach(punto => {
+        if (!punto.querySelector('.dispositivo-icono-eliminar')) {
+            const iconoX = document.createElement('div');
+            iconoX.className = 'dispositivo-icono-eliminar';
+            iconoX.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            punto.appendChild(iconoX);
+        }
+    });
+
+    mostrarNotificacion('Haz clic en un dispositivo para eliminarlo', 'advertencia');
 }
 
 
@@ -23,6 +36,9 @@ export function desactivarModoEliminacion() {
     modoEliminacionActivo = false;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.remove('modo-eliminacion-activo');
+
+    /* @galaxiahfast - Remueve todos los iconos de X de los dispositivos. */
+    document.querySelectorAll('.dispositivo-icono-eliminar').forEach(icono => icono.remove());
 }
 
 
@@ -34,30 +50,30 @@ export function esModoEliminacionActivo() {
 
 
 
-/* @galaxiahfast - Maneja el clic en un punto de dispositivo para eliminarlo del mapa. */
+/* @galaxiahfast - Maneja el clic en un dispositivo del mapa para eliminarlo con confirmación. */
 function manejarClicDispositivo(event) {
     if (!modoEliminacionActivo) return;
 
-    // @galaxiahfast - Busca el elemento del dispositivo más cercano al clic.
-    const punto = event.target.closest('.punto-dispositivo');
+    const punto = event.target.closest('.dispositivo-punto');
     if (!punto) return;
 
     event.stopPropagation();
 
-    // @galaxiahfast - Obtiene el identificador del dispositivo desde el atributo data.
-    const idDispositivo = parseInt(punto.dataset.idDispositivo);
+    const idDispositivo = parseInt(punto.dataset.id);
     if (!idDispositivo) return;
 
-    // @galaxiahfast - Ejecuta la eliminación lógica del dispositivo.
-    eliminarDispositivoDelMapa(idDispositivo);
+    /* @galaxiahfast - Confirmación de seguridad antes de ejecutar la eliminación. */
+    if (confirm('¿Eliminar este dispositivo? Se moverá a la papelera.')) {
+        eliminarDispositivoDelMapa(idDispositivo);
+    }
 }
 
 
 
 /* @galaxiahfast - Inicialización del módulo de eliminación de dispositivos. */
 export function inicializarModuloEliminacion() {
-    const capaDispositivos = document.getElementById('capaDispositivos');
-    if (capaDispositivos) {
-        capaDispositivos.addEventListener('click', manejarClicDispositivo);
+    const mapa = document.getElementById('contenedorMapa');
+    if (mapa) {
+        mapa.addEventListener('click', manejarClicDispositivo);
     }
 }

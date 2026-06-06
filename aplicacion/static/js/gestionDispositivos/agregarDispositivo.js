@@ -1,5 +1,6 @@
 /* @galaxiahfast - Módulo encargado de gestionar la lógica de creación de nuevos dispositivos en el mapa mediante clic. */
 import { crearDispositivoEnMapa } from '../infraestructura/sincronizarDispositivos.js';
+import { mostrarNotificacion } from '../otros/sistemaNotificaciones.js';
 
 /* ==========================================================================
    @galaxiahfast - ESTADO DEL MODO DE COLOCACIÓN
@@ -14,6 +15,7 @@ export function activarModoColocacion() {
     modoColocacionActivo = true;
     const mapa = document.getElementById('contenedorMapa');
     if (mapa) mapa.classList.add('modo-colocacion-activo');
+    mostrarNotificacion('Haz clic en el mapa para colocar un dispositivo', 'advertencia');
 }
 
 
